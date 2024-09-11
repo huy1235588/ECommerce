@@ -9,6 +9,10 @@ import AdminOrders from './pages/admin/orders'
 import AdminProducts from './pages/admin/products'
 import ShoppingLayout from './components/shopping/layout'
 import NotFound from './pages/not-found'
+import ShoppingAccount from './pages/shopping/account'
+import ShoppingCheckout from './pages/shopping/checkout'
+import ShoppingHome from './pages/shopping/home'
+import ShoppingListing from './pages/shopping/listing'
 
 function App(): JSX.Element {
     return (
@@ -16,23 +20,28 @@ function App(): JSX.Element {
             <Routes>
                 {/* Auth */}
                 <Route path='/auth' element={<AuthLayout />}>
-                    <Route path='login' element={<AuthLogin />}></Route>
-                    <Route path='register' element={<AuthRegister />}></Route>
+                    <Route path='login' element={<AuthLogin />} />
+                    <Route path='register' element={<AuthRegister />} />
                 </Route>
 
                 {/* Admin */}
                 <Route path='/admin' element={<AdminLayout />}>
-                    <Route path='dashboard' element={<AdminDashboard />}></Route>
-                    <Route path='features' element={<AdminFeatures />}></Route>
-                    <Route path='orders' element={<AdminOrders />}></Route>
-                    <Route path='products' element={<AdminProducts />}></Route>
+                    <Route path='dashboard' element={<AdminDashboard />} />
+                    <Route path='features' element={<AdminFeatures />} />
+                    <Route path='orders' element={<AdminOrders />} />
+                    <Route path='products' element={<AdminProducts />} />
                 </Route>
 
                 {/* Shopping */}
-                <Route path='/shop' element={<ShoppingLayout />}></Route>
+                <Route path='/shop' element={<ShoppingLayout />}>
+                    <Route path='account' element={<ShoppingAccount />} />
+                    <Route path='checkout' element={<ShoppingCheckout />} />
+                    <Route path='home' element={<ShoppingHome />} />
+                    <Route path='listing' element={<ShoppingListing />} />
+                </Route>
 
                 {/* Not found page */}
-                <Route path='*' element={<NotFound />}></Route>
+                <Route path='*' element={<NotFound />} />
 
             </Routes>
         </div>
