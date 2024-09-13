@@ -16,7 +16,7 @@ import ShoppingListing from './pages/shopping/listing'
 
 function App(): JSX.Element {
     return (
-        <div className="flex flex-col overflow-hidden bg-white">
+        <div className="flex flex-col overflow-hidden dark">
             <Routes>
                 {/* Auth */}
                 <Route path='/auth' element={<AuthLayout />}>
