@@ -7,7 +7,7 @@ function AuthLayout() {
                 <Outlet />
             </div>
             <aside className="flex-1 hidden lg:flex items-center justify-center bg-black w-1/2 px-12">
-                <div className="max-w-md space-y-6 text-center text-primary-foreground">
+                <div className="max-w-md space-y-6 text-center text-orange-50">
                     <h1 className="text-4xl font-extrabold tracking-tight">
                         Welcome
                     </h1>

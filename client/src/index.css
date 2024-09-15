@@ -144,6 +144,7 @@ button:focus-visible {
   height: 100vh;
   /* background-color: #242424; */
   background-color: #1b2838;
+  color: #fff;
 }
 
 header{

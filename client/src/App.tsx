@@ -13,19 +13,41 @@ import ShoppingAccount from './pages/shopping/account'
 import ShoppingCheckout from './pages/shopping/checkout'
 import ShoppingHome from './pages/shopping/home'
 import ShoppingListing from './pages/shopping/listing'
+import CheckAuth from './components/common/checkAuth'
 
 function App(): JSX.Element {
+    const isAuthenticated = true;
+    const user = {
+        name: "ha",
+        role: "user",
+    };
+
     return (
         <div className="flex flex-col overflow-hidden dark">
             <Routes>
                 {/* Auth */}
-                <Route path='/auth' element={<AuthLayout />}>
+                <Route path='/auth' element={
+                    //
+                    <CheckAuth
+                        isAuthenticated={isAuthenticated}
+                        user={user}
+                    >
+                        <AuthLayout />
+                    </CheckAuth>
+                }>
                     <Route path='login' element={<AuthLogin />} />
                     <Route path='register' element={<AuthRegister />} />
                 </Route>
 
                 {/* Admin */}
-                <Route path='/admin' element={<AdminLayout />}>
+                <Route path='/admin' element={
+                    <CheckAuth
+                        isAuthenticated={isAuthenticated}
+                        user={user}
+                    >
+                        <AdminLayout />
+                    </CheckAuth>
+                }>
                     <Route path='dashboard' element={<AdminDashboard />} />
                     <Route path='features' element={<AdminFeatures />} />
                     <Route path='orders' element={<AdminOrders />} />
@@ -33,7 +55,14 @@ function App(): JSX.Element {
                 </Route>
 
                 {/* Shopping */}
-                <Route path='/shop' element={<ShoppingLayout />}>
+                <Route path='/shop' element={
+                    <CheckAuth
+                        isAuthenticated={isAuthenticated}
+                        user={user}
+                    >
+                        <ShoppingLayout />
+                    </CheckAuth>
+                }>
                     <Route path='account' element={<ShoppingAccount />} />
                     <Route path='checkout' element={<ShoppingCheckout />} />
                     <Route path='home' element={<ShoppingHome />} />
@@ -44,7 +73,7 @@ function App(): JSX.Element {
                 <Route path='*' element={<NotFound />} />
 
             </Routes>
-        </div>
+        </div >
     );
 }
 
