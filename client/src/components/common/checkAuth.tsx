@@ -3,12 +3,12 @@ import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 interface CheckAuthProps {
-    isAuthenticated: boolean,
+    isAuthenticated: boolean;
     user: {
         name: string,
         role?: string
-    } | null,
-    children: React.ReactNode,
+    } | null;
+    children: React.ReactNode;
 }
 
 const CheckAuth: React.FC<CheckAuthProps> = ({
@@ -43,7 +43,8 @@ const CheckAuth: React.FC<CheckAuthProps> = ({
         user?.role !== 'admin' &&
         location.pathname.includes('admin')
     ) {
-        return <Navigate to="/unauth-page" />
+        return <NotFound />
+        // return <Navigate to="/unauth-page" />
     }
 
     // Ngăn admin truy cập vào trang shopping

@@ -14,13 +14,11 @@ import ShoppingCheckout from './pages/shopping/checkout'
 import ShoppingHome from './pages/shopping/home'
 import ShoppingListing from './pages/shopping/listing'
 import CheckAuth from './components/common/checkAuth'
+import UnAuthPage from './pages/unauth-page'
 
 function App(): JSX.Element {
-    const isAuthenticated = true;
-    const user = {
-        name: "ha",
-        role: "user",
-    };
+    const isAuthenticated = false;
+    const user = null;
 
     return (
         <div className="flex flex-col overflow-hidden dark">
@@ -71,7 +69,7 @@ function App(): JSX.Element {
 
                 {/* Not found page */}
                 <Route path='*' element={<NotFound />} />
-
+                <Route path='/unauth-page' element={< UnAuthPage />} />
             </Routes>
         </div >
     );
