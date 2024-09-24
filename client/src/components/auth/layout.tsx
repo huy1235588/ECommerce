@@ -9,10 +9,10 @@ function AuthLayout() {
 
     return (
         <main className="relative flex min-h-screen w-full">
-            <div className="flex items-center justify-center bg-neutral-900 text-white w-2/5 px-4 py-12 sm:px-6 lg:px-8 z-10">
+            <div className="flex items-center justify-center bg-neutral-900 text-white sm:w-2/5 px-4 py-12 sm:px-6 lg:px-8 z-10">
                 <Outlet />
             </div>
-            <aside className="flex-1 hidden lg:flex items-center justify-center bg-background w-1/2 px-12 no-select">
+            <aside className="lg:flex flex-1 items-center justify-center bg-background px-12 no-select">
                 <h1 className="text-4xl font-extrabold tracking-tight z-10">
                     Welcome to Ha
                 </h1>

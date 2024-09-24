@@ -3,18 +3,24 @@ import { loginFormControls } from "@/config";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-const initialState = {
-    useName: '',
-    email: '',
-    password: '',
+interface FormData {
+    userName: string;
+    email: string;
+    password: string;
 }
+
+const initialState: FormData = {
+    userName: "",
+    email: "",
+    password: "",
+};
 
 function AuthLogin() {
 
     const [formData, setFormData] = useState(initialState);
 
     function onSubmit() {
-        console.log(formData)
+        console.log("j")
     }
 
     return (
