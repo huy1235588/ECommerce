@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import AuthLayout from './components/auth/layout'
 import AuthLogin from './pages/auth/login'
 import AuthRegister from './pages/auth/register'
@@ -70,6 +70,7 @@ function App(): JSX.Element {
                 {/* Not found page */}
                 <Route path='*' element={<NotFound />} />
                 <Route path='/unauth-page' element={< UnAuthPage />} />
+                <Route path='/' element={<Navigate to='/shop/home' />} />
             </Routes>
         </div >
     );
