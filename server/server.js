@@ -2,6 +2,10 @@ const express = require('express');
 const connectDB = require('./src/config/db');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const dotnet = require('dotenv');
+const authRoute = require('./src/routers/authRoute');
+
+dotnet.config();
 
 const app = express();
 
@@ -25,10 +29,12 @@ app.use(cors({
     credentials: true, // Cho phép gửi thông tin xác thực như cookie, token... 
 }))
 
-app.use(cookieParser()); // Phân tích các cookie trong yêu cầu HTTP
-app.use(express.json()); // Phân tích dữ liệu JSON trong body ủa yêu cầu HTTP
+app.use(cookieParser()); // Phân tích các cookie trong yêu cầu HTTP (req.cookies)
+app.use(express.json()); // Phân tích dữ liệu JSON trong body của yêu cầu HTTP (req.body)
 
-const PORT = process.env.PORT || 3001; // Cổng
+app.use('/api/auth', authRoute);
+
+const PORT = process.env.PORT || 3002; // Cổng
 
 app.listen(PORT, () => {
     console.log(`Server is running on localhost:${PORT}`);
