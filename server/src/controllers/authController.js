@@ -5,11 +5,18 @@ const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 const { sendEmailVerification, sendEmailWelcome, sendEmailResetPassword, sendEmailResetSuccess } = require('../mail/email');
 
 const signup = async (req, res) => {
-    const { email, password, name } = req.body;
+    const { email, password, country, firstName, lastName, userName } = req.body;
 
     try {
         // Kiểm tra có giá trị hay không
-        if (!email || !password || !name) {
+        if (
+            !email ||
+            !country ||
+            !firstName ||
+            !lastName ||
+            !userName ||
+            !password
+        ) {
             throw new Error("All field are required");
         }
 
@@ -26,8 +33,11 @@ const signup = async (req, res) => {
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
         const user = new User({
             email,
+            country,
+            firstName,
+            lastName,
+            userName,
             password: hashedPassword,
-            name,
             verificationToken,
             verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24h   
         });
@@ -37,7 +47,7 @@ const signup = async (req, res) => {
         generateTokenAndSetCookie(res, user.id);
 
         // Gửi email xác minh
-        await sendEmailVerification(user.name, user.email, verificationToken);
+        await sendEmailVerification(user.userName, user.email, verificationToken);
 
         res.status(201).json({
             success: true,
@@ -74,7 +84,7 @@ const verifyEmail = async (req, res) => {
 
         await user.save();
 
-        await sendEmailWelcome(user.name, user.email);
+        await sendEmailWelcome(user.userName, user.email);
 
         res.status(200).json({
             success: true,
@@ -151,7 +161,7 @@ const forgotPassword = async (req, res) => {
 
         // Gửi email
         await sendEmailResetPassword(
-            user.name,
+            user.userName,
             user.email,
             `${process.env.CLIENT_URL}/reset-password/${resetToken}`
         );
@@ -187,7 +197,7 @@ const resetPassword = async (req, res) => {
 
         await user.save();
 
-        await sendEmailResetSuccess(user.name, user.email);
+        await sendEmailResetSuccess(user.userName, user.email);
 
         res.status(200).json({ success: true, message: "Password reset successfully" });
 
@@ -211,6 +221,10 @@ const checkAuth = async (req, res) => {
     }
 };
 
+const ha = async (req, res) => {
+    console.log(req.body);
+};
+
 module.exports = {
     signup,
     login,
@@ -219,4 +233,5 @@ module.exports = {
     forgotPassword,
     resetPassword,
     checkAuth,
+    ha,
 };

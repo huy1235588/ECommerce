@@ -1,12 +1,12 @@
 const { VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE, PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE } = require("./emailTemplates");
 const { mailtrapClient, mailtrapSender } = require("./mailtrapConfig");
 
-const sendEmailVerification = async (name, email, verificationToken) => {
+const sendEmailVerification = async (userName, email, verificationToken) => {
     const recipient = [{ email }];
 
     const htmlTemplate = VERIFICATION_EMAIL_TEMPLATE
         .replace("{verificationCode}", verificationToken)
-        .replace("{name}", name);
+        .replace("{userName}", userName);
 
     try {
         const response = await mailtrapClient.send({
@@ -25,11 +25,11 @@ const sendEmailVerification = async (name, email, verificationToken) => {
     }
 };
 
-const sendEmailWelcome = async (name, email) => {
+const sendEmailWelcome = async (userName, email) => {
     const recipient = [{ email }];
 
     const htmlTemplate = WELCOME_EMAIL_TEMPLATE
-        .replace("{name}", name);
+        .replace("{userName}", userName);
 
     try {
         const response = await mailtrapClient.send({
@@ -48,11 +48,11 @@ const sendEmailWelcome = async (name, email) => {
     }
 };
 
-const sendEmailResetPassword = async (name, email, resetPasswordURL) => {
+const sendEmailResetPassword = async (userName, email, resetPasswordURL) => {
     const recipient = [{ email }];
 
     const htmlTemplate = PASSWORD_RESET_REQUEST_TEMPLATE
-        .replace("{name}", name)
+        .replace("{userName}", userName)
         .replace("{resetPasswordURL}", resetPasswordURL)
 
     try {
@@ -72,11 +72,11 @@ const sendEmailResetPassword = async (name, email, resetPasswordURL) => {
     }
 };
 
-const sendEmailResetSuccess = async (name, email) => {
+const sendEmailResetSuccess = async (userName, email) => {
     const recipient = [{ email }];
 
     const htmlTemplate = PASSWORD_RESET_SUCCESS_TEMPLATE
-        .replace("{name}", name)
+        .replace("{userName}", userName)
 
     try {
         const response = await mailtrapClient.send({

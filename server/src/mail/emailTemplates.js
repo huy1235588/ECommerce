@@ -14,7 +14,7 @@ const VERIFICATION_EMAIL_TEMPLATE = `
         <div style="background-color: #242424;color: #fff; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
             <h2 style="color: #fff">
                     Hello,
-                    <span style="color: #4CAF50">{name}</span>
+                    <span style="color: #4CAF50">{userName}</span>
             </h2>
             <p style="color: #fff">Thank you for signing up! Your verification code is:</p>
             <div style="text-align: center; margin: 30px 0;"><span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4CAF50;">{verificationCode}</span></div>
@@ -52,7 +52,7 @@ const WELCOME_EMAIL_TEMPLATE = `
             style="background-color: #242424;color: #fff; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
             <h2 style="color: #fff">
                 Hello,
-                <span style="color: #4CAF50">{name}</span>
+                <span style="color: #4CAF50">{userName}</span>
             </h2>
             <p style="color: #fff">Thank you for signing up!</p>
             <p style="color: #fff; border-left: #4CAF50 5px solid; padding: 8px">Best regards,<br>The Ha Team</p>
@@ -83,7 +83,7 @@ const PASSWORD_RESET_SUCCESS_TEMPLATE = `
         </div>
         <div
             style="background-color: #242424; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <h2>Hello,<span style="color: #4CAF50"> {name}</span></h2>
+            <h2>Hello,<span style="color: #4CAF50"> {userName}</span></h2>
             <p>We're writing to confirm that your password has been successfully reset.</p>
             <div style="text-align: center; margin: 30px 0;">
                 <div
@@ -127,7 +127,7 @@ const PASSWORD_RESET_REQUEST_TEMPLATE = `
         </div>
         <div
             style="background-color: #242424; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            <h2>Hello,<span style="color: #4CAF50">{name}</span></h2>
+            <h2>Hello,<span style="color: #4CAF50">{userName}</span></h2>
             <p>We received a request to reset your password. If you didn't make this request, please ignore this email.
             </p>
             <p>To reset your password, click the button below:</p>
