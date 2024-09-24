@@ -3,30 +3,29 @@ import { registerFormControls } from "@/config";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-interface FormData {
-    userName: string;
-    email: string;
-    password: string;
-}
-
-const initialState: FormData = {
-    userName: "",
+const initialState = {
     email: "",
+    country: "",
+    userName: "",
+    firstName: "",
+    lastName: "",
     password: "",
 };
 
 function AuthRegister() {
+    const [formData, setFormData] = useState(initialState);
 
-    const [formData, setFormData] = useState<FormData>(initialState);
-
-    function onSubmit() {
+    async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
 
     }
+
+    console.log(formData);
 
     return (
         <main className="mmx-auto w-full max-w-md space-y-6">
             <h1 className="text-center text-3xl text-gray-200 font-bold tracking-tight">
-                Create new account
+                Create Account
             </h1>
 
             <CommonForm

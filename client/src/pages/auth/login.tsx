@@ -1,16 +1,9 @@
 import CommonForm from "@/components/common/form";
 import { loginFormControls } from "@/config";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-interface FormData {
-    userName: string;
-    email: string;
-    password: string;
-}
-
-const initialState: FormData = {
-    userName: "",
+const initialState = {
     email: "",
     password: "",
 };
@@ -19,14 +12,14 @@ function AuthLogin() {
 
     const [formData, setFormData] = useState(initialState);
 
-    function onSubmit() {
-        console.log("j")
+    function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
     }
 
     return (
         <main className="mmx-auto w-full max-w-md space-y-6">
             <h1 className="text-center text-3xl text-gray-200 font-bold tracking-tight">
-                Sign in
+                Sign In
             </h1>
 
             <CommonForm
