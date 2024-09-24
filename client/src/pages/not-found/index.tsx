@@ -14,7 +14,7 @@ function NotFound() {
     return (
         <main className="w-full h-full bg-neutral-800 text-violet-200 font-serif">
             <a href="/shop" className="absolute top-6 left-6 flex items-center justify-center w-24 h-11 z-10">
-                <img src="/public/logo.png" className="w-24" alt="logo" />
+                <img src="logo.png" className="w-24" alt="logo" />
             </a>
             <article className="flex items-center justify-center w-full h-dvh text-6xl text-center">
                 <p>
