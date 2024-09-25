@@ -12,6 +12,7 @@ type FormControl = {
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number" | "checkbox";
     options?: { id: string, label: string }[];
+    ha?: boolean
 };
 
 interface CommonFormProps {
@@ -86,14 +87,18 @@ function CommonForm({
                         }
                         value={value}
                     >
-                        <SelectTrigger className="w-full h-16 dark">
+                        <SelectTrigger className="w-full h-16 dark static">
                             <SelectValue placeholder={getControlItem.placeholder} />
                         </SelectTrigger>
 
-                        <SelectContent>
+                        <SelectContent className=" bg-gray-800 text-white overflow-y-scroll">
                             {getControlItem.options && getControlItem.options.length > 0
                                 ? getControlItem.options.map(optionItem => (
-                                    <SelectItem key={optionItem.id} value={optionItem.label}>
+                                    <SelectItem
+                                        className=""
+                                        key={optionItem.id}
+                                        value={optionItem.label}
+                                    >
                                         {optionItem.label}
                                     </SelectItem>
                                 )) : null}
@@ -155,16 +160,31 @@ function CommonForm({
 
     return (
         <form onSubmit={onSubmit}>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap justify-between gap-3">
                 {formControl.map((controlIem) => (
-                    <div className="relative grid w-full gap-1.5" key={controlIem.name}>
-                        {renderInputs(controlIem)}
-                        {controlIem.componentType === "input" && (
-                            <label className="absolute text-gray-500 duration-200 transform -translate-y-0 top-5 z-10 origin-[0] left-4 peer-focus:-translate-y-4 peer-focus:scale-[0.85] peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:scale-[0.85]">
-                                {controlIem.placeholder}
-                            </label>
-                        )}
-                    </div>
+                    controlIem.ha === true
+                        ? (<div className="relative grid w-[48%] gap-x-0 gap-y-1.5" key={controlIem.name}>
+                            {renderInputs(controlIem)}
+                            {controlIem.componentType === "input" && (
+                                <label
+                                    className="absolute cursor-text select-none text-gray-500 duration-200 transform -translate-y-0 top-5 z-10 origin-[0] left-4 peer-focus:-translate-y-4 peer-focus:scale-[0.85] peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:scale-[0.85]"
+                                    htmlFor={controlIem.name}
+                                >
+                                    {controlIem.placeholder}
+                                </label>
+                            )}
+                        </div>)
+                        : (<div className="relative grid w-full gap-1.5" key={controlIem.name}>
+                            {renderInputs(controlIem)}
+                            {controlIem.componentType === "input" && (
+                                <label
+                                    className="absolute cursor-text select-none text-gray-500 duration-200 transform -translate-y-0 top-5 z-10 origin-[0] left-4 peer-focus:-translate-y-4 peer-focus:scale-[0.85] peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:scale-[0.85]"
+                                    htmlFor={controlIem.name}
+                                >
+                                    {controlIem.placeholder}
+                                </label>
+                            )}
+                        </div>)
                 ))}
             </div>
 

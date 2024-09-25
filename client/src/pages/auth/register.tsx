@@ -17,10 +17,7 @@ function AuthRegister() {
 
     async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
-
     }
-
-    console.log(formData);
 
     return (
         <main className="mmx-auto w-full max-w-md space-y-6">
