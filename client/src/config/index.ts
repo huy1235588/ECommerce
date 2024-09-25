@@ -1,3 +1,5 @@
+import { countries } from "./countryForm";
+
 type FormControl = {
     name: string;
     placeholder: string;
@@ -5,15 +7,8 @@ type FormControl = {
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number" | "checkbox";
     options?: { id: string, label: string }[];
+    ha?: boolean;
 };
-
-const countries = [
-    { id: "us", label: "United States" },
-    { id: "ca", label: "Canada" },
-    { id: "uk", label: "United Kingdom" },
-    { id: "au", label: "Australia" },
-    { id: "vn", label: "Việt Nam" },
-];
 
 export const registerFormControls: FormControl[] = [
     {
@@ -36,6 +31,7 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "given-name",
         componentType: "input",
         type: "text",
+        ha: true,
     },
     {
         name: "lastName",
@@ -43,6 +39,7 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "family-name",
         componentType: "input",
         type: "text",
+        ha: true,
     },
     {
         name: "userName",
