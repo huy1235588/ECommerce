@@ -9,7 +9,7 @@ function AuthLayout() {
 
     return (
         <main className="relative flex min-h-screen w-full">
-            <div className="flex items-center justify-center bg-neutral-900 text-white w-full md:w-2/5 px-4 py-12 sm:px-6 lg:px-8 z-10">
+            <div className="flex items-center justify-center bg-neutral-900 text-white w-full md:w-2/5 px-4 py-9 sm:px-6 lg:px-8 z-10">
                 <Outlet />
             </div>
             <aside className="hidden md:flex flex-1 items-center justify-center bg-background px-12 no-select">
@@ -17,7 +17,7 @@ function AuthLayout() {
                     Welcome to Ha
                 </h1>
                 <img
-                    className="absolute top-0 right-0 bottom-0 left-0 opacity-50 ml-72"
+                    className="absolute top-0 bottom-0 left-64 right-0 opacity-50"
                     src={urlImg}
                     alt=""
                 />

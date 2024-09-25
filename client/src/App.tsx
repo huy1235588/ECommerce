@@ -15,6 +15,7 @@ import ShoppingHome from './pages/shopping/home'
 import ShoppingListing from './pages/shopping/listing'
 import CheckAuth from './components/common/checkAuth'
 import UnAuthPage from './pages/unauth-page'
+import EmailVerify from './pages/auth/emailVerify'
 
 function App(): JSX.Element {
     const isAuthenticated = false;
@@ -35,6 +36,7 @@ function App(): JSX.Element {
                 }>
                     <Route path='login' element={<AuthLogin />} />
                     <Route path='register' element={<AuthRegister />} />
+                    <Route path='verify-email' element={<EmailVerify />} />
                 </Route>
 
                 {/* Admin */}

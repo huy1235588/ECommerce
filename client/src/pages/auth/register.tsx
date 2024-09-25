@@ -1,7 +1,10 @@
 import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config";
+import { registerUser } from "@/store/auth-slice";
+import { AppDispatch } from "@/store/store";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 
 const initialState = {
     email: "",
@@ -14,10 +17,27 @@ const initialState = {
 
 function AuthRegister() {
     const [formData, setFormData] = useState(initialState);
+    const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
 
-    async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-    }
+        try {
+            const resultAction = await dispatch(registerUser(formData));
+            const payload = resultAction.payload as { success: boolean, message: string } | null;
+
+            if (resultAction.meta.requestStatus === 'fulfilled' && payload?.success) {
+                navigate("/auth/verify-email",{
+                    state: {
+                        clientId: formData.email,
+                    }
+                });
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <main className="mmx-auto w-full max-w-md space-y-6">

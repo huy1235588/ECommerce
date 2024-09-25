@@ -12,7 +12,7 @@ type FormControl = {
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number" | "checkbox";
     options?: { id: string, label: string }[];
-    ha?: boolean
+    ha?: string | null,
 };
 
 interface CommonFormProps {
@@ -162,8 +162,8 @@ function CommonForm({
         <form onSubmit={onSubmit}>
             <div className="flex flex-wrap justify-between gap-3">
                 {formControl.map((controlIem) => (
-                    controlIem.ha === true
-                        ? (<div className="relative grid w-[48%] gap-x-0 gap-y-1.5" key={controlIem.name}>
+                    controlIem.ha !== undefined
+                        ? (<div className={`relative grid ${controlIem.ha} gap-x-0 gap-y-1.5`} key={controlIem.name}>
                             {renderInputs(controlIem)}
                             {controlIem.componentType === "input" && (
                                 <label
@@ -188,7 +188,7 @@ function CommonForm({
                 ))}
             </div>
 
-            <Button type="submit" className="mt-10 w-full">
+            <Button type="submit" className="mt-7 w-full">
                 {buttonText || 'Submit'}
             </Button>
         </form>

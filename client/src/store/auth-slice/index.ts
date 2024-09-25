@@ -1,26 +1,42 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosResponse } from "axios";
 
-// Định nghĩa kiểu cho state
-interface authSlice {
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    user: any;
+interface User {
+    id: string,
+    email: string,
+    userName: string,
 }
 
-const initialState: authSlice = {
+interface AuthSlice {
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    user: User | null;
+    error?: string | null;
+}
+
+interface formData {
+    email: string;
+    country: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+}
+
+const initialState: AuthSlice = {
     isAuthenticated: false,
     isLoading: false,
     user: null
 }
 
 interface AuthResponse {
-    [key: string]: any;
+    success: boolean,
+    user: User,
 }
 
 export const registerUser = createAsyncThunk<
     AuthResponse,
-    { rejectValue: { error: string } }
+    formData
 >(
     "/auth/register",
     async (formData, { rejectWithValue }) => {
@@ -33,13 +49,8 @@ export const registerUser = createAsyncThunk<
 
             return response.data;
 
-
-        } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                return rejectWithValue({ error: error.response.data.error });
-            } else {
-                return rejectWithValue({ error: 'An unknown error occurred' });
-            }
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Registration failed");
         }
     }
 );
@@ -48,24 +59,27 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<any>) => {
-
+        setUser: (state, action: PayloadAction<User | null>) => {
+            state.user = action.payload;
         },
     },
     extraReducers: (builder) => {
         builder
+            // Register User
             .addCase(registerUser.pending, (state) => {
                 state.isLoading = true;
+                state.error = null;
             })
-            .addCase(registerUser.fulfilled, (state, action) => {
+            .addCase(registerUser.fulfilled, (state) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
             })
-            .addCase(registerUser.rejected, (state) => {
+            .addCase(registerUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
+                state.error = action.payload as string;
             })
     }
 })
