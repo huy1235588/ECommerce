@@ -4,9 +4,10 @@ import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { BiSolidHide, BiSolidShow } from "react-icons/bi";
+import { getStrongPassword, requiredInput, validateEmail } from "@/utils/formatInput";
 
 type FormControl = {
-    name: string;
+    name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
     placeholder: string;
     autocomplete?: string;
     componentType: "input" | "textarea" | "select";
@@ -22,6 +23,7 @@ interface CommonFormProps {
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     buttonText?: string;
     isBtnDisabled?: boolean;
+    isFormValid?: boolean;
 }
 
 function CommonForm({
@@ -30,9 +32,20 @@ function CommonForm({
     setFormData,
     onSubmit,
     buttonText,
+    isFormValid,
 }: CommonFormProps) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (isFormValid) {
+            onSubmit(event);
+        }
+    };
 
     function renderInputs(getControlItem: FormControl) {
+        const [inputValue, setInputValue] = useState("");
+        const [formatInput, setFormatInput] = useState("");
         const [inputType, setInputType] = useState(getControlItem.type);
 
         // Ẩn hiện mật khẩu
@@ -50,26 +63,49 @@ function CommonForm({
                 element = (
                     <>
                         <Input
-                            className="peer h-16 px-3 pt-7 pb-3 text-lg"
+                            className={`peer h-16 px-3 pt-7 pb-3 text-lg focus-visible:ring-1 ${formatInput !== "" ? 'ring-1 ring-red-600 ' : ''}`}
                             name={getControlItem.name}
                             id={getControlItem.name}
                             type={inputType}
                             placeholder=""
                             value={value}
-                            onChange={(event) =>
+                            onChange={(event) => {
+                                setInputValue(event.target.value);
                                 setFormData({
                                     ...formData,
                                     [getControlItem.name]: event.target.value,
                                 })
-                            }
+                            }}
+                            onBlur={() => {
+                                if (getControlItem.type === "email") {
+                                    setFormatInput(validateEmail(inputValue));
+                                    return;
+                                }
+                                else if (getControlItem.type === "password" && buttonText === "Create Account") {
+                                    setFormatInput(getStrongPassword(inputValue));
+                                    return;
+                                }
+                                else {
+                                    setFormatInput(requiredInput(inputValue));
+                                }
+                            }}
+                            onFocus={() => setFormatInput("")}
                         />
+                        {formatInput !== "" ? (
+                            <span className="text-xs text-red-600">
+                                {formatInput}
+                            </span>
+                        ) : null}
                         {getControlItem.type === "password" && (
-                            <button
-                                className="absolute right-3 top-3 bg-transparent hover:bg-gray-800 duration-200 py-3 px-3 focus:outline-none border-none"
-                                onClick={handleToggleType}
-                            >
-                                {inputType === "password" ? <BiSolidHide /> : <BiSolidShow />}
-                            </button>
+                            <>
+                                <button
+                                    type="button"
+                                    className="absolute right-3 top-3 bg-transparent hover:bg-gray-800 duration-200 py-3 px-3 focus:outline-none border-none"
+                                    onClick={handleToggleType}
+                                >
+                                    {inputType === "password" ? <BiSolidHide /> : <BiSolidShow />}
+                                </button>
+                            </>
                         )}
                     </>
                 );
@@ -86,23 +122,34 @@ function CommonForm({
                             })
                         }
                         value={value}
+                        autoComplete={getControlItem.autocomplete}
                     >
-                        <SelectTrigger className="w-full h-16 dark static">
-                            <SelectValue placeholder={getControlItem.placeholder} />
+                        <SelectTrigger
+                            className="w-full h-16 dark static"
+                            onClick={() => setIsOpen(true)}
+                        >
+                            <SelectValue placeholder={getControlItem.placeholder} >
+                                {value}
+                            </SelectValue>
                         </SelectTrigger>
 
-                        <SelectContent className=" bg-gray-800 text-white overflow-y-scroll">
-                            {getControlItem.options && getControlItem.options.length > 0
-                                ? getControlItem.options.map(optionItem => (
-                                    <SelectItem
-                                        className=""
-                                        key={optionItem.id}
-                                        value={optionItem.label}
-                                    >
-                                        {optionItem.label}
-                                    </SelectItem>
-                                )) : null}
-                        </SelectContent>
+                        {isOpen && (
+                            <SelectContent
+                                className="bg-gray-800 text-white overflow-y-scroll"
+                                onCloseAutoFocus={() => setIsOpen(false)}
+                            >
+                                {getControlItem.options && getControlItem.options.length > 0
+                                    ? getControlItem.options.map(optionItem => (
+                                        <SelectItem
+                                            className=""
+                                            key={optionItem.id}
+                                            value={optionItem.label}
+                                        >
+                                            {optionItem.label}
+                                        </SelectItem>
+                                    )) : null}
+                            </SelectContent>
+                        )}
                     </Select>
                 );
                 break;
@@ -159,11 +206,11 @@ function CommonForm({
     }
 
     return (
-        <form onSubmit={onSubmit}>
-            <div className="flex flex-wrap justify-between gap-3">
+        <form onSubmit={handleSubmit}>
+            <div className="flex flex-wrap justify-between">
                 {formControl.map((controlIem) => (
                     controlIem.ha !== undefined
-                        ? (<div className={`relative grid ${controlIem.ha} gap-x-0 gap-y-1.5`} key={controlIem.name}>
+                        ? (<div className={`relative grid ${controlIem.ha} min-h-[88px]`} key={controlIem.name}>
                             {renderInputs(controlIem)}
                             {controlIem.componentType === "input" && (
                                 <label
@@ -174,7 +221,7 @@ function CommonForm({
                                 </label>
                             )}
                         </div>)
-                        : (<div className="relative grid w-full gap-1.5" key={controlIem.name}>
+                        : (<div className="relative grid w-full min-h-[88px]" key={controlIem.name}>
                             {renderInputs(controlIem)}
                             {controlIem.componentType === "input" && (
                                 <label
@@ -188,7 +235,7 @@ function CommonForm({
                 ))}
             </div>
 
-            <Button type="submit" className="mt-7 w-full">
+            <Button type="submit" disabled={!isFormValid} className=" w-full">
                 {buttonText || 'Submit'}
             </Button>
         </form>

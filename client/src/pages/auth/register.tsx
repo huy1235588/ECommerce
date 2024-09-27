@@ -2,11 +2,21 @@ import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config";
 import { registerUser } from "@/store/auth-slice";
 import { AppDispatch } from "@/store/store";
-import { useState } from "react";
+import { getStrongPassword, requiredInput, validateEmail } from "@/utils/formatInput";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-const initialState = {
+type FormData = {
+    email: string;
+    country: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+}
+
+const initialState: FormData = {
     email: "",
     country: "",
     userName: "",
@@ -16,9 +26,30 @@ const initialState = {
 };
 
 function AuthRegister() {
-    const [formData, setFormData] = useState(initialState);
+    const [formData, setFormData] = useState<FormData>(initialState);
+    const [isFormValid, setIsFormValid] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const { email, password } = formData;
+
+        const isEmpty = Object.values(formData).some((value) => requiredInput(value));
+
+        if (isEmpty) {
+            setIsFormValid(false);
+        }
+        else if (validateEmail(email) !== "") {
+            setIsFormValid(false);
+        }
+        else if (getStrongPassword(password) !== "") {
+            setIsFormValid(false);
+        }
+        else {
+            setIsFormValid(true);
+        }
+
+    }, [formData])
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -27,9 +58,9 @@ function AuthRegister() {
             const payload = resultAction.payload as { success: boolean, message: string } | null;
 
             if (resultAction.meta.requestStatus === 'fulfilled' && payload?.success) {
-                navigate("/auth/verify-email",{
+                navigate("/auth/verify-email", {
                     state: {
-                        clientId: formData.email,
+                        clientId: formData,
                     }
                 });
             }
@@ -40,7 +71,7 @@ function AuthRegister() {
     };
 
     return (
-        <main className="mmx-auto w-full max-w-md space-y-6">
+        <main className="mmx-auto w-full max-w-md space-y-5">
             <h1 className="text-center text-3xl text-gray-200 font-bold tracking-tight">
                 Create Account
             </h1>
@@ -51,6 +82,7 @@ function AuthRegister() {
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={onSubmit}
+                isFormValid={isFormValid}
             />
 
             <p className="mt-2">

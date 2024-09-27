@@ -14,13 +14,18 @@ interface AuthSlice {
     error?: string | null;
 }
 
-interface formData {
+interface FormData {
     email: string;
     country: string;
     userName: string;
     firstName: string;
     lastName: string;
     password: string;
+}
+
+interface verifyEmailPayload {
+    email: string;
+    code: string;
 }
 
 const initialState: AuthSlice = {
@@ -36,7 +41,7 @@ interface AuthResponse {
 
 export const registerUser = createAsyncThunk<
     AuthResponse,
-    formData
+    FormData
 >(
     "/auth/register",
     async (formData, { rejectWithValue }) => {
@@ -51,6 +56,27 @@ export const registerUser = createAsyncThunk<
 
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Registration failed");
+        }
+    }
+);
+
+export const verifyEmail = createAsyncThunk<
+    AuthResponse,
+    verifyEmailPayload
+>(
+    "/auth/verify-email",
+    async (verifyEmailPayload, { rejectWithValue }) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/ha',
+                verifyEmailPayload,
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Verification email failed");
         }
     }
 );
@@ -80,6 +106,23 @@ const authSlice = createSlice({
                 state.user = null;
                 state.isAuthenticated = false;
                 state.error = action.payload as string;
+            })
+
+            // Verify Email
+            .addCase(verifyEmail.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(verifyEmail.fulfilled, (state) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated =false;
+            })
+            .addCase(verifyEmail.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.error as string;
             })
     }
 })

@@ -1,20 +1,43 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { verifyEmail } from "@/store/auth-slice";
+import { AppDispatch } from "@/store/store";
 import maskEmail from "@/utils/email";
 import { findLastIndex } from "@/utils/findLastIndex";
-import React, { useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function EmailVerify() {
     const [code, setCode] = useState(["", "", "", "", "", ""])
     const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
     const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const { clientId } = (location.state )|| {};
+    const { clientId } = location.state;
 
-    const onSubmit = async () => {
+    const { email } = clientId;
 
+    const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
 
+        const verificationCode = code.join("");
+
+        try {
+            const resultAction = await dispatch(verifyEmail({
+                email: email,
+                code: verificationCode,
+            }));
+            const payload = resultAction.payload as { success: boolean, message: string } | null;
+
+            if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
+                navigate("/auth/login");
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const onChange = (index: number, value: string) => {
@@ -67,6 +90,15 @@ function EmailVerify() {
         }
     };
 
+    useEffect(() => {
+        // Kiểm tra các input đều được nhập
+        if (code.every((digit) => digit !== "")) {
+            // Tạo một sự kiện submit form
+            const submitEvent = new Event("submit", { bubbles: true });
+            onSubmit(submitEvent as unknown as React.FormEvent<HTMLFormElement>);
+        }
+    }, [code]);
+
     return (
         <main className="mmx-auto w-full max-w-md space-y-6">
             <h1 className="text-center text-3xl text-gray-200 font-bold tracking-tight">
@@ -75,7 +107,7 @@ function EmailVerify() {
 
             <p className="font-medium">
                 To complete account setup, you need to verify
-                <span> {maskEmail(clientId)} </span>
+                <span> {maskEmail(email)} </span>
                 Please check your email then
                 enter the security code below.
             </p>
@@ -102,7 +134,16 @@ function EmailVerify() {
             <p>
                 Didn't receive the email? Check the spam folder.
                 <br />
-                Resend request or
+                <Link
+                    className="text-blue-500 font-medium mr-2 hover:underline"
+                    to={"/auth/verify-email"}
+                    onClick={() => {
+                        console.log("haha")
+                    }}
+                >
+                    Resend request
+                </Link>
+                or
                 <Link
                     className="text-blue-500 font-medium ml-2 hover:underline"
                     to={"/auth/register"}

@@ -1,7 +1,7 @@
 import { countries } from "./countryForm";
 
 type FormControl = {
-    name: string;
+    name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
     placeholder: string;
     autocomplete?: string;
     componentType: "input" | "textarea" | "select";

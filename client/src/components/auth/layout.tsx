@@ -9,7 +9,7 @@ function AuthLayout() {
 
     return (
         <main className="relative flex min-h-screen w-full">
-            <div className="flex items-center justify-center bg-neutral-900 text-white w-full md:w-2/5 px-4 py-9 sm:px-6 lg:px-8 z-10">
+            <div className="flex items-center justify-center bg-neutral-900 text-white w-full md:w-2/5 px-4 pt-4 pb-7 sm:px-6 lg:px-8 z-10">
                 <Outlet />
             </div>
             <aside className="hidden md:flex flex-1 items-center justify-center bg-background px-12 no-select">
