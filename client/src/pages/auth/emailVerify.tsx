@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { verifyEmail } from "@/store/auth-slice";
+import { verifyEmail } from "@/store/auth";
 import { AppDispatch } from "@/store/store";
 import maskEmail from "@/utils/email";
 import { findLastIndex } from "@/utils/findLastIndex";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 function EmailVerify() {
     const [code, setCode] = useState(["", "", "", "", "", ""])
@@ -15,9 +15,13 @@ function EmailVerify() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
-    const { clientId } = location.state;
+    // Kiểm tra nếu không đúng id
+    if (!location.state) {
+        return <Navigate to={`/site${location.pathname}${location.search}`} />
+    }
 
-    const { email } = clientId;
+    const { formData, clientId } = location.state;
+    const { email } = formData;
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -38,6 +42,17 @@ function EmailVerify() {
         } catch (error) {
             console.log(error);
         }
+    };
+
+    // Sự kiện click gửi lại email
+    const onClickResendEmail = async (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        try {
+            event.preventDefault();
+
+        } catch (error) {
+            console.log(error)
+        }
+
     };
 
     const onChange = (index: number, value: string) => {
@@ -136,10 +151,8 @@ function EmailVerify() {
                 <br />
                 <Link
                     className="text-blue-500 font-medium mr-2 hover:underline"
-                    to={"/auth/verify-email"}
-                    onClick={() => {
-                        console.log("haha")
-                    }}
+                    to={`/auth/verify-email?${clientId}`}
+                    onClick={() => onClickResendEmail}
                 >
                     Resend request
                 </Link>

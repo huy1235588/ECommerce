@@ -7,7 +7,7 @@ type FormControl = {
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number" | "checkbox";
     options?: { id: string, label: string }[];
-    ha?: string | null;
+    inputStyle?: string | null;
 };
 
 export const registerFormControls: FormControl[] = [
@@ -31,7 +31,7 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "given-name",
         componentType: "input",
         type: "text",
-        ha: "w-[48%]",
+        inputStyle: "w-[48%]",
     },
     {
         name: "lastName",
@@ -39,7 +39,7 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "family-name",
         componentType: "input",
         type: "text",
-        ha: "w-[48%]",
+        inputStyle: "w-[48%]",
     },
     {
         name: "userName",

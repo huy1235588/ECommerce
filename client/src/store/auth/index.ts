@@ -47,7 +47,7 @@ export const registerUser = createAsyncThunk<
     async (formData, { rejectWithValue }) => {
         try {
             const response: AxiosResponse<AuthResponse> = await axios.post(
-                '/api/auth/ha',
+                '/api/auth/signup',
                 formData,
                 { withCredentials: true, }
             );
@@ -68,7 +68,7 @@ export const verifyEmail = createAsyncThunk<
     async (verifyEmailPayload, { rejectWithValue }) => {
         try {
             const response: AxiosResponse<AuthResponse> = await axios.post(
-                '/api/auth/ha',
+                '/api/auth/verify-email',
                 verifyEmailPayload,
                 { withCredentials: true }
             )

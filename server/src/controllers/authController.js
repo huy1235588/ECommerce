@@ -41,22 +41,45 @@ const signup = async (req, res) => {
             verificationToken,
             verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24h   
         });
-        await user.save();
+        // await user.save();
 
         // jwt
         generateTokenAndSetCookie(res, user.id);
 
         // Gửi email xác minh
-        await sendEmailVerification(user.userName, user.email, verificationToken);
+        // const message_ids = await sendEmailVerification(user.userName, user.email, verificationToken);
+        const message_ids = "haa";
 
         res.status(201).json({
             success: true,
             message: "User created successfully",
-            user: {
-                ...user._doc,
-                password: undefined,
-            },
-        })
+            messageId: message_ids,
+        });
+
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+const resendEmail = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne(email);
+
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+
+        user.verificationToken = verificationToken;
+        user.verificationTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+
+        await user.save();
+
+        const message_ids = await sendEmailVerification(user.userName, user.email, verificationToken);
+
+        res.status(201).json({
+            success: true,
+            message: "User created successfully",
+            messageId: message_ids,
+        });
 
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
@@ -64,14 +87,16 @@ const signup = async (req, res) => {
 };
 
 const verifyEmail = async (req, res) => {
-    const { code } = req.body;
+    const { email, code } = req.body;
     try {
         const user = await User.findOne({
+            email: email,
             verificationToken: code,
             verificationTokenExpiresAt: { $gt: Date.now() }, // $gt: greater than
         });
 
         if (!user) {
+            console.log("Invalid or expired verification code");
             return res.status(400).json({
                 success: false,
                 message: "Invalid or expired verification code"
@@ -230,6 +255,7 @@ module.exports = {
     signup,
     login,
     logout,
+    resendEmail,
     verifyEmail,
     forgotPassword,
     resetPassword,

@@ -1,6 +1,6 @@
 import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config";
-import { registerUser } from "@/store/auth-slice";
+import { registerUser } from "@/store/auth";
 import { AppDispatch } from "@/store/store";
 import { getStrongPassword, requiredInput, validateEmail } from "@/utils/formatInput";
 import { useEffect, useState } from "react";
@@ -31,6 +31,7 @@ function AuthRegister() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
+    // Kiểm tra input form hợp lệ
     useEffect(() => {
         const { email, password } = formData;
 
@@ -51,16 +52,21 @@ function AuthRegister() {
 
     }, [formData])
 
+    // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
             const resultAction = await dispatch(registerUser(formData));
-            const payload = resultAction.payload as { success: boolean, message: string } | null;
+            const payload = resultAction.payload as {
+                success: boolean,
+                message: string,
+                messageId: string,
+            } | null;
 
             if (resultAction.meta.requestStatus === 'fulfilled' && payload?.success) {
-                navigate("/auth/verify-email", {
+                navigate(`/auth/verify-email?clientId=${payload.messageId}`, {
                     state: {
-                        clientId: formData,
+                        formData: formData,
                     }
                 });
             }

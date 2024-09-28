@@ -13,7 +13,7 @@ type FormControl = {
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number" | "checkbox";
     options?: { id: string, label: string }[];
-    ha?: string | null,
+    inputStyle?: string | null,
 };
 
 interface CommonFormProps {
@@ -209,8 +209,8 @@ function CommonForm({
         <form onSubmit={handleSubmit}>
             <div className="flex flex-wrap justify-between">
                 {formControl.map((controlIem) => (
-                    controlIem.ha !== undefined
-                        ? (<div className={`relative grid ${controlIem.ha} min-h-[88px]`} key={controlIem.name}>
+                    controlIem.inputStyle !== undefined
+                        ? (<div className={`relative grid ${controlIem.inputStyle} min-h-[88px]`} key={controlIem.name}>
                             {renderInputs(controlIem)}
                             {controlIem.componentType === "input" && (
                                 <label
