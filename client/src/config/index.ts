@@ -1,4 +1,6 @@
+import { getStrongPassword, requiredInput, validateEmail, validateName } from "@/utils/formatInput";
 import { countries } from "./countryForm";
+import { InputPasswordLogin, InputPasswordRegister, InputUserNameRegister } from "./customComponent";
 
 type FormControl = {
     name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
@@ -8,6 +10,9 @@ type FormControl = {
     type?: "text" | "email" | "password" | "number" | "checkbox";
     options?: { id: string, label: string }[];
     inputStyle?: string | null;
+    maxLength?: number;
+    onBlur?: (value: string) => string;
+    inputComponent?: React.ComponentType<any>;
 };
 
 export const registerFormControls: FormControl[] = [
@@ -17,6 +22,10 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "email",
         componentType: "input",
         type: "email",
+        maxLength: 1000,
+        onBlur: (value: string) => {
+            return validateEmail(value);
+        }
     },
     {
         name: "country",
@@ -24,6 +33,9 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "country",
         componentType: "select",
         options: countries,
+        onBlur: (value: string) => {
+            return requiredInput(value);
+        }
     },
     {
         name: "firstName",
@@ -32,6 +44,10 @@ export const registerFormControls: FormControl[] = [
         componentType: "input",
         type: "text",
         inputStyle: "w-[48%]",
+        maxLength: 1000,
+        onBlur: (value: string) => {
+            return validateName(value);
+        }
     },
     {
         name: "lastName",
@@ -40,13 +56,22 @@ export const registerFormControls: FormControl[] = [
         componentType: "input",
         type: "text",
         inputStyle: "w-[48%]",
+        maxLength: 1000,
+        onBlur: (value: string) => {
+            return validateName(value);
+        }
     },
     {
         name: "userName",
-        placeholder: "User Name",
+        placeholder: "UserName",
         autocomplete: "username",
         componentType: "input",
         type: "text",
+        maxLength: 16,
+        onBlur: (value: string) => {
+            return requiredInput(value);
+        },
+        inputComponent: InputUserNameRegister,
     },
     {
         name: "password",
@@ -54,6 +79,11 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "new-password",
         componentType: "input",
         type: "password",
+        maxLength: 1000,
+        onBlur: (value: string) => {
+            return getStrongPassword(value);
+        },
+        inputComponent: InputPasswordRegister,
     }
 ];
 
@@ -64,6 +94,10 @@ export const loginFormControls: FormControl[] = [
         autocomplete: "",
         componentType: "input",
         type: "email",
+        maxLength: 1000,
+        onBlur: (value: string) => {
+            return validateEmail(value);
+        }
     },
     {
         name: "password",
@@ -71,5 +105,10 @@ export const loginFormControls: FormControl[] = [
         autocomplete: "",
         componentType: "input",
         type: "password",
+        maxLength: 1000,
+        onBlur: (value: string) => {
+            return requiredInput(value);
+        },
+        inputComponent: InputPasswordLogin,
     },
 ];

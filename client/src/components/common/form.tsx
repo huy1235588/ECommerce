@@ -3,8 +3,6 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Textarea } from "../ui/textarea";
-import { BiSolidHide, BiSolidShow } from "react-icons/bi";
-import { getStrongPassword, requiredInput, validateEmail } from "@/utils/formatInput";
 
 type FormControl = {
     name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
@@ -13,7 +11,10 @@ type FormControl = {
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number" | "checkbox";
     options?: { id: string, label: string }[];
-    inputStyle?: string | null,
+    inputStyle?: string | null;
+    maxLength?: number;
+    onBlur?: (value: string) => string | "";
+    inputComponent?: React.ComponentType<any>;
 };
 
 interface CommonFormProps {
@@ -48,14 +49,10 @@ function CommonForm({
         const [formatInput, setFormatInput] = useState("");
         const [inputType, setInputType] = useState(getControlItem.type);
 
-        // Ẩn hiện mật khẩu
-        const handleToggleType = () => {
-            setInputType((prevType) => (prevType === "password" ? "text" : "password"));
-        };
-
         let element = null;
 
-        const value = formData[getControlItem.name] || ""
+        const value = formData[getControlItem.name] || "" // Lấy giá trị hiện tại
+        const InputComponent = getControlItem.inputComponent;
 
         // INPUT
         switch (getControlItem.componentType) {
@@ -63,11 +60,12 @@ function CommonForm({
                 element = (
                     <>
                         <Input
-                            className={`peer h-16 px-3 pt-7 pb-3 text-lg focus-visible:ring-1 ${formatInput !== "" ? 'ring-1 ring-red-600 ' : ''}`}
+                            className={`peer h-16 px-3 pt-7 pb-3 text-lg focus-visible:ring-1 ${formatInput !== "" ? 'ring-1 ring-red-600 ' : ''} ${getControlItem.type === "password" ? "pr-28" : ""}`}
                             name={getControlItem.name}
                             id={getControlItem.name}
                             type={inputType}
                             placeholder=""
+                            maxLength={getControlItem.maxLength}
                             value={value}
                             onChange={(event) => {
                                 setInputValue(event.target.value);
@@ -77,36 +75,25 @@ function CommonForm({
                                 })
                             }}
                             onBlur={() => {
-                                if (getControlItem.type === "email") {
-                                    setFormatInput(validateEmail(inputValue));
-                                    return;
+                                if (getControlItem.onBlur) {
+                                    setFormatInput(getControlItem.onBlur(inputValue));
                                 }
-                                else if (getControlItem.type === "password" && buttonText === "Create Account") {
-                                    setFormatInput(getStrongPassword(inputValue));
-                                    return;
-                                }
-                                else {
-                                    setFormatInput(requiredInput(inputValue));
-                                }
+                                return;
                             }}
                             onFocus={() => setFormatInput("")}
                         />
                         {formatInput !== "" ? (
-                            <span className="text-xs text-red-600">
+                            <span className="text-[11px] text-red-600 mb-0.5">
                                 {formatInput}
                             </span>
                         ) : null}
-                        {getControlItem.type === "password" && (
-                            <>
-                                <button
-                                    type="button"
-                                    className="absolute right-3 top-3 bg-transparent hover:bg-gray-800 duration-200 py-3 px-3 focus:outline-none border-none"
-                                    onClick={handleToggleType}
-                                >
-                                    {inputType === "password" ? <BiSolidHide /> : <BiSolidShow />}
-                                </button>
-                            </>
-                        )}
+                        {InputComponent ? (
+                            <InputComponent
+                                inputType={inputType}
+                                setInputType={setInputType}
+                                name={getControlItem.name}
+                            />
+                        ) : null}
                     </>
                 );
                 break;
@@ -179,7 +166,7 @@ function CommonForm({
                             className="peer px-3 pt-7 pb-3"
                             name={getControlItem.name}
                             id={getControlItem.name}
-                            type={inputType}
+                            type={getControlItem.type}
                             placeholder=""
                             value={value}
                             onChange={(event) =>
@@ -189,14 +176,6 @@ function CommonForm({
                                 })
                             }
                         />
-                        {getControlItem.type === "password" && (
-                            <button
-                                className="absolute right-3 top-3 bg-transparent hover:bg-gray-800 duration-200 py-3 px-3 focus:outline-none border-none"
-                                onClick={handleToggleType}
-                            >
-                                {inputType === "password" ? <BiSolidHide /> : <BiSolidShow />}
-                            </button>
-                        )}
                     </>
                 );
                 break;
@@ -235,7 +214,7 @@ function CommonForm({
                 ))}
             </div>
 
-            <Button type="submit" disabled={!isFormValid} className=" w-full">
+            <Button type="submit" disabled={!isFormValid} className=" w-full select-none">
                 {buttonText || 'Submit'}
             </Button>
         </form>
