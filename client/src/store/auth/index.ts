@@ -1,12 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosResponse } from "axios";
 
-interface User {
-    id: string,
-    email: string,
-    userName: string,
-}
-
 interface FormData {
     email: string;
     country: string;
@@ -21,14 +15,16 @@ interface verifyEmailPayload {
     code: string;
 }
 
+// Định nghĩa AuthSlice
 interface AuthSlice {
     isAuthenticated: boolean;
     isLoading: boolean;
-    user: User | null;
+    user: Object | null;
     error?: string | null;
     status?: number;
 }
 
+// Khởi tạo trạng thái ban đầu của AuthSlice
 const initialState: AuthSlice = {
     isAuthenticated: false,
     isLoading: false,
@@ -36,18 +32,28 @@ const initialState: AuthSlice = {
     status: undefined,
 }
 
+// Định nghĩa trạng thái phản hồi của api
 interface AuthResponse {
     success: boolean,
-    user: User,
     status?: number,
+}
+
+// Định nghĩa trạng thái lỗi của api
+interface AuthError {
+    message: string;
+    status: number;
 }
 
 export const registerUser = createAsyncThunk<
     AuthResponse,
-    FormData
+    FormData,
+    { rejectValue: AuthError }
 >(
     "/auth/register",
-    async (formData, { rejectWithValue }) => {
+    async (
+        formData,
+        { rejectWithValue }
+    ) => {
         try {
             const response: AxiosResponse<AuthResponse> = await axios.post(
                 '/api/auth/signup',
@@ -55,13 +61,15 @@ export const registerUser = createAsyncThunk<
                 { withCredentials: true, }
             );
 
-            return {
-                ...response.data,
-                status: response.status // Thêm status code vào dữ liệu trả về
-            };
+            return response.data;
 
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Registration failed");
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "Registration failed";
+
+            return rejectWithValue({ message, status });
         }
     }
 );
@@ -91,7 +99,7 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<User | null>) => {
+        setUser: (state, action: PayloadAction<AuthResponse | null>) => { 
             state.user = action.payload;
         },
     },
@@ -102,7 +110,7 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(registerUser.fulfilled, (state) => {
+            .addCase(registerUser.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
@@ -111,7 +119,8 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
-                state.error = action.payload as string;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
             })
 
             // Verify Email

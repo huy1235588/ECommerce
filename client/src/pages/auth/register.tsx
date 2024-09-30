@@ -1,9 +1,9 @@
 import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config";
 import { registerUser } from "@/store/auth";
-import { AppDispatch } from "@/store/store";
+import { AppDispatch, RootState } from "@/store/store";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
 type FormData = {
@@ -28,25 +28,24 @@ function AuthRegister() {
     const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-    
+
+    const { isLoading, error } = useSelector((state: RootState) => state.auth)
+
     // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            const resultAction = await dispatch(registerUser(formData));
-            const payload = resultAction.payload as {
-                success: boolean,
-                message: string,
-                messageId: string,
-            } | null;
 
-            if (resultAction.meta.requestStatus === 'fulfilled' && payload?.success) {
-                navigate(`/auth/verify-email?clientId=${payload.messageId}`, {
-                    state: {
-                        formData: formData,
-                    }
-                });
-            }
+            const resultAction = await dispatch(registerUser(formData));
+            const payload = resultAction.payload
+
+            // if (payload.message_ids === ) {
+            //     navigate(`/auth/verify-email?clientId=${payload.messageId}`, {
+            //         state: {
+            //             formData: formData,
+            //         }
+            //     });
+            // }
 
         } catch (error) {
             console.log(error);
@@ -65,6 +64,8 @@ function AuthRegister() {
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={onSubmit}
+                isLoading={isLoading}
+                isError={error}
             />
 
             <p className="mt-2">

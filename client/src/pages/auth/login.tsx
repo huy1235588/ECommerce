@@ -1,6 +1,8 @@
 import CommonForm from "@/components/common/form";
 import { loginFormControls } from "@/config";
+import { RootState } from "@/store/store";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 type FormData = {
@@ -15,6 +17,9 @@ const initialState: FormData = {
 
 function AuthLogin() {
     const [formData, setFormData] = useState<FormData>(initialState);
+    
+    const isLoading = useSelector((state: RootState) => state.auth.isLoading)
+    const isError = useSelector((state: RootState) => state.auth.error)
 
     function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -32,6 +37,8 @@ function AuthLogin() {
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={onSubmit}
+                isLoading={isLoading}
+                isError={isError}
             />
 
             <p className="mt-2">

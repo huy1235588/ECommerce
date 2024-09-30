@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
@@ -6,6 +6,8 @@ import { Textarea } from "../ui/textarea";
 import { requiredInput } from "@/utils/formatInput";
 import { OnChangeUserName } from "@/config/onChange";
 import { createInitialState } from "@/utils/state";
+import { BiLoaderAlt } from "react-icons/bi";
+import { BiSolidXCircle } from "react-icons/bi";
 
 type FormControl = {
     name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
@@ -32,6 +34,8 @@ interface CommonFormProps {
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     buttonText?: string;
     isBtnDisabled?: boolean;
+    isLoading: boolean;
+    isError: string | null | undefined;
 }
 
 function CommonForm({
@@ -40,6 +44,8 @@ function CommonForm({
     setFormData,
     onSubmit,
     buttonText,
+    isLoading,
+    isError,
 }: CommonFormProps) {
     const [isOpenSelect, setIsOpenSelect] = useState(false); // Khi nhấp vào select
 
@@ -91,7 +97,6 @@ function CommonForm({
 
                                 // Gán chuỗi rỗng thì gán giá trị true 
                                 if (validInput === "") {
-                                    console.log("ha")
                                     setValidationState((prevState) => ({
                                         ...prevState,
                                         [getControlItem.name]: true,
@@ -117,7 +122,7 @@ function CommonForm({
                                         .then(result => {
                                             setIsValidOnchange(result);
                                             setFormatInput(result);
-                                            
+
                                             // result trả về chuỗi rỗng khi useName không tồn tại
                                             if (result === "") {
                                                 setValidationState((prevState) => ({
@@ -174,7 +179,6 @@ function CommonForm({
                             const validInput = getControlItem.onChange(value);
 
                             if (validInput === "") {
-                                console.log("ha")
                                 setValidationState((prevState) => ({
                                     ...prevState,
                                     [getControlItem.name]: true,
@@ -271,6 +275,12 @@ function CommonForm({
 
     return (
         <form onSubmit={handleSubmit}>
+            {isError && (
+                <p className="flex items-center mb-3 p-5 rounded-md bg-gray-800 text-red-500">
+                    <BiSolidXCircle className="mr-3" />
+                    {isError}
+                </p>
+            )}
             <div className="flex flex-wrap justify-between">
                 {formControl.map((controlIem) => (
                     controlIem.inputStyle !== undefined
@@ -304,7 +314,10 @@ function CommonForm({
                 disabled={!isFormValid}
                 className=" w-full select-none"
             >
-                {buttonText || 'Submit'}
+                {isLoading
+                    ? (<BiLoaderAlt />)
+                    : (buttonText || 'Submit')
+                }
             </Button>
         </form>
     );

@@ -24,6 +24,7 @@ const checkUserName = async (req, res) => {
             message: "",
         });
 
+
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
@@ -33,6 +34,7 @@ const signup = async (req, res) => {
     const { email, password, country, firstName, lastName, userName } = req.body;
 
     try {
+
         // Kiểm tra có giá trị hay không
         if (
             !email ||
@@ -48,9 +50,9 @@ const signup = async (req, res) => {
         // Kiểm tra xem người dùng đã tồn tại hay chưa
         const userAlreadyExists = await User.findOne({ email });
         if (userAlreadyExists) {
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
-                message: "User already exists"
+                message: "This email is already in use by another account."
             });
         }
 
@@ -78,7 +80,7 @@ const signup = async (req, res) => {
         res.status(201).json({
             success: true,
             message: "User created successfully",
-            messageId: message_ids,
+            option: { message_ids },
         });
 
     } catch (error) {
