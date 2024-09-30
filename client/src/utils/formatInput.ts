@@ -19,10 +19,11 @@ export const requiredInput = (value: string) => {
     return value.trim() ? "" : "Required";
 }
 
-export const validateUserName = (pass: string) => {
-    if (pass.trim().length === 0) return "Required";
-    if (pass.length <= 2) return "Too short";
-    if (pass.match(/\s/)) return "Invalid format";
+export const validateUserName = (userName: string) => {
+    if (userName.trim().length === 0) return "Required";
+    if (userName.length <= 2) return "Too short";
+    if (userName.match(/\s/)) return "Invalid format";
+
     return "";
 };
 

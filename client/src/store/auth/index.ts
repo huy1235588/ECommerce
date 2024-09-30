@@ -7,13 +7,6 @@ interface User {
     userName: string,
 }
 
-interface AuthSlice {
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    user: User | null;
-    error?: string | null;
-}
-
 interface FormData {
     email: string;
     country: string;
@@ -28,15 +21,25 @@ interface verifyEmailPayload {
     code: string;
 }
 
+interface AuthSlice {
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    user: User | null;
+    error?: string | null;
+    status?: number;
+}
+
 const initialState: AuthSlice = {
     isAuthenticated: false,
     isLoading: false,
-    user: null
+    user: null,
+    status: undefined,
 }
 
 interface AuthResponse {
     success: boolean,
     user: User,
+    status?: number,
 }
 
 export const registerUser = createAsyncThunk<
@@ -52,7 +55,10 @@ export const registerUser = createAsyncThunk<
                 { withCredentials: true, }
             );
 
-            return response.data;
+            return {
+                ...response.data,
+                status: response.status // Thêm status code vào dữ liệu trả về
+            };
 
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Registration failed");
@@ -116,7 +122,7 @@ const authSlice = createSlice({
             .addCase(verifyEmail.fulfilled, (state) => {
                 state.isLoading = false;
                 state.user = null;
-                state.isAuthenticated =false;
+                state.isAuthenticated = false;
             })
             .addCase(verifyEmail.rejected, (state, action) => {
                 state.isLoading = false;

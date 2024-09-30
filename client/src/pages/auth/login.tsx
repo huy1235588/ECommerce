@@ -3,14 +3,18 @@ import { loginFormControls } from "@/config";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const initialState = {
+type FormData = {
+    email: string;
+    password: string;
+}
+
+const initialState: FormData = {
     email: "",
     password: "",
 };
 
 function AuthLogin() {
-
-    const [formData, setFormData] = useState(initialState);
+    const [formData, setFormData] = useState<FormData>(initialState);
 
     function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();

@@ -3,6 +3,9 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Textarea } from "../ui/textarea";
+import { requiredInput } from "@/utils/formatInput";
+import { OnChangeUserName } from "@/config/onChange";
+import { createInitialState } from "@/utils/state";
 
 type FormControl = {
     name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
@@ -13,18 +16,22 @@ type FormControl = {
     options?: { id: string, label: string }[];
     inputStyle?: string | null;
     maxLength?: number;
-    onBlur?: (value: string) => string | "";
+    onChange: (value: string) => string;
     inputComponent?: React.ComponentType<any>;
 };
+
+// Khởi tạo kiểu từ formData và đổi thành boolean
+type validationFormData = {
+    [key in keyof CommonFormProps['formData']]: boolean;
+}
 
 interface CommonFormProps {
     formControl: FormControl[];
     formData: any;
-    setFormData: any;
+    setFormData: React.Dispatch<React.SetStateAction<any>>;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     buttonText?: string;
     isBtnDisabled?: boolean;
-    isFormValid?: boolean;
 }
 
 function CommonForm({
@@ -33,26 +40,36 @@ function CommonForm({
     setFormData,
     onSubmit,
     buttonText,
-    isFormValid,
 }: CommonFormProps) {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpenSelect, setIsOpenSelect] = useState(false); // Khi nhấp vào select
 
+    // Khởi tạo key ban đầu là false
+    const initialValidationState = createInitialState(formData, false)
+    // Xác thực các input đã nhập hợp lệ
+    const [validationState, setValidationState] = useState<validationFormData>(initialValidationState);
+
+    // Kiểm tra nếu toàn bộ input hợp lệ
+    const isFormValid = Object.values(validationState).every((isValid) => isValid);
+
+    // Khi submit form
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        // Nếu toàn bộ input trong form hợp lệ
         if (isFormValid) {
             onSubmit(event);
         }
     };
 
     function renderInputs(getControlItem: FormControl) {
-        const [inputValue, setInputValue] = useState("");
-        const [formatInput, setFormatInput] = useState("");
+        const [inputValue, setInputValue] = useState(""); // Lấy giá trị trong input
+        const [formatInput, setFormatInput] = useState(""); // ghi lỗi khi input không hợp lệ
         const [inputType, setInputType] = useState(getControlItem.type);
+        const [isValidOnChange, setIsValidOnchange] = useState(""); // kiểm tra sự thay đổi của input có hợp lệ
 
         let element = null;
 
         const value = formData[getControlItem.name] || "" // Lấy giá trị hiện tại
-        const InputComponent = getControlItem.inputComponent;
+        const InputComponent = getControlItem.inputComponent; // Tùy chọn thêm component
 
         // INPUT
         switch (getControlItem.componentType) {
@@ -68,22 +85,73 @@ function CommonForm({
                             maxLength={getControlItem.maxLength}
                             value={value}
                             onChange={(event) => {
+                                // Kiểm tra input có hợp lệ, nếu có thì trả về chuỗi rỗng ""
+                                const validInput = getControlItem.onChange(event.target.value);
+                                setIsValidOnchange(validInput);
+
+                                // Gán chuỗi rỗng thì gán giá trị true 
+                                if (validInput === "") {
+                                    console.log("ha")
+                                    setValidationState((prevState) => ({
+                                        ...prevState,
+                                        [getControlItem.name]: true,
+                                    }));
+                                }
+                                // Trường hợp input không hợp lệ
+                                else {
+                                    setValidationState((prevState) => ({
+                                        ...prevState,
+                                        [getControlItem.name]: false,
+                                    }));
+                                }
+
+                                // Kiểm tra userName có tồn tại trong db
+                                if (getControlItem.name === "userName" && validInput === "") {
+                                    // Set false trước khi kiểm tra
+                                    setValidationState((prevState) => ({
+                                        ...prevState,
+                                        [getControlItem.name]: false,
+                                    }));
+
+                                    OnChangeUserName(event.target.value)
+                                        .then(result => {
+                                            setIsValidOnchange(result);
+                                            setFormatInput(result);
+                                            
+                                            // result trả về chuỗi rỗng khi useName không tồn tại
+                                            if (result === "") {
+                                                setValidationState((prevState) => ({
+                                                    ...prevState,
+                                                    [getControlItem.name]: true,
+                                                }));
+                                            }
+                                        })
+                                }
+
+                                // Lấy dữ liệu input
                                 setInputValue(event.target.value);
+                                // Đưa dữ liệu vào formData
                                 setFormData({
                                     ...formData,
                                     [getControlItem.name]: event.target.value,
-                                })
+                                });
                             }}
                             onBlur={() => {
-                                if (getControlItem.onBlur) {
-                                    setFormatInput(getControlItem.onBlur(inputValue));
+                                // Kiểm tra input không rỗng
+                                const isEmpty = requiredInput(inputValue);
+
+                                if (isEmpty === "") {
+                                    // Kiểm giá trị họp lệ mỗi input
+                                    setFormatInput(isValidOnChange);
                                 }
-                                return;
+                                else {
+                                    setFormatInput(isEmpty)
+                                }
                             }}
                             onFocus={() => setFormatInput("")}
                         />
                         {formatInput !== "" ? (
-                            <span className="text-[11px] text-red-600 mb-0.5">
+                            <span className="text-sm text-red-600 mb-0.5">
                                 {formatInput}
                             </span>
                         ) : null}
@@ -102,28 +170,45 @@ function CommonForm({
             case "select":
                 element = (
                     <Select
-                        onValueChange={(value) =>
+                        onValueChange={(value) => {
+                            const validInput = getControlItem.onChange(value);
+
+                            if (validInput === "") {
+                                console.log("ha")
+                                setValidationState((prevState) => ({
+                                    ...prevState,
+                                    [getControlItem.name]: true,
+                                }));
+                            }
+                            else {
+                                setValidationState((prevState) => ({
+                                    ...prevState,
+                                    [getControlItem.name]: false,
+                                }));
+                            }
+
                             setFormData({
                                 ...formData,
                                 [getControlItem.name]: value,
                             })
+                        }
                         }
                         value={value}
                         autoComplete={getControlItem.autocomplete}
                     >
                         <SelectTrigger
                             className="w-full h-16 dark static"
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => setIsOpenSelect(true)}
                         >
                             <SelectValue placeholder={getControlItem.placeholder} >
                                 {value}
                             </SelectValue>
                         </SelectTrigger>
 
-                        {isOpen && (
+                        {isOpenSelect && (
                             <SelectContent
                                 className="bg-gray-800 text-white overflow-y-scroll"
-                                onCloseAutoFocus={() => setIsOpen(false)}
+                                onCloseAutoFocus={() => setIsOpenSelect(false)}
                             >
                                 {getControlItem.options && getControlItem.options.length > 0
                                     ? getControlItem.options.map(optionItem => (
@@ -214,7 +299,11 @@ function CommonForm({
                 ))}
             </div>
 
-            <Button type="submit" disabled={!isFormValid} className=" w-full select-none">
+            <Button
+                type="submit"
+                disabled={!isFormValid}
+                className=" w-full select-none"
+            >
                 {buttonText || 'Submit'}
             </Button>
         </form>

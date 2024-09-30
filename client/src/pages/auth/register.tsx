@@ -2,8 +2,7 @@ import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config";
 import { registerUser } from "@/store/auth";
 import { AppDispatch } from "@/store/store";
-import { getStrongPassword, requiredInput, validateEmail } from "@/utils/formatInput";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -27,31 +26,9 @@ const initialState: FormData = {
 
 function AuthRegister() {
     const [formData, setFormData] = useState<FormData>(initialState);
-    const [isFormValid, setIsFormValid] = useState(false);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-
-    // Kiểm tra input form hợp lệ
-    useEffect(() => {
-        const { email, password } = formData;
-
-        const isEmpty = Object.values(formData).some((value) => requiredInput(value));
-
-        if (isEmpty) {
-            setIsFormValid(false);
-        }
-        else if (validateEmail(email) !== "") {
-            setIsFormValid(false);
-        }
-        else if (getStrongPassword(password) !== "") {
-            setIsFormValid(false);
-        }
-        else {
-            setIsFormValid(true);
-        }
-
-    }, [formData])
-
+    
     // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -88,7 +65,6 @@ function AuthRegister() {
                 formData={formData}
                 setFormData={setFormData}
                 onSubmit={onSubmit}
-                isFormValid={isFormValid}
             />
 
             <p className="mt-2">

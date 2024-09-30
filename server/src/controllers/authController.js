@@ -4,6 +4,31 @@ const crypto = require('crypto');
 const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 const { sendEmailVerification, sendEmailWelcome, sendEmailResetPassword, sendEmailResetSuccess } = require('../mail/email');
 
+const checkUserName = async (req, res) => {
+    const { userName } = req.body;
+    try {
+        const userNameAlreadyExists = await User.findOne({
+            userName: userName,
+        });
+
+        // const userNameAlreadyExists = false;
+        if (userNameAlreadyExists) {
+            return res.status(201).json({
+                success: false,
+                message: "UserName already exists",
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "",
+        });
+
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+};
+
 const signup = async (req, res) => {
     const { email, password, country, firstName, lastName, userName } = req.body;
 
@@ -252,6 +277,7 @@ const ha = async (req, res) => {
 };
 
 module.exports = {
+    checkUserName,
     signup,
     login,
     logout,
