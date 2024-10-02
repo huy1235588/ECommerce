@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-type FormData = {
+export type FormData = {
     email: string;
     country: string;
     userName: string;
@@ -36,15 +36,20 @@ function AuthRegister() {
         event.preventDefault();
         try {
             const resultAction = await dispatch(registerUser(formData));
-            const payload = resultAction.payload
+            const payload = resultAction.payload as {
+                success: boolean,
+                message: string,
+                clientId: string,
+            } | null;
 
-            // if (payload.message_ids === ) {
-            //     navigate(`/auth/verify-email?clientId=${payload.messageId}`, {
-            //         state: {
-            //             formData: formData,
-            //         }
-            //     });
-            // }
+            if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
+                navigate(`/auth/verify-email?clientId=${payload.clientId}`, {
+                    state: {
+                        email: formData.email,
+                        clientId: payload.clientId,
+                    }
+                });
+            }
 
         } catch (error) {
             console.log(error);

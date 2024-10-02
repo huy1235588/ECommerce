@@ -1,14 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosResponse } from "axios";
-
-interface FormData {
-    email: string;
-    country: string;
-    userName: string;
-    firstName: string;
-    lastName: string;
-    password: string;
-}
+import { FormData } from "@/pages/auth/register";
 
 interface verifyEmailPayload {
     email: string;
@@ -35,7 +27,9 @@ const initialState: AuthSlice = {
 // Định nghĩa trạng thái phản hồi của api
 interface AuthResponse {
     success: boolean,
+    message: string,
     status?: number,
+    clientId: string,
 }
 
 // Định nghĩa trạng thái lỗi của api
@@ -76,10 +70,14 @@ export const registerUser = createAsyncThunk<
 
 export const verifyEmail = createAsyncThunk<
     AuthResponse,
-    verifyEmailPayload
+    verifyEmailPayload,
+    { rejectValue: AuthError }
 >(
     "/auth/verify-email",
-    async (verifyEmailPayload, { rejectWithValue }) => {
+    async (
+        verifyEmailPayload,
+        { rejectWithValue }
+    ) => {
         try {
             const response: AxiosResponse<AuthResponse> = await axios.post(
                 '/api/auth/verify-email',
@@ -90,7 +88,42 @@ export const verifyEmail = createAsyncThunk<
             return response.data;
 
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || "Verification email failed");
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "Verification email failed"
+
+            return rejectWithValue({ message, status });
+        }
+    }
+);
+
+export const resendEmail = createAsyncThunk<
+    AuthResponse,
+    { email: string },
+    { rejectValue: AuthError }
+>(
+    "/auth/resend-email",
+    async (
+        email,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/resend-email',
+                email,
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error: any) {
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "resend email failed"
+
+            return rejectWithValue({ message, status });
         }
     }
 );
@@ -140,7 +173,26 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
-                state.error = action.error as string;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
+
+            // Resend Email
+            .addCase(resendEmail.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(resendEmail.fulfilled, (state) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+            })
+            .addCase(resendEmail.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
             })
     }
 })

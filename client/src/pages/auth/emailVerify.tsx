@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { verifyEmail } from "@/store/auth";
-import { AppDispatch } from "@/store/store";
+import { resendEmail, resetError, verifyEmail } from "@/store/auth";
+import { AppDispatch, RootState } from "@/store/store";
 import maskEmail from "@/utils/email";
 import { findLastIndex } from "@/utils/findLastIndex";
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { BiSolidXCircle } from "react-icons/bi";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 function EmailVerify() {
@@ -15,13 +16,14 @@ function EmailVerify() {
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
 
-    // Kiểm tra nếu không đúng id
+    const { status, isLoading, error } = useSelector((state: RootState) => state.auth);
+
+    // Kiểm tra nếu location.state tồn tại
     if (!location.state) {
         return <Navigate to={`/site${location.pathname}${location.search}`} />
     }
 
-    const { formData, clientId } = location.state;
-    const { email } = formData;
+    const { email, clientId } = location.state;
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -46,13 +48,20 @@ function EmailVerify() {
 
     // Sự kiện click gửi lại email
     const onClickResendEmail = async (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        dispatch(resetError()); // Reset lại lỗi
+
         try {
             event.preventDefault();
+            const resultAction = await dispatch(resendEmail(email));
+            const payload = resultAction.payload as { success: boolean, message: string } | null;
+
+            if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
+
+            }
 
         } catch (error) {
             console.log(error)
         }
-
     };
 
     const onChange = (index: number, value: string) => {
@@ -120,6 +129,13 @@ function EmailVerify() {
                 Please Verify Your Email
             </h1>
 
+            {error && status === 400 && (
+                <p className="flex items-center mb-5 p-5 rounded-md bg-gray-800 text-red-500 outline-none">
+                    <BiSolidXCircle className="mr-3" />
+                    {error}
+                </p>
+            )}
+
             <p className="font-medium">
                 To complete account setup, you need to verify
                 <span> {maskEmail(email)} </span>
@@ -141,8 +157,12 @@ function EmailVerify() {
                         className="w-12 h-12 text-center text-2xl font-bold "
                     />
                 ))}
-                <Button type="submit" className="mt-7 w-full">
-                    VERIFY EMAIL
+                <Button type="submit" className="mt-7 py-6 w-full">
+                    {isLoading ? (
+                        <div className="w-10 h-10 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
+                            <div className="w-6 h-6 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
+                        </div>
+                    ) : "VERIFY EMAIL"}
                 </Button>
             </form>
 
@@ -151,8 +171,8 @@ function EmailVerify() {
                 <br />
                 <Link
                     className="text-blue-500 font-medium mr-2 hover:underline"
-                    to={`/auth/verify-email?${clientId}`}
-                    onClick={() => onClickResendEmail}
+                    to={`/auth/verify-email?clientId=${clientId}`}
+                    onClick={onClickResendEmail}
                 >
                     Resend request
                 </Link>

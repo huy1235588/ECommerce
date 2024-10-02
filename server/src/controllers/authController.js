@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 const { sendEmailVerification, sendEmailWelcome, sendEmailResetPassword, sendEmailResetSuccess } = require('../mail/email');
+const generateRandomClientId = require('../utils/generateRandomClientId');
 
 const checkUserName = async (req, res) => {
     const { userName } = req.body;
@@ -74,13 +75,15 @@ const signup = async (req, res) => {
         generateTokenAndSetCookie(res, user.id);
 
         // Gửi email xác minh
-        // const message_ids = await sendEmailVerification(user.userName, user.email, verificationToken);
-        const message_ids = "haa";
+        // await sendEmailVerification(user.userName, user.email, verificationToken);
+
+        // Tạo ngẫu nhiên chuỗi clientId
+        const clientId = generateRandomClientId();
 
         res.status(201).json({
             success: true,
             message: "User created successfully",
-            option: { message_ids },
+            clientId,
         });
 
     } catch (error) {
@@ -100,12 +103,11 @@ const resendEmail = async (req, res) => {
 
         await user.save();
 
-        const message_ids = await sendEmailVerification(user.userName, user.email, verificationToken);
+        // await sendEmailVerification(user.userName, user.email, verificationToken);
 
         res.status(201).json({
             success: true,
             message: "User created successfully",
-            messageId: message_ids,
         });
 
     } catch (error) {
