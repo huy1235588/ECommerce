@@ -276,7 +276,7 @@ function CommonForm({
     return (
         <form onSubmit={handleSubmit}>
             {isError && (
-                <p className="flex items-center mb-3 p-5 rounded-md bg-gray-800 text-red-500">
+                <p className="flex items-center mb-5 p-5 rounded-md bg-gray-800 text-red-500">
                     <BiSolidXCircle className="mr-3" />
                     {isError}
                 </p>

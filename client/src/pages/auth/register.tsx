@@ -1,6 +1,6 @@
 import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config";
-import { registerUser } from "@/store/auth";
+import { registerUser, resetError } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,13 +29,12 @@ function AuthRegister() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
-    const { isLoading, error } = useSelector((state: RootState) => state.auth)
+    const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
     // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-
             const resultAction = await dispatch(registerUser(formData));
             const payload = resultAction.payload
 
@@ -54,7 +53,7 @@ function AuthRegister() {
 
     return (
         <main className="mmx-auto w-full max-w-md space-y-5">
-            <h1 className="text-center text-3xl text-gray-200 font-bold tracking-tight">
+            <h1 className="mb-5 text-center text-3xl text-gray-200 font-bold tracking-tight">
                 Create Account
             </h1>
 
@@ -73,6 +72,7 @@ function AuthRegister() {
                 <Link
                     className="text-blue-500 font-medium ml-2 hover:underline"
                     to="/auth/login"
+                    onClick={() => dispatch(resetError())}
                 >
                     Login
                 </Link>

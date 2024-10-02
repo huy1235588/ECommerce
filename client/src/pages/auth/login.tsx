@@ -1,8 +1,9 @@
 import CommonForm from "@/components/common/form";
 import { loginFormControls } from "@/config";
-import { RootState } from "@/store/store";
+import { resetError } from "@/store/auth";
+import { AppDispatch, RootState } from "@/store/store";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 type FormData = {
@@ -17,9 +18,9 @@ const initialState: FormData = {
 
 function AuthLogin() {
     const [formData, setFormData] = useState<FormData>(initialState);
+    const dispatch = useDispatch<AppDispatch>();
     
-    const isLoading = useSelector((state: RootState) => state.auth.isLoading)
-    const isError = useSelector((state: RootState) => state.auth.error)
+    const { isLoading, error } = useSelector((state: RootState) => state.auth) || null;
 
     function onSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -38,7 +39,7 @@ function AuthLogin() {
                 setFormData={setFormData}
                 onSubmit={onSubmit}
                 isLoading={isLoading}
-                isError={isError}
+                isError={error}
             />
 
             <p className="mt-2">
@@ -46,6 +47,7 @@ function AuthLogin() {
                 <Link
                     className="text-blue-500 font-medium ml-2 hover:underline"
                     to="/auth/register"
+                    onClick={() => dispatch(resetError())}
                 >
                     Register
                 </Link>
