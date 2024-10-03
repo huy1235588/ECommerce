@@ -12,7 +12,6 @@ const checkUserName = async (req, res) => {
             userName: userName,
         });
 
-        // const userNameAlreadyExists = false;
         if (userNameAlreadyExists) {
             return res.status(201).json({
                 success: false,
@@ -69,7 +68,7 @@ const signup = async (req, res) => {
             verificationToken,
             verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24h   
         });
-        // await user.save();
+        await user.save();
 
         // jwt
         generateTokenAndSetCookie(res, user.id);
@@ -94,7 +93,13 @@ const signup = async (req, res) => {
 const resendEmail = async (req, res) => {
     const { email } = req.body;
     try {
-        const user = await User.findOne(email);
+        const user = await User.findOne({
+            email: email,
+        });
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
@@ -107,7 +112,7 @@ const resendEmail = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: "User created successfully",
+            message: "Resend email successfully",
         });
 
     } catch (error) {
@@ -138,15 +143,15 @@ const verifyEmail = async (req, res) => {
 
         await user.save();
 
-        await sendEmailWelcome(user.userName, user.email);
+        // await sendEmailWelcome(user.userName, user.email);
 
         res.status(200).json({
             success: true,
             message: "Email verified successfully",
-            user: {
-                ...user._doc,
-                password: undefined,
-            }
+            // user: {
+            //     ...user._doc,
+            //     password: undefined,
+            // }
         });
 
     } catch (error) {
@@ -179,10 +184,10 @@ const login = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Logged in successfully",
-            user: {
-                ...user._doc,
-                password: undefined,
-            }
+            // user: {
+            //     ...user._doc,
+            //     password: undefined,
+            // }
         })
 
     } catch (error) {

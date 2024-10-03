@@ -111,7 +111,7 @@ export const resendEmail = createAsyncThunk<
         try {
             const response: AxiosResponse<AuthResponse> = await axios.post(
                 '/api/auth/resend-email',
-                email,
+                { email: email },
                 { withCredentials: true }
             )
 
@@ -146,7 +146,7 @@ const authSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(registerUser.fulfilled, (state, action) => {
+            .addCase(registerUser.fulfilled, (state) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
