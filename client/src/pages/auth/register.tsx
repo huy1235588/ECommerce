@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 
-export type FormData = {
+export type FormDataRegister = {
     email: string;
     country: string;
     userName: string;
@@ -15,7 +15,7 @@ export type FormData = {
     password: string;
 }
 
-const initialState: FormData = {
+const initialState: FormDataRegister = {
     email: "",
     country: "",
     userName: "",
@@ -25,7 +25,7 @@ const initialState: FormData = {
 };
 
 function AuthRegister() {
-    const [formData, setFormData] = useState<FormData>(initialState);
+    const [formData, setFormData] = useState<FormDataRegister>(initialState);
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 

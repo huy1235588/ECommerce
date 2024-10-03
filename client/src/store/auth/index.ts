@@ -1,26 +1,31 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios, { AxiosResponse } from "axios";
-import { FormData } from "@/pages/auth/register";
+import { FormDataRegister } from "@/pages/auth/register";
+import { FormDataLogin } from "@/pages/auth/login";
 
 interface verifyEmailPayload {
     email: string;
     code: string;
 }
 
+type User = {
+    userName: string;
+}
+
 // Định nghĩa AuthSlice
 interface AuthSlice {
+    user: any,
     isAuthenticated: boolean;
     isLoading: boolean;
-    user: Object | null;
     error?: string | null;
     status?: number;
 }
 
 // Khởi tạo trạng thái ban đầu của AuthSlice
 const initialState: AuthSlice = {
+    user: null,
     isAuthenticated: false,
     isLoading: false,
-    user: null,
     status: undefined,
 }
 
@@ -29,6 +34,7 @@ interface AuthResponse {
     success: boolean,
     message: string,
     status?: number,
+    user?: any,
     clientId: string,
 }
 
@@ -40,18 +46,18 @@ interface AuthError {
 
 export const registerUser = createAsyncThunk<
     AuthResponse,
-    FormData,
+    FormDataRegister,
     { rejectValue: AuthError }
 >(
     "/auth/register",
     async (
-        formData,
+        formDataRegister,
         { rejectWithValue }
     ) => {
         try {
             const response: AxiosResponse<AuthResponse> = await axios.post(
                 '/api/auth/signup',
-                formData,
+                formDataRegister,
                 { withCredentials: true, }
             );
 
@@ -128,12 +134,42 @@ export const resendEmail = createAsyncThunk<
     }
 );
 
+export const LoginUser = createAsyncThunk<
+    AuthResponse,
+    FormDataLogin,
+    { rejectValue: AuthError }
+>(
+    "/auth/login",
+    async (
+        FormDataLogin,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/login',
+                FormDataLogin,
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error: any) {
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "login failed"
+
+            return rejectWithValue({ message, status });
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
         setUser: (state, action: PayloadAction<AuthResponse | null>) => {
-            state.user = action.payload;
+            state.user = action.payload?.user;
         },
         resetError(state) {
             state.error = null;
@@ -194,6 +230,25 @@ const authSlice = createSlice({
                 state.error = action.payload?.message;
                 state.status = action.payload?.status;
             })
+
+            // Login User
+            .addCase(LoginUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(LoginUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.success ? action.payload.user : null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(LoginUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
+
     }
 })
 

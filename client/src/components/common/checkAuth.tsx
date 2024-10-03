@@ -18,24 +18,24 @@ const CheckAuth: React.FC<CheckAuthProps> = ({
 }) => {
     const location = useLocation();
 
-    // Kiểm tra xem đã đăng nhập chưa.
-    // Nếu chưa sẽ chuyển hướng đến trang đăng nhập
-    if (
-        !isAuthenticated &&
-        !['login', 'register', 'verify-email'].some((path) => location.pathname.includes(path))
-    ) {
-        return <Navigate to='/auth/login' />;
-    }
+    // // Kiểm tra xem đã đăng nhập chưa.
+    // // Nếu chưa sẽ chuyển hướng đến trang đăng nhập
+    // if (
+    //     !isAuthenticated &&
+    //     !['login', 'register', 'verify-email'].some((path) => location.pathname.includes(path))
+    // ) {
+    //     return <Navigate to='/auth/login' />;
+    // }
 
-    // Nếu đã đăng nhặp thì chuyển hướng dựa vào vai trò của người dùng
-    if (
-        isAuthenticated &&
-        ['login', 'register'].some((path) => location.pathname.includes(path))
-    ) {
-        return user?.role === 'admin'
-            ? <Navigate to="/admin/dashboard" /> // Chuyển hướng cho ADMIN
-            : <Navigate to="/shop/home" /> // Chuyển hướng cho USER
-    }
+    // // Nếu đã đăng nhặp thì chuyển hướng dựa vào vai trò của người dùng
+    // if (
+    //     isAuthenticated &&
+    //     ['login', 'register'].some((path) => location.pathname.includes(path))
+    // ) {
+    //     return user?.role === 'admin'
+    //         ? <Navigate to="/admin/dashboard" /> // Chuyển hướng cho ADMIN
+    //         : <Navigate to="/shop/home" /> // Chuyển hướng cho USER
+    // }
 
     // Ngăn người dùng truy cập trang admin
     if (

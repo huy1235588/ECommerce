@@ -1,29 +1,45 @@
 import CommonForm from "@/components/common/form";
 import { loginFormControls } from "@/config";
-import { resetError } from "@/store/auth";
+import { LoginUser, resetError } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-type FormData = {
+export type FormDataLogin = {
     email: string;
     password: string;
 }
 
-const initialState: FormData = {
+const initialState: FormDataLogin = {
     email: "",
     password: "",
 };
 
 function AuthLogin() {
-    const [formData, setFormData] = useState<FormData>(initialState);
+    const [formData, setFormData] = useState<FormDataLogin>(initialState);
     const dispatch = useDispatch<AppDispatch>();
-    
+    const navigate = useNavigate();
+
     const { isLoading, error } = useSelector((state: RootState) => state.auth) || null;
 
-    function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        try {
+            const resultAction = await dispatch(LoginUser(formData));
+            const payload = resultAction.payload as {
+                success: boolean,
+                message: string,
+            } | null;
+
+            if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
+                console.log("ga")
+                navigate("/");
+            }
+
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
