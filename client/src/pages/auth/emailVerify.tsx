@@ -3,15 +3,17 @@ import { Input } from "@/components/ui/input";
 import { resendEmail, resetError, verifyEmail } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import maskEmail from "@/utils/email";
-import { findLastIndex } from "@/utils/findLastIndex";
 import React, { useEffect, useRef, useState } from "react";
 import { BiSolidXCircle } from "react-icons/bi";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 function EmailVerify() {
-    const [code, setCode] = useState(["", "", "", "", "", ""])
-    const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+    const [code, setCode] = useState("");
+    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    const [isFormValid, setIsFormValid] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>();
@@ -28,12 +30,10 @@ function EmailVerify() {
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        const verificationCode = code.join("");
-
         try {
             const resultAction = await dispatch(verifyEmail({
                 email: email,
-                code: verificationCode,
+                code: code,
             }));
             const payload = resultAction.payload as { success: boolean, message: string } | null;
 
@@ -48,6 +48,11 @@ function EmailVerify() {
 
     // Sự kiện click gửi lại email
     const onClickResendEmail = async (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        if (timeLeft !== null) {
+            event.preventDefault();
+            return;
+        }
+
         dispatch(resetError()); // Reset lại lỗi
 
         try {
@@ -56,7 +61,7 @@ function EmailVerify() {
             const payload = resultAction.payload as { success: boolean, message: string } | null;
 
             if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
-
+                setTimeLeft(60); // Đặt thời gian đếm ngược là 60 giây
             }
 
         } catch (error) {
@@ -64,64 +69,37 @@ function EmailVerify() {
         }
     };
 
-    const onChange = (index: number, value: string) => {
-        const newCode = [...code];
-
+    const handleChange = (value: string) => {
         // Kiểm tra nếu giá trị nhập vào không phải là số thì không làm gì
         if (!/^\d*$/.test(value)) {
             return;
         }
 
-        // Trường hợp paste nhiều ký tự vào input
-        if (value.length > 1 && index !== 5) {
-            const pastedCode = value.slice(0, 6 - index).split("");
+        setCode(value)
 
-            for (let i = 0; i < 6; i++) {
-                newCode[i] = pastedCode[i] || "";
-            }
-
-            setCode(newCode);
-
-            const lastFilledIndex = findLastIndex(newCode, (digit) => digit !== "");
-            const focusIndex = lastFilledIndex < 5 ? lastFilledIndex + 1 : 5;
-
-            const nextInput = inputRefs.current[focusIndex];
-            if (nextInput) {
-                nextInput.focus();
-            }
+        // Kiểm tra xem đã nhập đủ 6 số
+        if (value.length === 6) {
+            setIsFormValid(true);
         }
-        // Trường hợp nhập từng ký tự
         else {
-            newCode[index] = value;
-            setCode(newCode);
-
-            // Di chuyển đến input tiếp theo khi được nhập
-            if (value && index < 5) {
-                const nextInput = inputRefs.current[index + 1];
-                if (nextInput) {
-                    nextInput.focus();
-                }
-            }
-        }
-    };
-
-    const onKeydown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Backspace' && !code[index] && index > 0) {
-            const prevInput = inputRefs.current[index - 1];
-            if (prevInput != null) {
-                prevInput.focus();
-            }
+            setIsFormValid(false);
         }
     };
 
     useEffect(() => {
-        // Kiểm tra các input đều được nhập
-        if (code.every((digit) => digit !== "")) {
-            // Tạo một sự kiện submit form
-            const submitEvent = new Event("submit", { bubbles: true });
-            onSubmit(submitEvent as unknown as React.FormEvent<HTMLFormElement>);
+        if (timeLeft === 0) {
+            setTimeLeft(null);
+            return; // Dừng lại khi thời gian hết
         }
-    }, [code]);
+
+        if (timeLeft !== null) {
+            const timer = setTimeout(() => {
+                setTimeLeft(timeLeft - 1);
+            }, 1000);
+
+            return () => clearTimeout(timer); // Xóa bộ đếm thời gian khi component unmount
+        }
+    }, [timeLeft]);
 
     return (
         <main className="mmx-auto w-full max-w-md space-y-6">
@@ -137,51 +115,68 @@ function EmailVerify() {
             )}
 
             <p className="font-medium">
-                To complete account setup, you need to verify
+                Please enter the email verification code to verify your identity
                 <span> {maskEmail(email)} </span>
-                Please check your email then
-                enter the security code below.
             </p>
 
-            <form className="flex flex-wrap justify-between gap-3" onSubmit={onSubmit}>
-                {code.map((digit, index) => (
+            <form className="gap-2" onSubmit={onSubmit}>
+                <div className="relative flex flex-wrap justify-between gap-3">
                     <Input
-                        key={index}
-                        ref={(el) => (inputRefs.current[index] = el)}
+                        id="code"
+                        ref={inputRef}
                         type="text"
-                        maxLength={index !== 5 ? 6 : 1}
-                        value={digit}
-                        onChange={(e) => onChange(index, e.target.value)}
-                        onKeyDown={(e) => onKeydown(index, e)}
-                        onFocus={(e) => e.target.select()}
-                        className="w-12 h-12 text-center text-2xl font-bold "
+                        maxLength={6}
+                        value={code}
+                        placeholder=""
+                        onChange={(e) => handleChange(e.target.value)}
+                        className="peer h-16 pl-3 pr-40 pt-7 pb-3 text-lg font-bold "
                     />
-                ))}
-                <Button type="submit" className="mt-7 py-6 w-full">
-                    {isLoading ? (
-                        <div className="w-10 h-10 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full">
-                            <div className="w-6 h-6 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full"></div>
-                        </div>
-                    ) : "VERIFY EMAIL"}
+                    <label
+                        className="absolute cursor-text select-none text-gray-500 duration-200 transform -translate-y-0 top-5 z-10 origin-[0] left-4 peer-focus:-translate-y-4 peer-focus:scale-[0.85] peer-[:not(:placeholder-shown)]:-translate-y-4 peer-[:not(:placeholder-shown)]:scale-[0.85]"
+                        htmlFor="code"
+                    >
+                        Verification code
+                    </label>
+                    <p className="absolute h-full right-5 flex items-center">
+                        {code !== "" &&
+                            <BiSolidXCircle
+                                onClick={() => {
+                                    setCode("");
+                                    setIsFormValid(false);
+                                    inputRef.current?.focus();
+                                }}
+                                className="text-gray-500 cursor-pointer"
+                            />
+                        }
+                        <Link
+                            className={`ml-5 cursor-pointer text-blue-500 hover:text-blue-600 select-none ${timeLeft !== null ? 'cursor-not-allowed text-gray-600 hover:text-gray-600' : ''}`}
+                            to={`/auth/verify-email?clientId=${clientId}`}
+                            onClick={onClickResendEmail}
+                        >
+                            <span className="border-l-[1px] border-gray-800 mr-3"></span>
+                            <span>Send</span>
+                            {timeLeft !== null && <span> ({timeLeft})</span>}
+                        </Link>
+                    </p>
+                </div>
+                <Button
+                    type="submit"
+                    className="mt-5 py-6 w-full"
+                    disabled={!isFormValid}
+                >
+                    VERIFY EMAIL
                 </Button>
             </form>
 
-            <p>
+            <p className="font-medium">
                 Didn't receive the email? Check the spam folder.
                 <br />
                 <Link
-                    className="text-blue-500 font-medium mr-2 hover:underline"
-                    to={`/auth/verify-email?clientId=${clientId}`}
-                    onClick={onClickResendEmail}
-                >
-                    Resend request
-                </Link>
-                or
-                <Link
-                    className="text-blue-500 font-medium ml-2 hover:underline"
+                    className="text-blue-500 hover:underline"
                     to={"/auth/register"}
+                    onClick={() => dispatch(resetError())}
                 >
-                    change email address
+                    Change email address
                 </Link>
             </p>
 
@@ -190,11 +185,20 @@ function EmailVerify() {
                 <Link
                     className="text-blue-500 font-medium ml-2 hover:underline"
                     to="/auth/login"
+                    onClick={() => dispatch(resetError())}
                 >
                     Login
                 </Link>
             </p>
 
+            {isLoading && (
+                <div>
+                    <p className="absolute top-0 bottom-0 right-0 left-0 bg-black/50 space-y-0"></p>
+                    <div className="absolute top-[43%] right-[48%] w-10 h-10 border-4 border-transparent text-blue-400 text-4xl animate-spin flex items-center justify-center border-t-blue-400 rounded-full opacity-100">
+                        <div className="w-6 h-6 border-4 border-transparent text-red-400 text-2xl animate-spin flex items-center justify-center border-t-red-400 rounded-full opacity-100"></div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
