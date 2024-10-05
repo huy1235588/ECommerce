@@ -8,7 +8,7 @@ const PasswordCriteria: React.FC<PasswordCriteriaProps> = ({
     password
 }) => {
     const criteria = [
-        { label: "Use at least 7 characters", met: password.length >= 7 },
+        { label: "Password must be 7-255 characters", met: password.length >= 7 && password.length <= 255 },
         { label: "Use at least 1 letter", met: /[A-Za-z]/.test(password) },
         { label: "Use at least 1 number", met: /\d/.test(password) },
         { label: "Not use spaces", met: !/\s/.test(password) },
@@ -64,7 +64,7 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
     };
 
     return (
-        <div className='w-full mt-1'>
+        <div className='w-full'>
             {/* <div className='flex justify-between items-center mb-1'>
                 <span className='text-xs text-gray-400'>Password strength</span>
                 <span className='text-xs text-gray-400'>{getStrengthText(strength)}</span>

@@ -61,6 +61,7 @@ function ResetPassword() {
                         ref={inputRef}
                         type={passwordType}
                         value={password}
+                        maxLength={255}
                         placeholder=""
                         onChange={(event) => {
                             // Lấy giá trị của input
@@ -134,6 +135,7 @@ function ResetPassword() {
                         ref={inputRef}
                         type={confirmPasswordType}
                         value={confirmPassword}
+                        maxLength={255}
                         placeholder=""
                         onChange={(event) => {
                             // Lấy giá trị của input
