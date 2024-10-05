@@ -8,11 +8,10 @@ const PasswordCriteria: React.FC<PasswordCriteriaProps> = ({
     password
 }) => {
     const criteria = [
-        { label: "At least 6 characters", met: password.length >= 6 },
-        { label: "Contains uppercase letter", met: /[A-Z]/.test(password) },
-        { label: "Contains lowercase letter", met: /[a-z]/.test(password) },
-        { label: "Contains a number", met: /\d/.test(password) },
-        { label: "Contains special character", met: /[^A-Za-z0-9]/.test(password) },
+        { label: "Use at least 7 characters", met: password.length >= 7 },
+        { label: "Use at least 1 letter", met: /[A-Za-z]/.test(password) },
+        { label: "Use at least 1 number", met: /\d/.test(password) },
+        { label: "Not use spaces", met: !/\s/.test(password) },
     ];
 
     return (
@@ -65,13 +64,13 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
     };
 
     return (
-        <div className='mt-2'>
-            <div className='flex justify-between items-center mb-1'>
+        <div className='w-full mt-1'>
+            {/* <div className='flex justify-between items-center mb-1'>
                 <span className='text-xs text-gray-400'>Password strength</span>
                 <span className='text-xs text-gray-400'>{getStrengthText(strength)}</span>
-            </div>
+            </div> */}
 
-            <div className='flex space-x-1'>
+            {/* <div className='flex space-x-1'>
                 {[...Array(4)].map((_, index) => (
                     <div
                         key={index}
@@ -80,7 +79,7 @@ const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
               `}
                     />
                 ))}
-            </div>
+            </div> */}
             <PasswordCriteria password={password} />
         </div>
     );
