@@ -224,6 +224,45 @@ export const ForgotPasswordVerifyUser = createAsyncThunk<
     }
 )
 
+export const ResetPasswordUser = createAsyncThunk<
+    AuthResponse,
+    {
+        email: string,
+        password: string,
+    },
+    { rejectValue: AuthError }
+>(
+    "/auth/reset-password",
+    async (
+        {
+            email,
+            password,
+        },
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/reset-password',
+                {
+                    email,
+                    password,
+                },
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error: any) {
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "Error sending reset password email"
+
+            return rejectWithValue({ message, status });
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -338,6 +377,24 @@ const authSlice = createSlice({
                 state.isAuthenticated = action.payload.success;
             })
             .addCase(ForgotPasswordVerifyUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
+
+            // Reset Password Verify
+            .addCase(ResetPasswordUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(ResetPasswordUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.success ? action.payload.user : null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(ResetPasswordUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;

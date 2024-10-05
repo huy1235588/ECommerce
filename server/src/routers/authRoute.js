@@ -17,7 +17,7 @@ router.post('/verify-email', verifyEmail);
 router.post('/forgot-password', forgotPassword);
 router.post('/forgot-password/verify', forgotPasswordVerify);
 
-router.post('/reset-password/:token', resetPassword);
+router.post('/reset-password/', resetPassword);
 
 router.post('/ha', ha);
 

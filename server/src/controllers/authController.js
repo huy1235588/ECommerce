@@ -274,28 +274,19 @@ const forgotPasswordVerify = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     try {
-        const { token } = req.params;
-        const { password } = req.body;
+        const { email, password } = req.body;
 
         const user = await User.findOne({
-            resetPasswordToken: token,
-            resetPasswordExpiresAt: { $gt: Date.now() },
+            email: email,
         });
-
-        if (!user) {
-            return res.status(400).json({ success: false, message: "Invalid or expires reset token" });
-        }
 
         // Cập nhật password
         const hashedPassword = await bcrypt.hash(password, 10);
         user.password = hashedPassword;
 
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpiresAt = undefined;
-
         await user.save();
 
-        await sendEmailResetSuccess(user.userName, user.email);
+        // await sendEmailResetSuccess(user.userName, user.email);
 
         res.status(200).json({ success: true, message: "Password reset successfully" });
 

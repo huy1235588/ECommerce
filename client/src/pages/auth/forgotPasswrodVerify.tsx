@@ -36,7 +36,11 @@ function ForgotPasswordVerify() {
         const payload = resultAction.payload as { success: boolean, message: string } | null;
 
         if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
-            navigate("/auth/reset-password");
+            navigate("/auth/reset-password", {
+                state: {
+                    email: email,
+                }
+            });
         }
     };
 

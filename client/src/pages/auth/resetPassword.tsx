@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PasswordStrengthMeter from "@/components/utils/passwordStrong";
-import { RootState } from "@/store/store";
+import { ResetPasswordUser } from "@/store/auth";
+import { AppDispatch, RootState } from "@/store/store";
 import { getStrongPassword } from "@/utils/formatInput";
 import { useRef, useState } from "react";
 import { BiSolidHide, BiSolidShow, BiSolidXCircle } from "react-icons/bi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 
 type validationData = {
     password: boolean;
@@ -22,6 +24,16 @@ function ResetPassword() {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const { status, error, isLoading } = useSelector((state: RootState) => state.auth);
+    const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
+
+    // Kiểm tra nếu location.state tồn tại
+    if (!location.state) {
+        return <Navigate to={`/site${location.pathname}${location.search}`} />
+    }
+
+    const { email } = location.state;
 
     // Xác thực các input đã nhập hợp lệ
     const [validationState, setValidationState] = useState<validationData>({
@@ -32,8 +44,17 @@ function ResetPassword() {
     // Kiểm tra nếu toàn bộ input hợp lệ
     const isFormValid = Object.values(validationState).every((isValid) => isValid);
 
+    // Sự kiện submit
     const onSubmit = async () => {
+        const resultAction = await dispatch(ResetPasswordUser({
+            email: email,
+            password: password,
+        }));
+        const payload = resultAction.payload as { success: boolean, message: string } | null;
 
+        if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
+            navigate("/auth/login");
+        }
     };
 
     return (
@@ -53,7 +74,12 @@ function ResetPassword() {
                 Please enter the account you want to retrieve the password
             </p>
 
-            <form className="gap-2" onSubmit={onSubmit}>
+            <form className="gap-2" onSubmit={(event) => {
+                event.preventDefault();
+                if (isFormValid) {
+                    onSubmit();
+                }
+            }}>
                 {/* New Password */}
                 <div className="relative flex flex-wrap justify-between gap-1">
                     <Input
