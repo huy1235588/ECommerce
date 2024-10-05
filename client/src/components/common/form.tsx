@@ -312,7 +312,7 @@ function CommonForm({
             <Button
                 type="submit"
                 disabled={!isFormValid}
-                className=" w-full select-none"
+                className=" w-full select-none py-6 bg-blue-600 text-white hover:bg-blue-500"
             >
                 {isLoading
                     ? (<BiLoaderAlt />)

@@ -10,7 +10,7 @@ import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 function EmailVerify() {
     const [code, setCode] = useState("");
-    const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    const [timeLeft, setTimeLeft] = useState<number | null>(60);
     const [isFormValid, setIsFormValid] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
