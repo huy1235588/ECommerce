@@ -16,6 +16,9 @@ import ShoppingListing from './pages/shopping/listing'
 import CheckAuth from './components/common/checkAuth'
 import UnAuthPage from './pages/unauth-page'
 import EmailVerify from './pages/auth/emailVerify'
+import ForgotPassword from './pages/auth/forgotPassword'
+import ResetPassword from './pages/auth/resetPassword'
+import ForgotPasswordVerify from './pages/auth/forgotPasswrodVerify'
 
 function App(): JSX.Element {
     const isAuthenticated = false;
@@ -37,6 +40,9 @@ function App(): JSX.Element {
                     <Route path='login' element={<AuthLogin />} />
                     <Route path='register' element={<AuthRegister />} />
                     <Route path='verify-email' element={<EmailVerify />} />
+                    <Route path='forgot-password' element={<ForgotPassword />} />
+                    <Route path='forgot-password/verify' element={<ForgotPasswordVerify />} />
+                    <Route path='reset-password' element={<ResetPassword />} />
                 </Route>
 
                 {/* Admin */}

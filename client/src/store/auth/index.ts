@@ -164,6 +164,66 @@ export const LoginUser = createAsyncThunk<
     }
 );
 
+export const ForgotPasswordUser = createAsyncThunk<
+    AuthResponse,
+    { email: string },
+    { rejectValue: AuthError }
+>(
+    "/auth/forgot-password",
+    async (
+        email,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/forgot-password',
+                email,
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error: any) {
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "Error sending reset password email"
+
+            return rejectWithValue({ message, status });
+        }
+    }
+);
+
+export const ForgotPasswordVerifyUser = createAsyncThunk<
+    AuthResponse,
+    verifyEmailPayload,
+    { rejectValue: AuthError }
+>(
+    "auth/forgot-password/verify",
+    async (
+        verifyEmailPayload,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/forgot-password/verify',
+                verifyEmailPayload,
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error: any) {
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "Verification email failed"
+
+            return rejectWithValue({ message, status });
+        }
+    }
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -242,6 +302,42 @@ const authSlice = createSlice({
                 state.isAuthenticated = action.payload.success;
             })
             .addCase(LoginUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
+
+            // Forgot Password
+            .addCase(ForgotPasswordUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(ForgotPasswordUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.success ? action.payload.user : null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(ForgotPasswordUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
+
+            // Forgot Password Verify
+            .addCase(ForgotPasswordVerifyUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(ForgotPasswordVerifyUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.success ? action.payload.user : null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(ForgotPasswordVerifyUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;

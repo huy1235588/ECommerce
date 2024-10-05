@@ -58,14 +58,20 @@ function AuthLogin() {
                 isError={error}
             />
 
-            <p className="mt-2">
-                Don't have an account?
+            <p className="flex justify-between mt-2">
                 <Link
-                    className="text-blue-500 font-medium ml-2 hover:underline"
+                    className="text-blue-300 font-medium ml-2 hover:underline"
+                    to="/auth/forgot-password"
+                    onClick={() => dispatch(resetError())}
+                >
+                    Forgot password?
+                </Link>
+                <Link
+                    className="text-blue-300 font-medium ml-2 hover:underline"
                     to="/auth/register"
                     onClick={() => dispatch(resetError())}
                 >
-                    Register
+                    Create account
                 </Link>
             </p>
         </main>
