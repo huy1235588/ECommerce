@@ -206,11 +206,11 @@ const forgotPassword = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ success: true, message: "User not found" });
+            return res.status(404).json({ success: true, message: "User not found" });
         }
 
         // Khởi tạo reset token
-        const resetToken = crypto.randomBytes(20).toString('hex');
+        const resetToken = Math.floor(100000 + Math.random() * 900000).toString();
         const resetTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
 
         user.resetPasswordToken = resetToken;
@@ -218,18 +218,57 @@ const forgotPassword = async (req, res) => {
 
         await user.save();
 
-        // Gửi email
-        await sendEmailResetPassword(
-            user.userName,
-            user.email,
-            `${process.env.CLIENT_URL}/reset-password/${resetToken}`
-        );
+        // // Gửi email
+        // await sendEmailResetPassword(
+        //     user.userName,
+        //     user.email,
+        //     resetToken,
+        //     `${process.env.CLIENT_URL}`
+        //     // `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+        // );
 
         res.status(200).json({ success: true, message: "Password reset link sent to your email" });
 
     } catch (error) {
         console.log("Error in forgotPassword ", error);
         res.status(400).json({ success: false, message: error.message });
+    }
+};
+
+const forgotPasswordVerify = async (req, res) => {
+    const { email, code } = req.body;
+    try {
+        const user = await User.findOne({
+            email: email,
+            resetPasswordToken: code,
+            resetPasswordExpiresAt: { $gt: Date.now() }, // $gt: greater than
+        });
+
+        if (!user) {
+            console.log("Invalid or expired verification code");
+            return res.status(404).json({
+                success: false,
+                message: "Invalid or expired verification code"
+            });
+        }
+
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Email verified successfully",
+            // user: {
+            //     ...user._doc,
+            //     password: undefined,
+            // }
+        });
+
+    } catch (error) {
+        console.log("error in verifyEmail ", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
 };
 
@@ -293,6 +332,7 @@ module.exports = {
     resendEmail,
     verifyEmail,
     forgotPassword,
+    forgotPasswordVerify,
     resetPassword,
     checkAuth,
     ha,

@@ -1,5 +1,5 @@
 const express = require('express');
-const { signup, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, ha, resendEmail, checkUserName } = require('../controllers/authController');
+const { signup, login, logout, verifyEmail, forgotPassword, resetPassword, checkAuth, ha, resendEmail, checkUserName, forgotPasswordVerify } = require('../controllers/authController');
 const { verifyToken } = require('../middleware/verifyToken');
 
 const router = express.Router();
@@ -15,6 +15,7 @@ router.post('/logout', logout);
 router.post('/resend-email', resendEmail);
 router.post('/verify-email', verifyEmail);
 router.post('/forgot-password', forgotPassword);
+router.post('/forgot-password/verify', forgotPasswordVerify);
 
 router.post('/reset-password/:token', resetPassword);
 

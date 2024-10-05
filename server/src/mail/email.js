@@ -48,11 +48,12 @@ const sendEmailWelcome = async (userName, email) => {
     }
 };
 
-const sendEmailResetPassword = async (userName, email, resetPasswordURL) => {
+const sendEmailResetPassword = async (userName, email, resetPasswordToken, resetPasswordURL) => {
     const recipient = [{ email }];
 
     const htmlTemplate = PASSWORD_RESET_REQUEST_TEMPLATE
         .replace("{userName}", userName)
+        .replace("{resetPasswordToken}", resetPasswordToken)
         .replace("{resetPasswordURL}", resetPasswordURL)
 
     try {
