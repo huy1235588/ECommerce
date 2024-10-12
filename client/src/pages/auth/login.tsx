@@ -21,7 +21,7 @@ function AuthLogin() {
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
-    const { isLoading, error } = useSelector((state: RootState) => state.auth) || null;
+    const { isLoading, error, status } = useSelector((state: RootState) => state.auth) || null;
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -33,7 +33,6 @@ function AuthLogin() {
             } | null;
 
             if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
-                console.log("ga")
                 navigate("/");
             }
 
@@ -55,7 +54,7 @@ function AuthLogin() {
                 setFormData={setFormData}
                 onSubmit={onSubmit}
                 isLoading={isLoading}
-                isError={error}
+                isError={(status === 404) ? error : null}
             />
 
             <p className="flex justify-between mt-2">

@@ -8,13 +8,27 @@ interface verifyEmailPayload {
     code: string;
 }
 
-type User = {
+export type User = {
+    _id: string;
+    email: string;
+    country: string;
+    firstName: string;
+    lastName: string;
     userName: string;
+    password: string;
+    isVerified: boolean;
+    role: string;
+    verificationToken: string;
+    verificationTokenExpiresAt: Date;
+    lastLogin: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    __v: number;
 }
 
 // Định nghĩa AuthSlice
 interface AuthSlice {
-    user: any,
+    user: User | null,
     isAuthenticated: boolean;
     isLoading: boolean;
     error?: string | null;
@@ -166,11 +180,12 @@ export const LoginUser = createAsyncThunk<
 
 export const LogoutUser = createAsyncThunk<
     AuthResponse,
+    void,
     { rejectValue: AuthError }
 >(
     "/auth/logout",
     async (
-        { },
+        _,
         { rejectWithValue }
     ) => {
         try {
@@ -185,7 +200,7 @@ export const LogoutUser = createAsyncThunk<
             // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
             const status = error.response?.status || 500;
             // Lấy thông báo lỗi từ server
-            const message = error.response?.data?.message || "Error sending reset password email"
+            const message = error.response?.data?.message || "Error Logout user"
 
             return rejectWithValue({ message, status });
         }
@@ -291,6 +306,35 @@ export const ResetPasswordUser = createAsyncThunk<
     }
 );
 
+export const CheckAuthUser = createAsyncThunk<
+    AuthResponse,
+    void,
+    { rejectValue: AuthError }
+>(
+    "/auth/check-auth",
+    async (
+        _,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.get(
+                '/api/auth/check-auth',
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error: any) {
+            // Lấy status code, nếu không có thì mặc định là 500 (Internal Server Error)
+            const status = error.response?.status || 500;
+            // Lấy thông báo lỗi từ server
+            const message = error.response?.data?.message || "Error sending reset password email"
+
+            return rejectWithValue({ message, status });
+        }
+    }
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -390,8 +434,13 @@ const authSlice = createSlice({
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
-                state.error = action.payload.;
-                state.status = action.payload?.status;
+                if (action.payload) {
+                    state.error = action.payload.message;
+                    state.status = action.payload.status;
+                } else {
+                    state.error = "An unknown error occurred";
+                    state.status = 500;
+                }
             })
 
             // Forgot Password
@@ -448,6 +497,23 @@ const authSlice = createSlice({
                 state.status = action.payload?.status;
             })
 
+            // Check Auth
+            .addCase(CheckAuthUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(CheckAuthUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.success ? action.payload.user : null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(CheckAuthUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
     }
 })
 

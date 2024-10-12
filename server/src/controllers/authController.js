@@ -165,19 +165,23 @@ const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({
+            // ^$ $ Chính các từ đầu đến cuối
+            // 'i' Không phân biệt chữ hoa
+            email: { $regex: new RegExp(`^${email}$`, 'i') }
+        });
         // Kiểm tra có tồn tại email
         if (!user) {
-            return res.status(400).json({ success: false, message: "Invalid credentials" });
+            return res.status(404).json({ success: false, message: "Invalid credentials" });
         }
 
         // So sánh mật khẩu
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
-            return res.status(400).json({ success: false, message: "Invalid credentials" });
+            return res.status(404).json({ success: false, message: "Invalid credentials" });
         }
 
-        // generateTokenAndSetCookie(res, user.id);
+        generateTokenAndSetCookie(res, user.id);
 
         user.lastLogin = Date.now();
         await user.save();
@@ -185,10 +189,10 @@ const login = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Logged in successfully",
-            // user: {
-            //     ...user._doc,
-            //     password: undefined,
-            // }
+            user: {
+                ...user._doc,
+                password: undefined,
+            }
         })
 
     } catch (error) {
@@ -261,10 +265,10 @@ const forgotPasswordVerify = async (req, res) => {
         res.status(200).json({
             success: true,
             message: "Email verified successfully",
-            // user: {
-            //     ...user._doc,
-            //     password: undefined,
-            // }
+            user: {
+                ...user._doc,
+                password: undefined,
+            }
         });
 
     } catch (error) {
@@ -304,7 +308,10 @@ const checkAuth = async (req, res) => {
             return res.status(400).json({ success: false, message: "User not found" });
         }
 
-        res.status(200).json({ success: true, user });
+        res.status(200).json({
+            success: true, 
+            user
+        });
     } catch (error) {
         console.log("Error in checkAuth ", error);
         res.status(400).json({ success: false, message: error.message });

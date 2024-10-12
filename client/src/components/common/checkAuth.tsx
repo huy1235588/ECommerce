@@ -1,13 +1,11 @@
 import NotFound from "@/pages/not-found";
+import { User } from "@/store/auth";
 import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
 interface CheckAuthProps {
     isAuthenticated: boolean;
-    user: {
-        name: string,
-        role?: string
-    } | null;
+    user: User | null;
     children: React.ReactNode;
 }
 

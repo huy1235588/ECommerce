@@ -19,10 +19,20 @@ import EmailVerify from './pages/auth/emailVerify'
 import ForgotPassword from './pages/auth/forgotPassword'
 import ResetPassword from './pages/auth/resetPassword'
 import ForgotPasswordVerify from './pages/auth/forgotPasswrodVerify'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from './store/store'
+import { CheckAuthUser } from './store/auth'
 
 function App(): JSX.Element {
-    const isAuthenticated = false;
-    const user = null;
+    const dispath = useDispatch<AppDispatch>();
+
+    const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+    useEffect(() => {
+        dispath(CheckAuthUser());
+    }, [dispath])
+
 
     return (
         <div className="flex flex-col overflow-hidden dark">

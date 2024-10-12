@@ -1,17 +1,30 @@
 import { LogoutUser } from "@/store/auth";
-import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "@/store/store";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 function ShoppingHeader() {
-    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const onClickLogout = async (event: React.FormEvent<HTMLElement>) => {
-        event.preventDefault();
+    const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+    const [menuAccount, setMenuAccount] = useState(false);
+
+    const onClickLogout = async () => {
         try {
-            const resultAction = await dispatch(LogoutUser());
+            await dispatch(LogoutUser());
+            location.reload();
 
         } catch (error) {
             console.log(error);
         }
+    }
+
+    const onClickLogin = (event: React.FormEvent<HTMLElement>) => {
+        event.preventDefault();
+        navigate('/auth/login');
     }
 
     return (
@@ -23,10 +36,38 @@ function ShoppingHeader() {
                     </a>
 
                     <button
-                        onClick={onClickLogout}
+                        onClick={() => {
+                            console.log(user)
+                            console.log(`haha: ${isAuthenticated}`)
+                        }}
                     >
-
+                        test
                     </button>
+
+                    {isAuthenticated ? (
+                        <div>
+                            <button
+                                onClick={() => setMenuAccount(prev => !prev)}
+                            >
+                                {user?.userName}
+                            </button>
+
+                            {menuAccount && <div>
+                                <button
+                                    className="absolute"
+                                    onClick={onClickLogout}
+                                >
+                                    Logout
+                                </button>
+                            </div>}
+                        </div>
+                    ) : (
+                        <button
+                            onClick={onClickLogin}
+                        >
+                            Login
+                        </button>
+                    )}
                 </ul>
             </nav>
         </header>
