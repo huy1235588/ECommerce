@@ -37,31 +37,32 @@ interface PasswordStrengthMeterProps {
 const PasswordStrengthMeter: React.FC<PasswordStrengthMeterProps> = ({
     password
 }) => {
-    const getStrength = (pass: string) => {
-        let strength = 0;
-        if (pass.length >= 6) strength++;
-        if (pass.match(/[a-z]/) && pass.match(/[A-Z]/)) strength++;
-        if (pass.match(/\d/)) strength++;
-        if (pass.match(/[^a-zA-Z\d]/)) strength++;
-        return strength;
-    };
-    const strength = getStrength(password);
+    // const getStrength = (pass: string) => {
+    //     let strength = 0;
+    //     if (pass.length >= 6) strength++;
+    //     if (pass.match(/[a-z]/) && pass.match(/[A-Z]/)) strength++;
+    //     if (pass.match(/\d/)) strength++;
+    //     if (pass.match(/[^a-zA-Z\d]/)) strength++;
+    //     return strength;
+    // };
 
-    const getColor = (strength: number) => {
-        if (strength === 0) return "bg-red-500";
-        if (strength === 1) return "bg-red-400";
-        if (strength === 2) return "bg-yellow-500";
-        if (strength === 3) return "bg-yellow-400";
-        return "bg-green-500";
-    };
+    // const strength = getStrength(password);
 
-    const getStrengthText = (strength: number) => {
-        if (strength === 0) return "Very Weak";
-        if (strength === 1) return "Weak";
-        if (strength === 2) return "Fair";
-        if (strength === 3) return "Good";
-        return "Strong";
-    };
+    // const getColor = (strength: number) => {
+    //     if (strength === 0) return "bg-red-500";
+    //     if (strength === 1) return "bg-red-400";
+    //     if (strength === 2) return "bg-yellow-500";
+    //     if (strength === 3) return "bg-yellow-400";
+    //     return "bg-green-500";
+    // };
+
+    // const getStrengthText = (strength: number) => {
+    //     if (strength === 0) return "Very Weak";
+    //     if (strength === 1) return "Weak";
+    //     if (strength === 2) return "Fair";
+    //     if (strength === 3) return "Good";
+    //     return "Strong";
+    // };
 
     return (
         <div className='w-full'>
