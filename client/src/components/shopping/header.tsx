@@ -12,7 +12,7 @@ function ShoppingHeader() {
 
     const [menuAccount, setMenuAccount] = useState(false);
 
-    const onClickLogout = async (event: React.MouseEvent<HTMLElement>) => {
+    const onClickLogout = async () => {
         try {
             await dispatch(LogoutUser());
             location.reload();
