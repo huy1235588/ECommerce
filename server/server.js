@@ -17,7 +17,7 @@ connectDB();
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Pragma
 app.use(cors({
-    origin: 'https://localhost:3000/', // Chỉ cho phép ở cổng 3000
+    origin: process.env.SERVER_URL, // Chỉ cho phép ở cổng 3000
     methods: ['GET', 'POST', 'DELETE', 'PUT'], // Chỉ cho phép các phương thức HTTP này
     allowedHeaders: [
         'Content-Type', // Cho biết định dạng của dữ liệu đang được gửi hoặc nhận

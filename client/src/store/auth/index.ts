@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
+import axios from "../../config/axios/axios";
 import { FormDataRegister } from "@/pages/auth/register";
 import { FormDataLogin } from "@/pages/auth/login";
 

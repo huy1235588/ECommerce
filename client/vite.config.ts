@@ -1,6 +1,10 @@
 import path from "path"
 import { defineConfig } from 'vite'
+import { config } from "dotenv"
 import react from '@vitejs/plugin-react'
+
+// // Load environment variables from .env file
+config();
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,12 +16,9 @@ export default defineConfig({
     },
     server: {
         port: 3000,
-        host: true,
-        proxy: {
-            '/api': {
-                target: process.env.SERVER_URL,
-                changeOrigin: true,
-            },
-        },
+        host: true       
+    },
+    define:{
+        'process.env': process.env
     }
 })
