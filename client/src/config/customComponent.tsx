@@ -60,6 +60,7 @@ export const InputPasswordRegister: React.FC<CustomInputProps> = ({
                 type="button"
                 className=" bg-transparent hover:bg-gray-800 duration-200 py-3 px-3 focus:outline-none border-none"
                 onClick={handleToggleType}
+                title="hide-password"
             >
                 {inputType === "password" ? <BiSolidHide /> : <BiSolidShow />}
             </button>
@@ -103,6 +104,7 @@ export const InputPasswordLogin: React.FC<CustomInputProps> = ({
                 type="button"
                 className=" bg-transparent hover:bg-gray-800 duration-200 py-3 px-3 focus:outline-none border-none"
                 onClick={handleToggleType}
+                title="hide-password"
             >
                 {inputType === "password" ? <BiSolidHide /> : <BiSolidShow />}
             </button>
