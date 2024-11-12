@@ -228,8 +228,8 @@ const forgotPassword = async (req, res) => {
         //     user.userName,
         //     user.email,
         //     resetToken,
-        //     `${process.env.CLIENT_URL}`
-        //     // `${process.env.CLIENT_URL}/reset-password/${resetToken}`
+        //     `${process.env.SERVER_URL}`
+        //     // `${process.env.SERVER_URL}/reset-password/${resetToken}`
         // );
 
         res.status(200).json({ success: true, message: "Password reset link sent to your email" });
