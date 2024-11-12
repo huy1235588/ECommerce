@@ -12,7 +12,7 @@ function ShoppingHeader() {
 
     const [menuAccount, setMenuAccount] = useState(false);
 
-    const onClickLogout = async () => {
+    const onClickLogout = async (event: React.MouseEvent<HTMLElement>) => {
         try {
             await dispatch(LogoutUser());
             location.reload();
@@ -22,7 +22,7 @@ function ShoppingHeader() {
         }
     }
 
-    const onClickLogin = (event: React.FormEvent<HTMLElement>) => {
+    const onClickLogin = (event: React.MouseEvent<HTMLElement>) => {
         event.preventDefault();
         navigate('/auth/login');
     }
