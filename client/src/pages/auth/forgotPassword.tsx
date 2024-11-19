@@ -65,7 +65,7 @@ function ForgotPassword() {
                         }}
                         onBlur={() => setFormatInput(validateEmail(inputValue))}
                         onFocus={() => setFormatInput("")}
-                        className={`peer h-16 pl-3 pr-40 pt-7 pb-3 text-lg font-bold ${formatInput !== "" ? 'ring-1 ring-red-600 ' : ''}`}
+                        className={`peer h-16 pl-3 pr-40 pt-7 pb-3 text-lg ${formatInput !== "" ? 'ring-1 ring-red-600 ' : ''}`}
                     />
                     <span className="text-sm text-red-600 min-h-5">
                         {formatInput !== "" ? formatInput : ""}

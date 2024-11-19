@@ -35,7 +35,7 @@ function App(): JSX.Element {
 
 
     return (
-        <div className="flex flex-col overflow-hidden dark">
+        <div className="flex flex-col dark">
             <Routes>
                 {/* Auth */}
                 <Route path='/auth' element={

@@ -17,7 +17,14 @@ connectDB();
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Pragma
 app.use(cors({
-    origin: process.env.CLIENT_URL, // Chỉ cho phép ở cổng 3000
+    origin: (origin, callback) => {
+        const allowedOrigins = process.env.ALLOW_ORIGINS; // Chỉ cho phép ở cổng 3000
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, origin); // Allow the request
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'DELETE', 'PUT'], // Chỉ cho phép các phương thức HTTP này
     allowedHeaders: [
         'Content-Type', // Cho biết định dạng của dữ liệu đang được gửi hoặc nhận
