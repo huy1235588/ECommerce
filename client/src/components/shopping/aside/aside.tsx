@@ -53,13 +53,29 @@ function ShoppingHomeAside() {
     const [startX, setStartX] = useState(0);
     const [offsetX, setOffsetX] = useState(0);
 
+    const [isTransitioning, setIsTransitioning] = useState<boolean>(true);
+
     const slideContainerRef = useRef<HTMLUListElement>(null);
 
     const handlePrev = () => {
+        if (currentIndex === 0) {
+            setIsTransitioning(false);
+        }
+        else {
+            setIsTransitioning(true);
+        }
+
         setCurrentIndex((prevIndex) => (prevIndex - 1 + slides.length) % slides.length);
     };
 
     const handleNext = () => {
+        if (currentIndex === slides.length - 1) {
+            setIsTransitioning(false);
+        }
+        else {
+            setIsTransitioning(true);
+        }
+
         setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
     };
 
@@ -124,7 +140,7 @@ function ShoppingHomeAside() {
                 {/* Slider Container */}
                 <ul
                     ref={slideContainerRef}
-                    className="flex transition-transform duration-500 ease-in-out"
+                    className={`flex transition-transform ${isTransitioning ? "duration-500 ease-in-out" : ""}`}
                     style={{
                         transform: `translateX(calc(-${(currentIndex) * 100}% + ${offsetX}px + ${hoverBothSide}px))`,
                     }}
