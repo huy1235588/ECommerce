@@ -23,6 +23,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from './store/store'
 import { CheckAuthUser } from './store/auth'
+import ShoppingAbout from './pages/shopping/about'
 
 function App(): JSX.Element {
     const dispath = useDispatch<AppDispatch>();
@@ -83,6 +84,7 @@ function App(): JSX.Element {
                     <Route path='checkout' element={<ShoppingCheckout />} />
                     <Route path='home' element={<ShoppingHome />} />
                     <Route path='listing' element={<ShoppingListing />} />
+                    <Route path='about' element={<ShoppingAbout />} />
                 </Route>
 
                 {/* Not found page */}
