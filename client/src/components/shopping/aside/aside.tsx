@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 
 interface Slide {
     src: string;
@@ -87,15 +88,45 @@ function ShoppingHomeAside() {
         setOffsetX(0);
     };
 
+    const [hoverBothSide, setHoverBothSide] = useState(0);
+    const [hoverLeft, setHoverLeft] = useState<number | null>(null);
+    const [hoverRight, setHoverRight] = useState<number | null>(null);
+
     return (
-        <aside className="relative flex flex-col w-full items-center">
-            <div className="relative w-[80%] overflow-hidden">
+        <aside className="relative flex flex-col w-full items-center overflow-hidden">
+            <div className="relative w-[80%]">
+                {/* Left */}
+                <div className="absolute top-0 w-full h-full cursor-pointer z-100 z-10"
+                    style={{ right: `calc(100% + 16px)` }}
+                    onClick={handlePrev}
+                    onMouseEnter={() => {
+                        setHoverBothSide(30);
+                        setHoverLeft((currentIndex - 1 + slides.length) % slides.length);
+                    }}
+                    onMouseLeave={() => {
+                        setHoverBothSide(0);
+                        setHoverLeft(null);
+                    }}
+                ></div>
+                {/* Right */}
+                <div className="absolute top-0 w-full h-full cursor-pointer z-100 z-10"
+                    style={{ left: `calc(100% + 16px)` }}
+                    onClick={handleNext}
+                    onMouseEnter={() => {
+                        setHoverBothSide(-30);
+                        setHoverRight((currentIndex + 1) % slides.length);
+                    }}
+                    onMouseLeave={() => {
+                        setHoverBothSide(0);
+                        setHoverRight(null);
+                    }}
+                ></div>
                 {/* Slider Container */}
                 <ul
                     ref={slideContainerRef}
                     className="flex transition-transform duration-500 ease-in-out"
                     style={{
-                        transform: `translateX(calc(-${(currentIndex) * 100}% + ${offsetX}px))`,
+                        transform: `translateX(calc(-${(currentIndex) * 100}% + ${offsetX}px + ${hoverBothSide}px))`,
                     }}
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
@@ -105,15 +136,17 @@ function ShoppingHomeAside() {
                     {slides.map((slide, index) => (
                         <li
                             key={index}
-                            className="flex-shrink-0 relative w-full"
+                            className="flex-shrink-0 relative w-full mr-4"
                             style={{
-                                flexBasis: "100%",
+                                flexBasis: "calc(100% - 16px)",
                                 maxWidth: "100%",
                             }}
                         >
                             <a
                                 href="#"
-                                className="block relative w-full h-[550px]"
+                                className={`block relative w-full h-[550px]
+                                        ${index === currentIndex || index === hoverLeft || index === hoverRight ? "opacity-100" : "opacity-10"}
+                                     `}
                                 draggable="false"
                             >
                                 <img
@@ -126,7 +159,7 @@ function ShoppingHomeAside() {
                                     {/* Title */}
                                     <h3 className="text-2xl font-semibold my-5 mx-7">{slide.title}</h3>
                                     <div className="flex m-5 h-12 my-5 mx-7">
-                                        <p className="flex items-center mr-3">
+                                        <div className="flex items-center mr-3">
                                             {/* Discount */}
                                             {slide.discount && (
                                                 <p className="p-3 mr-2 text-xl rounded-md text-lime-300 bg-green-800">
@@ -134,17 +167,17 @@ function ShoppingHomeAside() {
                                                 </p>
                                             )}
                                             {/* Final price and Baseprice */}
-                                            <p>
+                                            <div>
                                                 {slide.basePrice && (
-                                                    <p className="line-through text-lg text-gray-300">
+                                                    <p className="block line-through text-md text-gray-300">
                                                         ${slide.basePrice}
                                                     </p>
                                                 )}
-                                                <p className="text-2xl font-semibold">
+                                                <p className="block text-2xl font-semibold">
                                                     {slide.finalPrice === 0 ? "Free to Play" : `$${slide.finalPrice}`}
                                                 </p>
-                                            </p>
-                                        </p>
+                                            </div>
+                                        </div>
                                         <button className="px-6 py-2 bg-blue-500 rounded hover:bg-blue-600">
                                             Add to Cart
                                         </button>
@@ -154,31 +187,32 @@ function ShoppingHomeAside() {
                         </li>
                     ))}
                 </ul>
-                {/* Navigation Buttons */}
-                <button
-                    className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
-                    onClick={handlePrev}
-                >
-                    ❮
-                </button>
-                <button
-                    className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full"
-                    onClick={handleNext}
-                >
-                    ❯
-                </button>
+                {/* Indicators */}
+                <div className="flex justify-center mt-3">
+                    {slides.map((_, index) => (
+                        <button
+                            key={index}
+                            className={`h-1 w-1 rounded-full mx-1 py-1 px-5 ${index === currentIndex ? "bg-blue-500" : "bg-gray-300"
+                                }`}
+                            onClick={() => setCurrentIndex(index)}
+                        ></button>
+                    ))}
+                </div>
             </div>
-            {/* Indicators */}
-            <div className="flex justify-center mt-4">
-                {slides.map((_, index) => (
-                    <button
-                        key={index}
-                        className={`h-1 w-1 rounded-full mx-1 py-1 px-3 ${index === currentIndex ? "bg-blue-500" : "bg-gray-300"
-                            }`}
-                        onClick={() => setCurrentIndex(index)}
-                    ></button>
-                ))}
-            </div>
+
+            {/* Navigation Buttons */}
+            <button
+                className="absolute top-1/2 left-24 transform -translate-y-1/2 bg-gray-700 text-white p-4 rounded-full hover:bg-purple-600 z-20"
+                onClick={handlePrev}
+            >
+                <FaAngleLeft />
+            </button>
+            <button
+                className="absolute top-1/2 right-28 transform -translate-y-1/2 bg-gray-700 text-white p-4 rounded-full hover:bg-purple-600 z-20"
+                onClick={handleNext}
+            >
+                <FaAngleRight />
+            </button>
         </aside>
     )
 }
