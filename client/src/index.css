@@ -101,9 +101,9 @@ a {
     text-decoration: inherit;
 }
 
-a:hover {
-    color: #535bf2;
-}
+/* a:hover {
+     color: #535bf2; 
+} */
 
 body {
     margin: 0;
@@ -181,7 +181,55 @@ header {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 3px;
 }
+/********************************************************/
 
+/*                 Aside                               */
+
+/******************************************************/
+.swiper-pagination-bullet {
+    padding: 4px 20px;
+    border-radius: 10px;
+    background-color: rgb(209, 213, 219);
+}
+
+.swiper-pagination-bullet-active {
+    position: relative;
+    background-color: #404b59;
+    border: 1px solid #646cff;
+}
+
+.swiper-pagination-bullet-active::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #007bff 0%, rgba(0, 123, 255, 0.5) 100%);
+    transition: width 0.3s ease;
+    transform-origin: left;
+    width: 0%; /* Khởi tạo chiều rộng là 0 */
+}
+
+.swiper-slide {
+    opacity: 0.1;
+}
+
+.swiper-slide-active {
+    opacity: 1;
+}
+
+.swiper-slide.swiper-slide-next,
+.swiper-slide.swiper-slide-prev {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.swiper.swiper-initialized:has(.slide-wrapper-left:hover)
+    .swiper-slide.swiper-slide-prev,
+.swiper.swiper-initialized:has(.slide-wrapper-right:hover)
+    .swiper-slide.swiper-slide-next {
+    opacity: 1;
+}
 /********************************************************/
 
 /*                 Section releases                    */

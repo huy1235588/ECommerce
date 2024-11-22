@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 
 // Định nghĩa kiểu dữ liệu cho danh sách video
-interface VideoItem {
+interface GameItem {
     src: string;
     title: string;
 }
 
 // Dữ liệu mẫu cho danh sách "Mới phát hành" và "Sắp ra mắt"
-const newReleasesData: VideoItem[] = [
+const newReleasesData: GameItem[] = [
     {
         src: "/releases-section/new-releases/black-myth-wukong.webp",
         title: "Black Myth: Wukong",
@@ -55,7 +55,7 @@ const newReleasesData: VideoItem[] = [
 
 ];
 
-const comingSoonData: VideoItem[] = [
+const comingSoonData: GameItem[] = [
     {
         src: "/releases-section/coming-soon/doom-the-dark-ages.jpg",
         title: "Doom: The Dark Ages",
