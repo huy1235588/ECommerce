@@ -55,7 +55,7 @@ function ShoppingHomeAside() {
 
     const swiperRef = useRef<SwiperRef>(null);
 
-    const onAutoplayTimeLeft = (s: SwiperType, time: number, progress: number) => {
+    const onAutoplayTimeLeft = (_s: SwiperType, _time: number, progress: number) => {
         const swiperPaginationBulletActive = document.querySelector(".swiper-pagination-bullet-active") as HTMLElement;
         //         
         // 

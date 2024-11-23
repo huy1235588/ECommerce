@@ -186,6 +186,7 @@ header {
 /*                 Aside                               */
 
 /******************************************************/
+/* Pagination */
 aside .swiper-pagination-bullet {
     padding: 0px 20px;
     border-radius: 10px;
@@ -210,6 +211,7 @@ aside .swiper-pagination-bullet-active::after {
     transform-origin: left;
 }
 
+/* Button next prev */
 aside .swiper-slide {
     opacity: 0.1;
 }
@@ -223,9 +225,11 @@ aside .swiper-slide.swiper-slide-prev {
     transition: opacity 0.2s ease-in-out;
 }
 
-aside .swiper.swiper-initialized:has(.slide-wrapper-left:hover)
+aside
+    .swiper.swiper-initialized:has(.slide-wrapper-left:hover)
     .swiper-slide.swiper-slide-prev,
-aside .swiper.swiper-initialized:has(.slide-wrapper-right:hover)
+aside
+    .swiper.swiper-initialized:has(.slide-wrapper-right:hover)
     .swiper-slide.swiper-slide-next {
     opacity: 1;
 }
@@ -277,4 +281,52 @@ aside .swiper.swiper-initialized:has(.slide-wrapper-right:hover)
     100% {
         opacity: 1;
     }
+}
+
+/********************************************************/
+
+/*                 Section Category                    */
+
+/******************************************************/
+.category-section .swiper-pagination-bullet {
+    padding: 0px 20px;
+    border-radius: 10px;
+    background-color: rgb(209, 213, 219);
+}
+
+.category-section .swiper-pagination-bullet-active {
+    position: relative;
+    background-color: #404b59;
+    border: 1px solid #646cff;
+}
+
+.category-section .swiper-pagination-bullet-active::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--swiper-after-width);
+    height: 100%;
+    background: linear-gradient(90deg, #007bff 0%, rgba(0, 123, 255, 0.5) 100%);
+    transition: width 0.3s ease;
+    transform-origin: left;
+}
+
+/* Swiper pagination */
+.category-section .swiper-wrapper {
+    height: 42vh;
+}
+
+/* Title */
+.cate:hover p {
+    transform: translateY(44px);
+}
+
+.cate:hover img {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+.cate:hover div {
+    opacity: 0.5;
 }

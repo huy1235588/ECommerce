@@ -145,7 +145,7 @@ const ReleasesSection: React.FC = () => {
                         key={index}
                         className="flex-shrink-0 ml-4 releases-item"
                     >
-                        <a href="" className="releases-item-a">
+                        <a href="" className="releases-item-a select-none">
                             <img src={video.src} className="w-full" alt={video.title} />
                             <p className="mt-3 text-base text-center">{video.title}</p>
                         </a>
@@ -162,7 +162,7 @@ const ReleasesSection: React.FC = () => {
                         key={index}
                         className={`flex-shrink-0 ml-4 releases-item`}
                     >
-                        <a href="" className="releases-item-a">
+                        <a href="" className="releases-item-a select-none">
                             <img src={video.src} className="w-full" alt={video.title} />
                             <p className="mt-3 text-base text-center">{video.title}</p>
                         </a>
