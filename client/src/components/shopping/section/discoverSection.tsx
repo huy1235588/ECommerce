@@ -1,4 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, FreeMode } from "swiper/modules";
 import 'swiper/swiper-bundle.css';
 
 interface GameItem {
@@ -69,64 +70,83 @@ const discoverData2: GameItem[] = [
 ];
 
 function DiscoverSection() {
-
     return (
-        <section className="relative w-full mb-16 py-10 bg-white text-black">
+        <section className="discover-section relative w-full mb-16 py-10 bg-white text-black">
             <h2 className="text-center text-4xl mb-10 font-semibold">
                 Discover fun for all
             </h2>
 
             <div className="container mx-auto overflow-hidden select-none">
                 <Swiper
+                    modules={[FreeMode, Autoplay]}
                     slidesPerView={3.33247} // Số lượng hình ảnh hiển thị trên mỗi slide
                     spaceBetween={30} // Khoảng cách giữa các hình ảnh
                     grabCursor={true} // Hiệu ứng kéo bằng chuột
                     loop={true} // Quay lại đầu khi kéo hết
-                    initialSlide={0}
-                    effect=""
+                    autoplay={{
+                        delay: 4000,  // Đặt thời gian chuyển slide là 2.5 giây
+                        disableOnInteraction: false,  // Đảm bảo autoplay tiếp tục dù người dùng tương tác
+                    }}
+
                     className="swiper-container mb-6"
                 >
                     {discoverData1.map((discover, index) => (
                         <SwiperSlide
                             key={index}
-                            className="overflow-hidden"
                         >
-                            <img
-                                src={discover.src}
-                                alt="Image 1"
-                                className="h-[209px] rounded-3xl duration-300 hover:scale-125"
-                            />
+                            <a href=""
+                                className="block overflow-hidden rounded-3xl"
+                            >
+                                <img
+                                    src={discover.src}
+                                    alt="Image 1"
+                                    className="h-[209px] rounded-3xl duration-300 hover:scale-125"
+                                />
+                            </a>
                         </SwiperSlide>
                     ))}
 
                 </Swiper>
 
-                <Swiper
-                    slidesPerView={3.33247} // Số lượng hình ảnh hiển thị trên mỗi slide
-                    spaceBetween={30} // Khoảng cách giữa các hình ảnh
-                    grabCursor={true} // Hiệu ứng kéo bằng chuột
-                    loop={true} // Quay lại đầu khi kéo hết
-                    initialSlide={0}
-                    effect="fade"
-                    autoplay={{
-                        delay: 2500,  // Đặt thời gian chuyển slide là 2.5 giây
-                        disableOnInteraction: true  // Đảm bảo autoplay tiếp tục dù người dùng tương tác
-                    }}
-                    className="swiper-container"
-                >
-                    {discoverData2.map((discover, index) => (
-                        <SwiperSlide
-                            key={index}
-                            className="overflow-hidden rounded-3xl"
-                        >
-                            <img
-                                src={discover.src}
-                                alt="Image 1"
-                                className="h-[209px] rounded-3xl duration-300 hover:scale-125"
-                            />
-                        </SwiperSlide>
-                    ))}
-                </Swiper>
+                <div className="w-[102%]">
+                    <Swiper
+                        modules={[FreeMode, Autoplay]}
+                        slidesPerView={3.33247} // Số lượng hình ảnh hiển thị trên mỗi slide
+                        spaceBetween={30} // Khoảng cách giữa các hình ảnh
+                        grabCursor={true} // Hiệu ứng kéo bằng chuột
+                        loop={true} // Quay lại đầu khi kéo hết
+                        initialSlide={0}
+                        autoplay={{
+                            delay: 4000,  // Đặt thời gian chuyển slide là 2.5 giây
+                            disableOnInteraction: false,  // Đảm bảo autoplay tiếp tục dù người dùng tương tác
+                            reverseDirection: true, // Đảo ngược hướng chạy
+                        }}
+                        onInit={(swiper) => {
+                            setTimeout(() => {
+                                swiper.autoplay.start(); // Bắt đầu autoplay sau 2 giây
+                            }, 2000); // Thời gian chờ trước khi bắt đầu autoplay
+                        }}
+
+                        className="swiper-container w-[98%] -ml-[259px] overflow-visible"
+                    >
+                        {discoverData2.map((discover, index) => (
+                            <SwiperSlide
+                                key={index}
+                            >
+                                <a href=""
+                                    className="block overflow-hidden rounded-3xl"
+                                >
+                                    <img
+                                        src={discover.src}
+                                        alt="Image 1"
+                                        className="h-[209px] rounded-3xl duration-300 hover:scale-125"
+                                    />
+                                </a>
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+                </div>
+
             </div>
 
             <div className="flex justify-center">

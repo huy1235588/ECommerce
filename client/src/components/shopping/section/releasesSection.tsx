@@ -113,7 +113,7 @@ const ReleasesSection: React.FC = () => {
             </h2>
 
             {/* Vùng chứa các nút chuyển tab */}
-            <div className="flex justify-center px-10 pt-1 pb-4 mt-4 pb-4">
+            <div className="flex justify-center px-10 pt-1 pb-4 mt-4">
                 <div className="rounded-full bg-slate-900">
                     {/* Nút "Mới phát hành" */}
                     <button

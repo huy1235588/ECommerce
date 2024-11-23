@@ -1,11 +1,11 @@
 import { Swiper, SwiperRef, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y, Autoplay } from "swiper/modules";
+import { Swiper as SwiperType } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { useRef } from "react";
-import { Swiper as SwiperType } from "swiper";
 
 interface Slide {
     src: string;
@@ -56,7 +56,6 @@ function ShoppingHomeAside() {
     const swiperRef = useRef<SwiperRef>(null);
 
     const onAutoplayTimeLeft = (s: SwiperType, time: number, progress: number) => {
-        console.log(s, time, progress)
         const swiperPaginationBulletActive = document.querySelector(".swiper-pagination-bullet-active") as HTMLElement;
         //         
         // 
