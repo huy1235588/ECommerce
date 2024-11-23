@@ -1,6 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode } from "swiper/modules";
 import 'swiper/swiper-bundle.css';
+import { useState } from "react";
 
 interface GameItem {
     src: string;
@@ -70,16 +71,25 @@ const discoverData2: GameItem[] = [
 ];
 
 function DiscoverSection() {
+    const [slidesPerView, setSlidePerView] = useState<number>(window.innerWidth / 358);
+
+    console.log(slidesPerView)
+    
+    window.addEventListener('resize', () => {
+        setSlidePerView(window.innerWidth / 358);
+        console.log(slidesPerView)
+    });
+
     return (
-        <section className="discover-section relative w-full mb-16 py-10 bg-white text-black">
+        <section className="discover-section relative w-[calc(100vw - var(--scrollbar-width))] mb-16 py-10 bg-white text-black">
             <h2 className="text-center text-4xl mb-10 font-semibold">
                 Discover fun for all
             </h2>
 
-            <div className="container mx-auto overflow-hidden select-none">
+            <div className="mx-auto overflow-hidden select-none">
                 <Swiper
                     modules={[FreeMode, Autoplay]}
-                    slidesPerView={3.33247} // Số lượng hình ảnh hiển thị trên mỗi slide
+                    slidesPerView={slidesPerView} // Số lượng hình ảnh hiển thị trên mỗi slide
                     spaceBetween={30} // Khoảng cách giữa các hình ảnh
                     grabCursor={true} // Hiệu ứng kéo bằng chuột
                     loop={true} // Quay lại đầu khi kéo hết
@@ -95,13 +105,18 @@ function DiscoverSection() {
                             key={index}
                         >
                             <a href=""
-                                className="block overflow-hidden rounded-3xl"
+                                className="relative block overflow-hidden rounded-3xl"
                             >
                                 <img
                                     src={discover.src}
                                     alt="Image 1"
                                     className="h-[209px] rounded-3xl duration-300 hover:scale-125"
                                 />
+                                <div className="absolute top-40 bottom-0 left-0 right-0 bg-black bg-opacity-40 flex justify-between items-center select-none">
+                                    <p className="pl-6 pb-2 text-xl font-semibold text-white z-10">
+                                        {discover.title}
+                                    </p>
+                                </div>
                             </a>
                         </SwiperSlide>
                     ))}
@@ -111,7 +126,7 @@ function DiscoverSection() {
                 <div className="w-[102%]">
                     <Swiper
                         modules={[FreeMode, Autoplay]}
-                        slidesPerView={3.33247} // Số lượng hình ảnh hiển thị trên mỗi slide
+                        slidesPerView={slidesPerView} // Số lượng hình ảnh hiển thị trên mỗi slide
                         spaceBetween={30} // Khoảng cách giữa các hình ảnh
                         grabCursor={true} // Hiệu ứng kéo bằng chuột
                         loop={true} // Quay lại đầu khi kéo hết
@@ -127,20 +142,25 @@ function DiscoverSection() {
                             }, 2000); // Thời gian chờ trước khi bắt đầu autoplay
                         }}
 
-                        className="swiper-container w-[98%] -ml-[259px] overflow-visible"
+                        className="swiper-container w-[98%] -ml-[15%] overflow-visible"
                     >
                         {discoverData2.map((discover, index) => (
                             <SwiperSlide
                                 key={index}
                             >
                                 <a href=""
-                                    className="block overflow-hidden rounded-3xl"
+                                    className="relative block overflow-hidden rounded-3xl"
                                 >
                                     <img
                                         src={discover.src}
                                         alt="Image 1"
                                         className="h-[209px] rounded-3xl duration-300 hover:scale-125"
                                     />
+                                    <div className="absolute top-40 bottom-0 left-0 right-0 bg-black bg-opacity-40 flex justify-between items-center select-none">
+                                        <p className="pl-6 pb-2 text-xl font-semibold text-white z-10">
+                                            {discover.title}
+                                        </p>
+                                    </div>
                                 </a>
                             </SwiperSlide>
                         ))}
@@ -150,7 +170,7 @@ function DiscoverSection() {
             </div>
 
             <div className="flex justify-center">
-                <div className="mt-14">
+                <div className="mt-10">
                     <a href="" className="block px-7 py-3 rounded-3xl duration-300 bg-green-500 text-white hover:bg-green-600">
                         See all games
                     </a>
