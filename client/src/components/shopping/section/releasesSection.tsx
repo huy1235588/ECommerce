@@ -147,7 +147,7 @@ const ReleasesSection: React.FC = () => {
                     >
                         <a href="" className="releases-item-a select-none">
                             <img src={video.src} className="w-full" alt={video.title} />
-                            <p className="mt-3 text-base text-center">{video.title}</p>
+                            <p className="mt-3 text-center text-lg font-semibold text-white">{video.title}</p>
                         </a>
                     </li>
                 ))}
@@ -164,7 +164,7 @@ const ReleasesSection: React.FC = () => {
                     >
                         <a href="" className="releases-item-a select-none">
                             <img src={video.src} className="w-full" alt={video.title} />
-                            <p className="mt-3 text-base text-center">{video.title}</p>
+                            <p className="mt-3 text-center text-lg font-semibold text-white">{video.title}</p>
                         </a>
                     </li>
                 ))}
