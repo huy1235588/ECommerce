@@ -57,17 +57,17 @@ function ShoppingHomeAside() {
 
     const onAutoplayTimeLeft = (s: SwiperType, time: number, progress: number) => {
         console.log(s, time, progress)
-        const swiperPaginationBullet = document.querySelector(".swiper-pagination-bullet-active") as HTMLElement;
+        const swiperPaginationBulletActive = document.querySelector(".swiper-pagination-bullet-active") as HTMLElement;
         //         
         // 
         //              CSS after of swiper-pagination-bullet-active
         // 
         //         
-        swiperPaginationBullet.style.setProperty('--swiper-after-width', `${(100 - progress * 100)}%`);
+        swiperPaginationBulletActive.style.setProperty('--swiper-after-width', `${(100 - progress * 100) <= 99 ? (100 - progress * 100).toFixed(0) : 0}%`);
     };
 
     return (
-        <aside className="relative flex flex-col w-full items-center overflow-hidden">
+        <aside className="relative flex flex-col w-full h-[92vh] items-center overflow-hidden">
             <Swiper
                 ref={swiperRef}
                 modules={[Navigation, Pagination, A11y, Autoplay]}
@@ -83,11 +83,11 @@ function ShoppingHomeAside() {
                     clickable: true,
                 }}
                 autoplay={{
-                    delay: 3500,  // Đặt thời gian chuyển slide là 2.5 giây
+                    delay: 4000,  // Đặt thời gian chuyển slide là 2.5 giây
                     disableOnInteraction: false,  // Đảm bảo autoplay tiếp tục dù người dùng tương tác
                 }}
                 onAutoplayTimeLeft={onAutoplayTimeLeft}
-                className="w-[70%] h-[600px] overflow-visible"
+                className="w-[76%] h-full overflow-visible"
             >
                 {/* Left */}
                 <div className="slide-wrapper-left absolute top-0 w-full h-full cursor-pointer z-50"
@@ -136,7 +136,9 @@ function ShoppingHomeAside() {
                             }, 0);
                         }
                     }}
-                ></div>
+                >
+
+                </div>
                 {/* Right */}
                 <div className="slide-wrapper-right absolute top-0 w-full h-full cursor-pointer z-50"
                     style={{ left: `calc(100% + 16px)` }}
@@ -191,7 +193,7 @@ function ShoppingHomeAside() {
                 {/* Slider Container */}
                 {slides.map((slide, index) => (
                     <SwiperSlide key={index}>
-                        <a href="" className="relative w-full h-[550px] block">
+                        <a href="" className="relative w-full h-[86vh] block">
                             <img
                                 className=" h-full object-cover object-center select-none"
                                 src={slide.src}
@@ -236,10 +238,10 @@ function ShoppingHomeAside() {
             </Swiper>
 
             {/* Navigation Buttons */}
-            <button className="swiper-button-prev absolute top-1/2 left-44 w-12 h-12 block after:!content-none transform -translate-y-1/2 m-0 bg-gray-700 text-white p-4 rounded-full hover:bg-purple-600 z-20">
+            <button className="swiper-button-prev absolute top-1/2 left-32 w-12 h-12 block after:!content-none transform -translate-y-1/2 m-0 bg-gray-700 text-white p-4 rounded-full hover:bg-purple-600 z-20">
                 <FaAngleLeft />
             </button>
-            <button className="swiper-button-next absolute top-1/2 right-44 w-12 h-12 block after:!content-none transform -translate-y-1/2 m-0 bg-gray-700 text-white p-4 rounded-full hover:bg-purple-600 z-20">
+            <button className="swiper-button-next absolute top-1/2 right-32 w-12 h-12 block after:!content-none transform -translate-y-1/2 m-0 bg-gray-700 text-white p-4 rounded-full hover:bg-purple-600 z-20">
                 <FaAngleRight />
             </button>
         </aside >
