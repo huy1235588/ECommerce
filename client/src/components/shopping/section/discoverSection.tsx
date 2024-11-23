@@ -72,8 +72,6 @@ const discoverData2: GameItem[] = [
 
 function DiscoverSection() {
     const [slidesPerView, setSlidePerView] = useState<number>(window.innerWidth / 358);
-
-    console.log(slidesPerView)
     
     window.addEventListener('resize', () => {
         setSlidePerView(window.innerWidth / 358);
