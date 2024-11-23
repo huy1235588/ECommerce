@@ -107,7 +107,7 @@ const ReleasesSection: React.FC = () => {
     const [activeTab, setActiveTab] = useState<"newReleases" | "comingSoon">("newReleases");
 
     return (
-        <section className="relative w-full mb-16">
+        <section className="relative w-full mb-16 mt-10">
             <h2 className="text-center text-4xl pb-4">
                 New Releases and Comming soon
             </h2>

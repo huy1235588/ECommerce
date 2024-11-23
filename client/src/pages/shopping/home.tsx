@@ -8,7 +8,7 @@ function ShoppingHome() {
         <main className="flex flex-col w-full">
             <ShoppingHomeAside />
 
-            <article className="mt-10">
+            <article className="">
                 <ReleasesSection />
                 <DiscoverSection />
                 <CategoriesSection />
