@@ -423,7 +423,7 @@ const GameShowcase: React.FC = () => {
 
                                             {/* Thể loại */}
                                             <p className=" text-gray-500 text-base truncate">
-                                                Genres: {game.genres.join(", ")}
+                                                {game.genres.join(", ")}
                                             </p>
                                         </div>
 
