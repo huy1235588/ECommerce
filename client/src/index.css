@@ -330,3 +330,12 @@ aside
 .cate:hover div {
     opacity: 0.5;
 }
+
+/********************************************************/
+
+/*                 Game Showcase                       */
+
+/******************************************************/
+.tab-item-hover {
+    background: linear-gradient(to right, #c6e6f8 5%, #95bcd3 95%);
+}

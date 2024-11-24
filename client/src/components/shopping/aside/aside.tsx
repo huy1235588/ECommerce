@@ -70,6 +70,7 @@ function ShoppingHomeAside() {
             <Swiper
                 ref={swiperRef}
                 modules={[Navigation, Pagination, A11y, Autoplay]}
+                lazyPreloadPrevNext={5}
                 spaceBetween={20} // Khoảng cách giữa các slide
                 slidesPerView={1} // Hiển thị một slide mỗi lần.
                 centeredSlides={true} // Các slide sẽ được căn giữa
@@ -193,11 +194,19 @@ function ShoppingHomeAside() {
                 {slides.map((slide, index) => (
                     <SwiperSlide key={index}>
                         <a href="" className="relative w-full h-[86vh] block">
+                            {/* Image */}
                             <img
                                 className=" h-full object-cover object-center select-none"
-                                src={slide.src}
+                                data-src={slide.src}
+                                srcSet={slide.src}
+                                loading="lazy"
                                 alt={slide.title}
                             />
+
+                            {/* Loading Spinner */}
+                            <div className="swiper-lazy-preloader"></div>
+
+                            {/* Content */}
                             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 flex justify-between items-center text-white select-none">
                                 {/* Title */}
                                 <h3 className="text-2xl font-semibold my-5 mx-7">{slide.title}</h3>

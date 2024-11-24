@@ -72,7 +72,7 @@ const discoverData2: GameItem[] = [
 
 function DiscoverSection() {
     const [slidesPerView, setSlidePerView] = useState<number>(window.innerWidth / 358);
-    
+
     window.addEventListener('resize', () => {
         setSlidePerView(window.innerWidth / 358);
         console.log(slidesPerView)
@@ -87,6 +87,7 @@ function DiscoverSection() {
             <div className="mx-auto overflow-hidden select-none">
                 <Swiper
                     modules={[FreeMode, Autoplay]}
+                    lazyPreloadPrevNext={2}
                     slidesPerView={slidesPerView} // Số lượng hình ảnh hiển thị trên mỗi slide
                     spaceBetween={30} // Khoảng cách giữa các hình ảnh
                     grabCursor={true} // Hiệu ứng kéo bằng chuột
@@ -106,10 +107,13 @@ function DiscoverSection() {
                                 className="relative block overflow-hidden rounded-3xl"
                             >
                                 <img
-                                    src={discover.src}
+                                    srcSet={discover.src}
                                     alt="Image 1"
+                                    loading="lazy"
                                     className="h-[209px] rounded-3xl duration-300 hover:scale-125"
                                 />
+                                <div className="swiper-lazy-preloader"></div>
+
                                 <div className="absolute top-40 bottom-0 left-0 right-0 bg-black bg-opacity-40 flex justify-between items-center select-none">
                                     <p className="pl-6 pb-2 text-xl font-semibold text-white z-10">
                                         {discover.title}
@@ -124,6 +128,7 @@ function DiscoverSection() {
                 <div className="w-[102%]">
                     <Swiper
                         modules={[FreeMode, Autoplay]}
+                        lazyPreloadPrevNext={2}
                         slidesPerView={slidesPerView} // Số lượng hình ảnh hiển thị trên mỗi slide
                         spaceBetween={30} // Khoảng cách giữa các hình ảnh
                         grabCursor={true} // Hiệu ứng kéo bằng chuột
@@ -150,10 +155,13 @@ function DiscoverSection() {
                                     className="relative block overflow-hidden rounded-3xl"
                                 >
                                     <img
-                                        src={discover.src}
+                                        srcSet={discover.src}
                                         alt="Image 1"
+                                        loading="lazy"
                                         className="h-[209px] rounded-3xl duration-300 hover:scale-125"
                                     />
+                                    <div className="swiper-lazy-preloader"></div>
+
                                     <div className="absolute top-40 bottom-0 left-0 right-0 bg-black bg-opacity-40 flex justify-between items-center select-none">
                                         <p className="pl-6 pb-2 text-xl font-semibold text-white z-10">
                                             {discover.title}

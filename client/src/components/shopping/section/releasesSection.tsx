@@ -146,7 +146,11 @@ const ReleasesSection: React.FC = () => {
                         className="flex-shrink-0 ml-4 releases-item"
                     >
                         <a href="" className="releases-item-a select-none">
-                            <img src={video.src} className="w-full" alt={video.title} />
+                            <img src={video.src}
+                                className="w-full"
+                                alt={video.title}
+                                loading="lazy"
+                            />
                             <p className="mt-3 text-center text-lg font-semibold text-white">{video.title}</p>
                         </a>
                     </li>
@@ -163,7 +167,11 @@ const ReleasesSection: React.FC = () => {
                         className={`flex-shrink-0 ml-4 releases-item`}
                     >
                         <a href="" className="releases-item-a select-none">
-                            <img src={video.src} className="w-full" alt={video.title} />
+                            <img src={video.src}
+                                className="w-full"
+                                alt={video.title}
+                                loading="lazy"
+                            />
                             <p className="mt-3 text-center text-lg font-semibold text-white">{video.title}</p>
                         </a>
                     </li>

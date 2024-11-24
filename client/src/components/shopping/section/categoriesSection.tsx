@@ -33,7 +33,7 @@ const categoryData: Category[] = [
 
 function CategoriesSection() {
     return (
-        <section className="category-section relative w-full mb-16">
+        <section className="category-section relative w-full pb-16">
             <h2 className="text-center text-4xl pb-4 mb-10">
                 Browse by category
             </h2>
@@ -42,6 +42,7 @@ function CategoriesSection() {
                 <div className="relative">
                     <Swiper
                         modules={[Navigation, Pagination, A11y]}
+                        lazyPreloadPrevNext={2}
                         slidesPerView={4} // Số lượng hình ảnh hiển thị trên mỗi slide
                         spaceBetween={30} // Khoảng cách giữa các hình ảnh
                         grabCursor={true} // Hiệu ứng kéo bằng chuột
@@ -65,10 +66,13 @@ function CategoriesSection() {
                                 >
                                     {/* Image */}
                                     <img
-                                        src={category.src}
                                         alt="Image 1"
+                                        srcSet={category.src}
+                                        loading="lazy"
                                         className="w-full h-full max-w-[480px] max-h-[466px] rounded-3xl duration-300 hover:scale-125"
                                     />
+                                    <div className="swiper-lazy-preloader"></div>
+
                                     {/* Title */}
                                     <p className="absolute bottom-12 w-full p-4 text-center duration-300 transition-transform ease-in-out z-10">
                                         <span className="px-3 py-2 rounded-sm font-bold bg-white text-cyan-600">
