@@ -1,0 +1,226 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.GENERAL STYLE
+    02.HEADER STYLE
+		
+*=============================================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    01.START GENERAL
+*===================================*/
+.article {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    /* margin: 1.25rem; */
+    padding: 1rem 2rem 1.75rem;
+    background-color: #171717;
+}
+
+@media (min-width: 768px) {
+    .container {
+        width: 40%;
+    }
+}
+
+.main {
+    max-width: 28rem;
+    width: 100%;
+}
+
+.logo-container {
+    position: relative;
+    width: 5rem;
+    height: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.heading {
+    text-align: center;
+    letter-spacing: -0.025em;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e5e7eb;
+}
+
+.links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.link {
+    color: #63b3ed;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+/*===================================*
+    01.END GENERAL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    01.START FORM
+*===================================*/
+.form {
+    margin: 1.5rem 0;
+}
+
+.form-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 1.7rem;
+    column-gap: 1rem;
+}
+
+.form-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-field {
+    width: 100%;
+}
+
+/* Input */
+.input-form input {
+    color: #e5e7eb;
+    background-color: #0a0a0a;
+}
+
+.input-form label {
+    color: #6b7280;
+}
+
+.form-field:has(.input-form-48) {
+    width: 48%;
+}
+
+/* Select */
+.form-field .select-form div {
+    color: #e5e7eb;
+    background-color: #0a0a0a;
+}
+
+.form-field .select-form label,
+.form-field .select-form svg {
+    color: #6b7280;
+    fill: #6b7280;
+}
+
+.form-field
+    .select-form
+    label.css-113d811-MuiFormLabel-root-MuiInputLabel-root {
+    background-color: #171717;
+    padding: 0 7px;
+}
+
+.MuiPaper-root.css-1tktgsa-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+    color: #e5e7eb;
+    background-color: #242424;
+    max-height: calc(50% - 32px);
+}
+
+/* Password */
+.eye-password {
+    position: absolute;
+    top: 0.7rem;
+    right: 3rem;
+}
+
+.eye-password button {
+    width: 35px;
+    color: #6b7280;
+}
+
+.form-field .css-1n04w30-MuiInputBase-root-MuiOutlinedInput-root {
+    padding: 0;
+}
+
+/* Tooltip */
+div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
+    width: 250px;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.form-field .tooltip-icon {
+    position: absolute;
+    top: 1.7rem;
+    right: 0.5rem;
+    width: 35px;
+    border-radius: 2px;
+    transform: translateY(-50%);
+    color: #6b7280;
+    z-index: 2;
+}
+
+.form-field .tooltip-icon:hover{
+    background-color: #1f2937;
+}
+
+/* Button submit */
+.submit-button {
+    margin-top: 1.7rem !important;
+    padding: 0.7rem !important;
+    color: #ffffff !important;
+    background-color: #2563eb !important;
+}
+
+.submit-button:hover {
+    background-color: #3b82f6 !important;
+}
+
+.submit-button:disabled {
+    background-color: #2563eb !important;
+    opacity: 0.5;
+}
+
+.submit-button span {
+    counter-reset: #fff;
+}
+/*===================================*
+    01.END FORM
+*===================================*/
