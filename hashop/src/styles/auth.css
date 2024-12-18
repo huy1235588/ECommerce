@@ -110,7 +110,7 @@ Author       : LeThienHuy.
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    row-gap: 1.7rem;
+    row-gap: 1.85rem;
     column-gap: 1rem;
 }
 
@@ -170,9 +170,22 @@ Author       : LeThienHuy.
     right: 3rem;
 }
 
+.eye-password.login {
+    right: 0.5rem;
+}
+
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
+
 .eye-password button {
     width: 35px;
     color: #6b7280;
+}
+
+.eye-password button:hover {
+    background-color: #1f2937;
 }
 
 .form-field .css-1n04w30-MuiInputBase-root-MuiOutlinedInput-root {
@@ -188,16 +201,16 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
 
 .form-field .tooltip-icon {
     position: absolute;
-    top: 1.7rem;
+    top: 0.7rem;
     right: 0.5rem;
     width: 35px;
+    padding: 8px 8px;
     border-radius: 2px;
-    transform: translateY(-50%);
     color: #6b7280;
     z-index: 2;
 }
 
-.form-field .tooltip-icon:hover{
+.form-field .tooltip-icon:hover {
     background-color: #1f2937;
 }
 

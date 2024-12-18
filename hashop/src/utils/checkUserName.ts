@@ -35,6 +35,6 @@ export const CheckUserName = async (
                 // Xử lý lỗi (trả về chuỗi rỗng nếu lỗi xảy ra)
                 resolve("");
             }
-        }, 2000); // Độ trễ debounce là 2000ms
+        }, 1000); // Độ trễ debounce là 2000ms
     });
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
     Button,
     TextField,
@@ -14,28 +14,10 @@ import {
     Tooltip,
 } from "@mui/material";
 import { BiInfoCircle, BiSolidXCircle } from "react-icons/bi";
-import { FormDataRegister } from "@/types/auth";
-import { requiredInput } from "@/utils/formatInput";
+import { FormData } from "@/types/auth";
 import { CheckUserName } from "@/utils/checkUserName";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
-/*************************************************************************
- 
-    Loại FormControlType định nghĩa cấu trúc cho từng trường nhập liệu
-
-*************************************************************************/
-type FormControlType = {
-    name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
-    placeholder: string;
-    componentType: "input" | "textarea" | "select";
-    type?: "text" | "email" | "password" | "number";
-    autocomplete?: string;
-    options?: { id: string; label: string }[];
-    tooltipTile?: string;
-    className?: string;
-    maxLength?: number;
-    onChange?: (value: string) => string;
-};
+import { FormControl as FormControlType } from "@/config/auth";
 
 /*************************************************************************
  
@@ -45,7 +27,7 @@ type FormControlType = {
 interface CommonFormProps {
     formControl: FormControlType[];
     formData: Record<string, string>;
-    setFormData: React.Dispatch<React.SetStateAction<FormDataRegister>>;
+    setFormData: React.Dispatch<React.SetStateAction<FormData>>;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     buttonText?: string;
     isLoading: boolean;
@@ -65,7 +47,6 @@ const CommonForm: React.FC<CommonFormProps> = ({
         values: Record<string, string>;       // Lưu trữ giá trị nhập vào của các trường trong form
         errors: Record<string, string>;       // Lưu trữ thông báo lỗi cho mỗi trường
         isValid: Record<string, boolean>;     // Lưu trữ trạng thái hợp lệ (true/false) của từng trường
-        isValidBlur: Record<string, boolean>;
     }>(
         Object.keys(formData).reduce(
             (acc, key) => ({
@@ -73,9 +54,8 @@ const CommonForm: React.FC<CommonFormProps> = ({
                 values: { ...acc.values, [key]: "" },   // Mặc định giá trị của tất cả các trường là chuỗi rỗng
                 errors: { ...acc.errors, [key]: "" },   // Mặc định không có lỗi cho tất cả các trường
                 isValid: { ...acc.isValid, [key]: false }, // Mặc định các trường đều không hợp lệ
-                isValidBlur: { ...acc.isValidBlur, [key]: false }
             }),
-            { values: {}, errors: {}, isValid: {}, isValidBlur: {} } // Giá trị mặc định ban đầu của formState
+            { values: {}, errors: {}, isValid: {} } // Giá trị mặc định ban đầu của formState
         )
     );
 
@@ -86,54 +66,63 @@ const CommonForm: React.FC<CommonFormProps> = ({
     const isFormValid = Object.values(formState.isValid).every(Boolean);
 
     // Khi submit form
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         // Nếu toàn bộ input trong form hợp lệ
         if (isFormValid) {
             onSubmit(event);
         }
-    };
+    }, [isFormValid, onSubmit]);
 
     // Hàm xử lý khi người dùng thay đổi giá trị nhập liệu
-    const handleInputChange = (
+    const handleInputChange = useCallback((
         name: string,
         value: string,
         onChange?: (value: string) => string
     ) => {
         const validationResult = onChange ? onChange(value) : "";
 
-        // Cập nhật giá trị input và trạng thái hợp lệ
+        // Cập nhật giá trị input
         setFormState((prev) => ({
             ...prev,
             values: { ...prev.values, [name]: value },
             isValid: { ...prev.isValid, [name]: !validationResult },
-            errors: { ...prev.errors, [name]: validationResult },
         }));
 
         // Lưu dữ liệu của trường nhập liệu
         setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
-    };
+    }, [setFormData]);
 
     // Hàm kiểm tra lỗi khi input mất focus (blur)
-    const handleValidation = async (name: string, value: string) => {
-        const validationResult = requiredInput(value);
+    const handleValidation = async (
+        name: string,
+        value: string,
+        onChange?: (value: string) => string
+    ) => {
+        const validationResult = onChange ? onChange(value) : "";
+        const isFieldValid = !validationResult;
+
         setFormState((prev) => ({
             ...prev,
-            isValidBlur: { ...prev.isValidBlur, [name]: validationResult === "" },
+            isValid: { ...prev.isValid, [name]: !validationResult },
             errors: { ...prev.errors, [name]: validationResult },
         }));
 
         // Gọi hàm kiểm tra tên người dùng
-        const responseMessage = await CheckUserName(value);
-        setFormState((prev) => ({
-            ...prev,
-            isValid: { ...prev.isValid, [name]: responseMessage !== "" },
-            errors: { ...prev.errors, [name]: responseMessage },
-        }));
+        if (name === "userName" && isFieldValid) {
+            const responseMessage = await CheckUserName(value);
+            setFormState((prev) => ({
+                ...prev,
+                isValid: { ...prev.isValid, [name]: responseMessage !== "" },
+                errors: { ...prev.errors, [name]: responseMessage },
+            }));
+        }
+
+        await console.log(formState.isValid)
     };
 
     // Hàm xóa lỗi khi người dùng focus vào input
@@ -168,7 +157,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
                             }
 
                             onBlur={() =>
-                                handleValidation(control.name, value)
+                                handleValidation(control.name, value, control.onChange)
                             } // Đổi trạng thái hiển thị lỗi khi blur
 
                             onFocus={() =>
@@ -186,7 +175,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
                                 },
                                 input: {
                                     endAdornment: control.type === "password" && (
-                                        <InputAdornment className="eye-password" position="end">
+                                        <InputAdornment className={`eye-password ${buttonText === "Login" ? "login" : ""}`} position="end">
                                             <IconButton
                                                 onClick={() => setShowPassword(!showPassword)}
                                                 onMouseDown={(e) => e.preventDefault()}
@@ -226,7 +215,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
                         rows={4}
                         value={value}
                         onChange={(e) =>
-                            handleInputChange(control.name, e.target.value, control.onChange)
+                            handleInputChange(control.name, e.target.value)
                         }
                         error={hasError}
                         helperText={hasError ? errorMessage : ""}

@@ -1,6 +1,6 @@
 'use client'
 // import { LogoutUser } from "@/store/auth";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {  useAppSelector } from "@/store/hooks";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
@@ -12,7 +12,7 @@ interface HomeHeaderProps {
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
     const router = useRouter();
-    const dispatch = useAppDispatch();
+    // const dispatch = useAppDispatch();
 
     // Lấy thông tin người dùng và trạng thái xác thực từ store
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);

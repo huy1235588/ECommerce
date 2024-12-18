@@ -8,7 +8,7 @@ import {
 
 import { countries } from "./countryForm";
 
-type FormControl = {
+export type FormControl = {
     name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
     placeholder: string;
     componentType: "input" | "textarea" | "select";

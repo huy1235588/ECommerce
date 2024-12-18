@@ -1,7 +1,7 @@
 'use client'
 
 import CommonForm from "@/components/common/form";
-import { loginFormControls } from "@/config";
+import { loginFormControls } from "@/config/auth";
 // import { LoginUser, resetError } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import Link from "next/link";
@@ -10,19 +10,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 import "@/styles/auth.css";
 import Image from "next/image";
+import { resetError } from "@/store/auth";
+import { FormData } from "@/types/auth";
 
-export type FormDataLogin = {
-    email: string;
-    password: string;
-}
-
-const initialState: FormDataLogin = {
+const initialState: FormData = {
     email: "",
     password: "",
 };
 
 function AuthLogin() {
-    const [formData, setFormData] = useState<FormDataLogin>(initialState);
+    const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
 
     const { isLoading, error, status } = useSelector((state: RootState) => state.auth) || null;
@@ -30,15 +27,15 @@ function AuthLogin() {
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            const resultAction = await dispatch(LoginUser(formData));
-            const payload = resultAction.payload as {
-                success: boolean,
-                message: string,
-            } | null;
+            // const resultAction = await dispatch(LoginUser(formData));
+            // const payload = resultAction.payload as {
+            //     success: boolean,
+            //     message: string,
+            // } | null;
 
-            if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
-                // navigate("/");
-            }
+            // if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
+            //     // navigate("/");
+            // }
 
         } catch (error) {
             console.log(error);
@@ -55,7 +52,7 @@ function AuthLogin() {
                 {/* Content */}
                 <main className="main">
                     <h1 className="heading">
-                        Sign In
+                        Log in
                     </h1>
 
                     <CommonForm

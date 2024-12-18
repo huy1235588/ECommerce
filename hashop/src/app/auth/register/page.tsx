@@ -5,10 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetError } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import CommonForm from "@/components/common/form";
-import { registerFormControls } from "@/config";
+import { registerFormControls } from "@/config/auth";
 import Link from "next/link";
 import { Typography } from "@mui/material";
-import { FormDataRegister } from "@/types/auth";
+import { FormData } from "@/types/auth";
 
 import "@/styles/auth.css";
 import Image from "next/image";
@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import axios from "@/config/axios";
 import Notification from "@/components/common/notification ";
 
-const initialState: FormDataRegister = {
+const initialState: FormData = {
     email: "",
     country: "",
     userName: "",
@@ -26,7 +26,7 @@ const initialState: FormDataRegister = {
 };
 
 function AuthRegister() {
-    const [formData, setFormData] = useState<FormDataRegister>(initialState);
+    const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const [showNotification, setShowNotification] = useState(false);
@@ -40,7 +40,7 @@ function AuthRegister() {
             const response = await axios.post('/api/auth/signup', formData);
             if (response.data.success) {
                 setShowNotification(true) // Thông báo thành công
-                // router.push('/login'); // Chuyển hướng sang trang đăng nhập
+                router.push('/login'); // Chuyển hướng sang trang đăng nhập
             }
 
         } catch (error) {
@@ -62,7 +62,7 @@ function AuthRegister() {
                 {/* Content */}
                 <main className="main">
                     <h1 className="heading">
-                        Sign In
+                        Sign up
                     </h1>
 
                     <CommonForm

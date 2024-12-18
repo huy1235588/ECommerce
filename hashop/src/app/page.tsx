@@ -1,9 +1,9 @@
 import HomeHeader from "@/components/home/header";
-import styles from "@/styles/home.module.css";
+import "@/styles/home.css";
 
 export default function Home() {
     return (
-        <div className={styles.root}>
+        <div className="root">
             <HomeHeader
                 active="ha"
             />
