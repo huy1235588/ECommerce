@@ -38,27 +38,19 @@ Author       : LeThienHuy.
     align-items: center;
     justify-content: center;
     width: 100%;
-    /* margin: 1.25rem; */
-    padding: 1rem 2rem 1.75rem;
+    padding: 1rem 1.75rem 1.75rem;
     background-color: #171717;
 }
 
 @media (min-width: 768px) {
     .container {
-        width: 40%;
+        width: 45%;
     }
 }
 
 .auth-main {
-    max-width: 28rem;
+    max-width: 30rem;
     width: 100%;
-}
-
-.logo-container {
-    position: relative;
-    width: 5rem;
-    height: 2rem;
-    margin-bottom: 2.5rem;
 }
 
 .heading {
@@ -100,7 +92,52 @@ Author       : LeThienHuy.
 
 */
 /*===================================*
-    02.START FORM
+    02.START ASIDE
+*===================================*/
+.auth-aside {
+    flex: 1;
+}
+
+.auth-aside img {
+    z-index: -1;
+    user-select: none;
+}
+
+.auth-aside.left {
+    order: 2;
+}
+
+.auth-aside.right {
+    order: 0;
+}
+
+/* Logo */
+.logo-container {
+    position: absolute;
+    top: 5%;
+    left: 3%;
+    width: 5rem;
+    height: 2rem;
+    margin-bottom: 2.5rem;
+    z-index: 2;
+}
+/*===================================*
+    02.END ASIDE
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START FORM
 *===================================*/
 .form {
     margin: 1.5rem 0;
@@ -236,7 +273,7 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
     counter-reset: #fff;
 }
 /*===================================*
-    02.END FORM
+    03.END FORM
 *===================================*/
 /*
 
@@ -251,7 +288,7 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
 
 */
 /*===================================*
-    03.START ACCOUNT VERIFICATION
+    04.START ACCOUNT VERIFICATION
 *===================================*/
 .info-text {
     margin-top: 1.7rem;
@@ -346,5 +383,5 @@ button.verify-button:disabled {
     background-color: #c0c0c088;
 }
 /*===================================*
-    03.END ACCOUNT VERIFICATION
+    04.END ACCOUNT VERIFICATION
 *===================================*/
