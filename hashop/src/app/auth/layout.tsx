@@ -5,13 +5,14 @@ import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import "@/styles/auth.css?v=1";
 
 export default function AuthLayout({
     children,
 }: Readonly<{
     children: React.ReactNode,
 }>) {
-    const { auth, setAuth } = useAuth();
+    const { notification, setNotification } = useAuth();
     const pathname = usePathname();
     const isLogin = pathname.includes('login');
     const urlImg = isLogin
@@ -45,18 +46,19 @@ export default function AuthLayout({
             </aside>
 
             {/* Main Content */}
-            <div className="container">
+            <div className={`container ${isLogin ? 'login' : 'register'}`}>
                 {children}
             </div>
 
             {/* Thông báo */}
-            {auth.isShowNotification && (
+            {notification.isShowNotification && notification.notification && (
                 <Notification
-                    message="Registration successful!"
-                    type="success"
-                    duration={300000} // Tự động đóng sau 3 giây
+                    message={notification.notification.message}
+                    type={notification.notification.type}
+                    duration={notification.notification.duration}
                     onClose={() => [
-                        setAuth({
+                        setNotification({
+                            notification: null,
                             isShowNotification: false
                         })
                     ]} // Đóng thông báo
