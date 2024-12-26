@@ -245,6 +245,9 @@ const CommonForm: React.FC<CommonFormProps> = ({
                             }
                             onBlur={() => handleValidation(control.name, value)}
                             onFocus={() => clearError(control.name)} // Khi focus, ẩn lỗi
+                            MenuProps={{
+                                disableScrollLock: true,
+                            }}
                         >
                             {control.options?.map((option) => (
                                 <MenuItem key={option.id} value={option.label}>
