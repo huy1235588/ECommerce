@@ -49,7 +49,7 @@ Author       : LeThienHuy.
 }
 
 .auth-main {
-    max-width: 30rem;
+    max-width: 32rem;
     width: 100%;
 }
 
@@ -118,8 +118,15 @@ Author       : LeThienHuy.
     left: 3%;
     width: 5rem;
     height: 2rem;
-    margin-bottom: 2.5rem;
     z-index: 2;
+}
+
+.logo-container a {
+    display: inline-block;
+}
+
+.auth-aside-banner{
+    z-index: -1;
 }
 /*===================================*
     02.END ASIDE

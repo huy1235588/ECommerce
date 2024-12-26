@@ -15,29 +15,33 @@ export default function AuthLayout({
     const pathname = usePathname();
     const isLogin = pathname.includes('login');
     const urlImg = isLogin
-        ? "/image/banner/elden-ring-1.jpg"
+        ? "/image/banner/elden-ring-2.jpg"
         : "/image/banner/RedDeadRedemption2.jpg"
 
     return (
         <article className="article">
+            <Image
+                className="auth-aside-banner"
+                src={urlImg}
+                fill={true}
+                alt="aside"
+            />
+
+            {/* Logo */}
+            <div className="logo-container">
+                <Link
+                    href="/"
+                >
+                    <Image className="logo"
+                        src="/logo/logo.png"
+                        width={80}
+                        height={32}
+                        priority={true}
+                        alt="logo" />
+                </Link>
+            </div>
+
             <aside className={`auth-aside  ${isLogin ? 'left' : 'right'}`}>
-                <Image
-                    src={urlImg}
-                    fill={true}
-                    alt="aside"
-                />
-                {/* Logo */}
-                <div className="logo-container">
-                    <Link
-                        href="/"
-                    >
-                        <Image className="logo"
-                            src="/logo/logo.png"
-                            fill={true}
-                            sizes="(max-width: 768px) 5rem, (max-width: 1200px) 7rem"
-                            alt="logo" />
-                    </Link>
-                </div>
             </aside>
 
             {/* Main Content */}
