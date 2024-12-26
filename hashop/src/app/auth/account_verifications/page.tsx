@@ -2,7 +2,6 @@
 
 import maskEmail from "@/utils/email";
 import { Button, TextField, Typography } from "@mui/material";
-import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { BiSolidXCircle } from "react-icons/bi";
 import "@/styles/auth.css";

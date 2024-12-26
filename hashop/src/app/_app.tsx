@@ -1,6 +1,7 @@
 'use client'
 import { Provider } from 'react-redux';
 import store from '@/store/store';
+import GlobalProvider from '@/context/GlobalProvider';
 
 export default function MyApp({
     children,
@@ -9,7 +10,9 @@ export default function MyApp({
 }>) {
     return (
         <Provider store={store}>
-            {children}
+            <GlobalProvider>
+                {children}
+            </GlobalProvider>
         </Provider>
     );
 }

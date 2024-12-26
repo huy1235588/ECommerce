@@ -11,10 +11,9 @@ import { Typography } from "@mui/material";
 import { FormData } from "@/types/auth";
 
 import "@/styles/auth.css?v=1";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import axios from "@/config/axios";
-import Notification from "@/components/common/notification ";
+import { useAuth } from "@/context/AuthContext";
 
 const initialState: FormData = {
     email: "",
@@ -27,7 +26,7 @@ const initialState: FormData = {
 
 function AuthRegister() {
     const [formData, setFormData] = useState<FormData>(initialState);
-    const [showNotification, setShowNotification] = useState(false);
+    const { setAuth } = useAuth();
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
 
@@ -42,7 +41,9 @@ function AuthRegister() {
 
             // Kiểm tra phản hồi api
             if (response.data.success) {
-                setShowNotification(true) // Thông báo thành công
+                setAuth({
+                    isShowNotification: true // Thông báo thành công
+                })
 
                 // Truyền dữ liệu
                 const data: User = {
@@ -84,7 +85,7 @@ function AuthRegister() {
                     Login
                 </Link>
             </Typography>
-           
+
         </main>
     );
 }
