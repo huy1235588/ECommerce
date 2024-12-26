@@ -75,8 +75,8 @@ const CommonForm: React.FC<CommonFormProps> = ({
         }
     }, [isFormValid, onSubmit]);
 
-    // Hàm xử lý khi người dùng thay đổi giá trị nhập liệu
-    const handleInputChange = useCallback((
+    // Hàm xử lý thay đổi giá trị input
+    const handleInputChange = useCallback(async (
         name: string,
         value: string,
         onChange?: (value: string) => string
@@ -88,6 +88,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
             ...prev,
             values: { ...prev.values, [name]: value },
             isValid: { ...prev.isValid, [name]: !validationResult },
+            errors: { ...prev.errors, [name]: validationResult },
         }));
 
         // Lưu dữ liệu của trường nhập liệu
@@ -95,6 +96,23 @@ const CommonForm: React.FC<CommonFormProps> = ({
             ...prev,
             [name]: value,
         }));
+
+        // Gọi hàm kiểm tra tên người dùng
+        if (name === "userName" && !validationResult) {
+            setFormState((prev) => ({
+                ...prev,
+                isValid: { ...prev.isValid, [name]: false },
+            }));
+
+            const responseMessage = await CheckUserName(value);
+
+            setFormState((prev) => ({
+                ...prev,
+                isValid: { ...prev.isValid, [name]: responseMessage === "" },
+                errors: { ...prev.errors, [name]: responseMessage },
+            }));
+
+        }
     }, [setFormData]);
 
     // Hàm kiểm tra lỗi khi input mất focus (blur)
@@ -103,30 +121,21 @@ const CommonForm: React.FC<CommonFormProps> = ({
         value: string,
         onChange?: (value: string) => string
     ) => {
+        if (name === "userName") return;
+
         const validationResult = onChange ? onChange(value) : "";
-        const isFieldValid = !validationResult;
 
         setFormState((prev) => ({
             ...prev,
             isValid: { ...prev.isValid, [name]: !validationResult },
             errors: { ...prev.errors, [name]: validationResult },
         }));
-
-        // Gọi hàm kiểm tra tên người dùng
-        if (name === "userName" && isFieldValid) {
-            const responseMessage = await CheckUserName(value);
-            setFormState((prev) => ({
-                ...prev,
-                isValid: { ...prev.isValid, [name]: responseMessage !== "" },
-                errors: { ...prev.errors, [name]: responseMessage },
-            }));
-        }
-
-        await console.log(formState.isValid)
     };
 
     // Hàm xóa lỗi khi người dùng focus vào input
     const clearError = (name: string) => {
+        if (name === "userName") return;
+
         setFormState((prev) => ({
             ...prev,
             errors: { ...prev.errors, [name]: "" },
