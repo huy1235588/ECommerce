@@ -44,7 +44,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
                 <ul className="flex flex-1 items-center w-3/5 h-full">
                     <li className="relative h-full flex">
                         <a href="/shop/home" className="flex items-center justify-center w-full mr-5">
-                            <Image src="/public/logo.png" width={16} height={16} className="w-16" alt="" />
+                            <Image src="/logo/logo.png" width={16} height={16} className="w-16" alt="" />
                         </a>
                     </li>
 
