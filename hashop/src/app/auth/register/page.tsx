@@ -40,7 +40,7 @@ function AuthRegister() {
             const response = await axios.post('/api/auth/signup', formData);
             if (response.data.success) {
                 setShowNotification(true) // Thông báo thành công
-                router.push('/login'); // Chuyển hướng sang trang đăng nhập
+                router.push('/auth/login'); // Chuyển hướng sang trang đăng nhập
             }
 
         } catch (error) {

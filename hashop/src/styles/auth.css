@@ -100,13 +100,14 @@ Author       : LeThienHuy.
 
 */
 /*===================================*
-    01.START FORM
+    02.START FORM
 *===================================*/
 .form {
     margin: 1.5rem 0;
 }
 
 .form-container {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -235,5 +236,89 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
     counter-reset: #fff;
 }
 /*===================================*
-    01.END FORM
+    02.END FORM
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START ACCOUNT VERIFICATION
+*===================================*/
+.info-text {
+    margin-top: 1.5rem;
+    font-weight: 600;
+}
+
+/* Input */
+.input-form-code input {
+    padding: 1.2rem 1rem;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 700;
+}
+
+/* Action form */
+.action-form-container {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+.clear-icon {
+    color: #718096;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.clear-icon:hover{
+    color: #647185;
+}
+
+.divider {
+    border-left: 1px solid #2d3748;
+    margin-right: 5px;
+}
+.link-resend span:last-child {
+    padding: 0.5rem;
+}
+.link-resend:hover {
+    text-decoration: none;
+    color: #2563eb;
+}
+
+/* Button submit */
+button.verify-button {
+    margin-top: 20px;
+    padding: 10px 0;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    color: #080808;
+    background-color: #f9fcff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button.verify-button:hover {
+    background-color: #c0c0c0;
+}
+
+button.verify-button:disabled {
+    background-color: #cbd5e0;
+    cursor: not-allowed;
+}
+/*===================================*
+    03.END ACCOUNT VERIFICATION
 *===================================*/
