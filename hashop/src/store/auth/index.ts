@@ -4,45 +4,27 @@ import axiosLib, { AxiosResponse } from "axios";
 
 // Định nghĩa kiểu dữ liệu người dùng (User)
 export type User = {
-    _id: string;
-    email: string;
-    country: string;
-    firstName: string;
-    lastName: string;
-    userName: string;
-    password: string;
-    isVerified: boolean;
-    role: string;
-    verificationToken: string;
-    verificationTokenExpiresAt: Date;
-    lastLogin: Date;
-    createdAt: Date;
-    updatedAt: Date;
-    __v: number;
-};
-
-// Định nghĩa trạng thái của AuthSlice
-interface AuthSlice {
-    user: User | null;
-    isAuthenticated: boolean;
-    isLoading: boolean;
-    error?: string | null;
-    status?: number;
-}
-
-// Trạng thái khởi tạo cho AuthSlice
-const initialState: AuthSlice = {
-    user: null,
-    isAuthenticated: false,
-    isLoading: false,
-    status: undefined,
+    _id?: string;
+    email?: string;
+    country?: string;
+    firstName?: string;
+    lastName?: string;
+    userName?: string;
+    password?: string;
+    isVerified?: boolean;
+    role?: string;
+    verificationToken?: string;
+    verificationTokenExpiresAt?: Date;
+    lastLogin?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    __v?: number;
 };
 
 // Định nghĩa cấu trúc phản hồi từ API
 interface AuthResponse {
     success: boolean;
     message: string;
-    status?: number;
     user?: User;
 }
 
@@ -51,6 +33,26 @@ interface AuthError {
     message: string;
     status: number;
 }
+
+
+// Định nghĩa trạng thái của AuthSlice
+interface AuthState {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    error?: string | null;
+    status?: number;
+}
+
+// Trạng thái khởi tạo cho AuthSlice
+const initialState: AuthState = {
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    error: null,
+    status: undefined,
+};
+
 
 // AsyncThunk kiểm tra xác thực người dùng
 export const checkAuthUser = createAsyncThunk<
@@ -68,10 +70,16 @@ export const checkAuthUser = createAsyncThunk<
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {
                 const { status, data } = error.response;
-                const message = data?.message || "Authentication check failed";
-                return rejectWithValue({ message, status });
+                return rejectWithValue({
+                    message: data?.message || "Authentication check failed",
+                    status
+                });
             }
-            return rejectWithValue({ message: "Unexpected error occurred", status: 500 });
+
+            return rejectWithValue({
+                message: "Unexpected error occurred",
+                status: 500
+            });
         }
     }
 );

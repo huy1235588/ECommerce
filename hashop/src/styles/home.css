@@ -41,7 +41,6 @@ Author       : LeThienHuy.
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-left: 12%;
     transition: padding-left 0.3s ease-in-out;
 }
 

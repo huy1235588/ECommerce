@@ -49,7 +49,7 @@ Author       : LeThienHuy.
     }
 }
 
-.main {
+.auth-main {
     max-width: 28rem;
     width: 100%;
 }
@@ -254,8 +254,18 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
     03.START ACCOUNT VERIFICATION
 *===================================*/
 .info-text {
-    margin-top: 1.5rem;
-    font-weight: 600;
+    margin-top: 1.7rem;
+    font-weight: 500;
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #2d3748;
+    color: #e53e3e;
 }
 
 /* Input */
@@ -264,6 +274,10 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
     font-size: 1.125rem;
     line-height: 1.75rem;
     font-weight: 700;
+}
+
+.input-form-code label {
+    line-height: 1.75rem;
 }
 
 /* Action form */
@@ -281,7 +295,7 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
     margin-right: 10px;
 }
 
-.clear-icon:hover{
+.clear-icon:hover {
     color: #647185;
 }
 
@@ -289,9 +303,21 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
     border-left: 1px solid #2d3748;
     margin-right: 5px;
 }
-.link-resend span:last-child {
-    padding: 0.5rem;
+
+.link-resend.cursor-not-allowed {
+    user-select: none;
+    color: #6b7280;
 }
+
+.link-resend.cursor-not-allowed:hover {
+    color: #6b7280;
+}
+
+.link-resend .link-resend-text {
+    padding: 0.5rem 0.7rem;
+    padding-right: 0;
+}
+
 .link-resend:hover {
     text-decoration: none;
     color: #2563eb;
@@ -316,8 +342,8 @@ button.verify-button:hover {
 }
 
 button.verify-button:disabled {
-    background-color: #cbd5e0;
-    cursor: not-allowed;
+    color: #08080888;
+    background-color: #c0c0c088;
 }
 /*===================================*
     03.END ACCOUNT VERIFICATION

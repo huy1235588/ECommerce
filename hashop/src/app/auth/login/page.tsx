@@ -9,7 +9,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import "@/styles/auth.css";
-import Image from "next/image";
 import { resetError } from "@/store/auth";
 import { FormData } from "@/types/auth";
 
@@ -43,47 +42,38 @@ function AuthLogin() {
     }
 
     return (
-        <article className="article">
-            <div className="container">
-                <aside className="logo-container">
-                    <Image className="logo" src="/logo/logo.png" fill={true} alt="logo" />
-                </aside>
+        <main className="auth-main">
+            <h1 className="heading">
+                Log in
+            </h1>
 
-                {/* Content */}
-                <main className="main">
-                    <h1 className="heading">
-                        Log in
-                    </h1>
+            <CommonForm
+                formControl={loginFormControls}
+                buttonText={'Login'}
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={onSubmit}
+                isLoading={isLoading}
+                isError={(status === 404) ? error : null}
+            />
 
-                    <CommonForm
-                        formControl={loginFormControls}
-                        buttonText={'Login'}
-                        formData={formData}
-                        setFormData={setFormData}
-                        onSubmit={onSubmit}
-                        isLoading={isLoading}
-                        isError={(status === 404) ? error : null}
-                    />
-
-                    <p className="links">
-                        <Link
-                            className="link"
-                            href="/auth/forgot-password"
-                            onClick={() => dispatch(resetError())}
-                        >
-                            Forgot password?
-                        </Link>
-                        <Link
-                            className="link"
-                            href="/auth/register"
-                            onClick={() => dispatch(resetError())}
-                        >
-                            Create account
-                        </Link>
-                    </p>
-                </main>
-            </div>
-        </article>
+            <p className="links">
+                <Link
+                    className="link"
+                    href="/auth/forgot-password"
+                    onClick={() => dispatch(resetError())}
+                >
+                    Forgot password?
+                </Link>
+                <Link
+                    className="link"
+                    href="/auth/register"
+                    onClick={() => dispatch(resetError())}
+                >
+                    Create account
+                </Link>
+            </p>
+        </main>
     );
 }
 
