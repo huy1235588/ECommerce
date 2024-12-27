@@ -4,13 +4,14 @@ import maskEmail from "@/utils/email";
 import { Button, TextField, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { BiSolidXCircle } from "react-icons/bi";
-import "@/styles/auth.css";
 import Link from "next/link";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
 import NotFound from "@/app/not-found";
 import axios from "@/config/axios";
+import axiosLib from "axios";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const AccountVerification: React.FC = () => {
     const [code, setCode] = useState("");
@@ -19,6 +20,7 @@ const AccountVerification: React.FC = () => {
     const [isFormValid, setIsFormValid] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
+    const { setNotification } = useAuth();
 
     const email = useSelector((state: RootState) => state.auth.user?.email);
 
@@ -39,15 +41,22 @@ const AccountVerification: React.FC = () => {
             );
 
             if (response.data.success) {
+                setNotification({
+                    notification: {
+                        message: "Verification successful!",
+                        type: "success",
+                        duration: 3000,
+                    },
+                    isShowNotification: true // Thông báo thành công
+                })
                 router.push("/auth/login");
             }
-
-            else {
-                setError(response.data);
-            }
-
+            
         } catch (error) {
-            console.log(error);
+            if (axiosLib.isAxiosError(error) && error.response) {
+                console.log(error);
+                setError(error.response.data.message);   
+            }
         }
     };
 

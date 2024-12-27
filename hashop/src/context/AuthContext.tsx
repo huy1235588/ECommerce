@@ -14,10 +14,25 @@ interface User {
     email: string;
 }
 
+// Định nghĩa kiểu dữ liệu cho trạng thái thống báo
+interface ShowNotificationState {
+    notification: Notification | null;
+    isShowNotification?: boolean;
+}
+
+//Dịnh nghĩa kiểu thông báo
+interface Notification {
+    message: string;
+    type: "error" | "success" | "info" | "warning" | undefined;
+    duration?: number;
+}
+
 // Định nghĩa kiểu dữ liệu cho Context
 interface AuthContextProps {
     auth: AuthState;
     setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
+    notification: ShowNotificationState;
+    setNotification: React.Dispatch<React.SetStateAction<ShowNotificationState>>;
 }
 
 // Tạo Context
@@ -30,8 +45,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isShowNotification: false,
     });
 
+    const [notification, setNotification] = useState<ShowNotificationState>({
+        notification: null,
+        isShowNotification: false,
+    })
+
     return (
-        <AuthContext.Provider value={{ auth, setAuth }}>
+        <AuthContext.Provider value={{
+            auth, setAuth,
+            notification, setNotification
+        }}>
             {children}
         </AuthContext.Provider>
     );

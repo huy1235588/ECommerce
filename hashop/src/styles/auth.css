@@ -46,18 +46,27 @@ Author       : LeThienHuy.
     .container {
         width: 45%;
     }
+    .container.login {
+        width: 35%;
+    }
 }
 
 .auth-main {
-    max-width: 30rem;
+    max-width: 32rem;
     width: 100%;
 }
 
+.container.login .auth-main {
+    max-width: 30rem;
+}
+
 .heading {
+    margin-bottom: 2rem;
     text-align: center;
     letter-spacing: -0.025em;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 2rem;
+    font-weight: 800;
     color: #e5e7eb;
 }
 
@@ -118,8 +127,15 @@ Author       : LeThienHuy.
     left: 3%;
     width: 5rem;
     height: 2rem;
-    margin-bottom: 2.5rem;
     z-index: 2;
+}
+
+.logo-container a {
+    display: inline-block;
+}
+
+.auth-aside-banner {
+    z-index: -1;
 }
 /*===================================*
     02.END ASIDE
@@ -170,6 +186,20 @@ Author       : LeThienHuy.
 
 .input-form label {
     color: #6b7280;
+}
+
+.input-form fieldset,
+.select-form fieldset {
+    border-color: #ffffff2f;
+}
+
+.input-form
+    > div:not(.Mui-focused, .Mui-error):hover
+    .MuiOutlinedInput-notchedOutline,
+.select-form
+    > div:not(.Mui-focused, .Mui-error):hover
+    .MuiOutlinedInput-notchedOutline {
+    border-color: #aaaaae;
 }
 
 .form-field:has(.input-form-48) {
@@ -291,18 +321,39 @@ div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
     04.START ACCOUNT VERIFICATION
 *===================================*/
 .info-text {
-    margin-top: 1.7rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
     font-weight: 500;
 }
 
-.error-message {
+p.error-message {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding: 10px;
+    padding: 1.2rem 1.25rem;
+    padding-right: 0.75rem;
+    margin: 1.4rem 0;
+    border: 1px solid #f8514966;
     border-radius: 5px;
-    background-color: #2d3748;
-    color: #e53e3e;
+    background-image: linear-gradient(#e53e3e1a, #e53e3e1a);
+    color: #f0f6fc;
+}
+
+.error-message svg {
+    height: 100%;
+    color: #f85149;
+}
+.error-message button.error-close {
+    min-width: 2.25rem;
+    width: 2.25rem;
+}
+
+.error-message button.error-close:hover {
+    background-color: transparent;
+}
+
+.error-message button.error-close:hover svg {
+    color: #b9403c;
 }
 
 /* Input */

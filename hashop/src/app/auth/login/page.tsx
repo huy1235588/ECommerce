@@ -8,7 +8,6 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import "@/styles/auth.css";
 import { resetError } from "@/store/auth";
 import { FormData } from "@/types/auth";
 

@@ -1,18 +1,18 @@
 'use client'
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { resetError, setUser, User } from "@/store/auth";
-import { AppDispatch, RootState } from "@/store/store";
+import { AppDispatch } from "@/store/store";
 import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config/auth";
 import Link from "next/link";
 import { Typography } from "@mui/material";
 import { FormData } from "@/types/auth";
 
-import "@/styles/auth.css?v=1";
 import { useRouter } from "next/navigation";
 import axios from "@/config/axios";
+import axiosLib from "axios";
 import { useAuth } from "@/context/AuthContext";
 
 const initialState: FormData = {
@@ -26,22 +26,30 @@ const initialState: FormData = {
 
 function AuthRegister() {
     const [formData, setFormData] = useState<FormData>(initialState);
-    const { setAuth } = useAuth();
+    const { setNotification } = useAuth();
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
-
-    const { isLoading, error } = useSelector((state: RootState) => state.auth);
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
     // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
+            // Set loading
+            setIsLoading(true);
+
             // Gọi api đăng ký
             const response = await axios.post('/api/auth/signup', formData);
 
             // Kiểm tra phản hồi api
             if (response.data.success) {
-                setAuth({
+                setNotification({
+                    notification: {
+                        message: "Registration successful!",
+                        type: "success",
+                        duration: 3000,
+                    },
                     isShowNotification: true // Thông báo thành công
                 })
 
@@ -55,7 +63,12 @@ function AuthRegister() {
             }
 
         } catch (error) {
-            console.error(error);
+            if (axiosLib.isAxiosError(error) && error.response) {
+                console.log(error);
+                setError(error.response.data.message);
+            }
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -73,6 +86,7 @@ function AuthRegister() {
                 onSubmit={onSubmit}
                 isLoading={isLoading}
                 isError={error}
+                setError={setError}
             />
 
             <Typography variant="body2" sx={{ mt: 2 }}>

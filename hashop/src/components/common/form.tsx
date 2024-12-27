@@ -13,11 +13,12 @@ import {
     IconButton,
     Tooltip,
 } from "@mui/material";
-import { BiInfoCircle, BiSolidXCircle } from "react-icons/bi";
+import { BiInfoCircle } from "react-icons/bi";
 import { FormData } from "@/types/auth";
 import { CheckUserName } from "@/utils/checkUserName";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FormControl as FormControlType } from "@/config/auth";
+import { IoMdClose } from "react-icons/io";
 
 /*************************************************************************
  
@@ -32,6 +33,7 @@ interface CommonFormProps {
     buttonText?: string;
     isLoading: boolean;
     isError?: string | null;
+    setError?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const CommonForm: React.FC<CommonFormProps> = ({
@@ -42,6 +44,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
     buttonText = "Submit",
     isLoading,
     isError,
+    setError,
 }) => {
     const [formState, setFormState] = useState<{
         values: Record<string, string>;       // Lưu trữ giá trị nhập vào của các trường trong form
@@ -274,12 +277,22 @@ const CommonForm: React.FC<CommonFormProps> = ({
             {/* Hiển thị thông báo lỗi nếu có */}
             {isError && (
                 <Typography
-                    variant="body2"
+                    variant="body1"
                     color="error"
-                    className="flex items-center mb-5"
+                    className="error-message"
                 >
-                    <BiSolidXCircle className="mr-2" />
                     {isError}
+                    <Button className="error-close"
+                        variant="text"
+                        disableRipple={true}
+                        onClick={() => {
+                            if (setError) {
+                                setError("");
+                            }
+                        }}
+                    >
+                        <IoMdClose />
+                    </Button>
                 </Typography>
             )}
 
