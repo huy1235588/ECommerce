@@ -20,7 +20,57 @@ export default function Home() {
                 active="ha"
             />
             <main>
-                main
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
+                <p>main</p>
             </main>
         </div>
     );

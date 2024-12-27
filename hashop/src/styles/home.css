@@ -44,7 +44,98 @@ Author       : LeThienHuy.
     transition: padding-left 0.3s ease-in-out;
 }
 
-
 /*===================================*
-    01.START GENERAL
+    01.END GENERAL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.START HEADER
+*===================================*/
+.home-header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background-color: #393939;
+    z-index: 10;
+    opacity: 0.95;
+}
+
+.home-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 75rem;
+    margin: 0 auto;
+    height: 3.5rem;
+}
+
+.home-menu {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.home-menu li {
+    position: relative;
+    height: 100%;
+    display: flex;
+}
+
+.home-menu li a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+}
+
+.home-menu li a.default {
+    color: #e5e7eb;
+    transition: color 0.3s ease;
+}
+
+.home-menu li a.default:hover {
+    color: #9ca3af;
+}
+
+.home-menu li a.active {
+    color: #10b981;
+}
+
+/* Menu account */
+.menu-account-container {
+    /* display: flex; */
+    align-items: center;
+}
+
+.menu-account .MuiPaper-root {
+    width: 350px;
+    background-color: #1e1e2e;
+    color: #fff;
+}
+
+.menu-account .MuiPaper-root .MuiMenuItem-root:hover,
+.menu-account .MuiPaper-root .MuiMenuItem-root:hover .MuiListItemIcon-root {
+    color: #556de5;
+    background-color: #343746;
+}
+
+.menu-account .MuiPaper-root .MuiMenuItem-root,
+.menu-account .MuiPaper-root .MuiMenuItem-root .MuiListItemIcon-root {
+    color: #5c5f6b;
+}
+/*===================================*
+    01.END GENERAL
 *===================================*/

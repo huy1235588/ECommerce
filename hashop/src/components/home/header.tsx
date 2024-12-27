@@ -1,10 +1,11 @@
 'use client'
-// import { LogoutUser } from "@/store/auth";
-import {  useAppSelector } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks";
+import { Button } from "@mui/material";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { FaAngleDown } from "react-icons/fa";
+import { UserMenu } from "./userMenu ";
 
 interface HomeHeaderProps {
     active: string | undefined; // Nhận trạng thái active từ props để đánh dấu menu nào đang được chọn
@@ -12,25 +13,9 @@ interface HomeHeaderProps {
 
 const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
     const router = useRouter();
-    // const dispatch = useAppDispatch();
 
     // Lấy thông tin người dùng và trạng thái xác thực từ store
     const { user, isAuthenticated } = useAppSelector((state) => state.auth);
-
-    // Quản lý trạng thái hiển thị menu tài khoản
-    const [menuAccount, setMenuAccount] = useState(false);
-
-    // Hàm xử lý đăng xuất
-    const onClickLogout = async () => {
-        try {
-            // Gọi action LogoutUser
-            // await dispatch(LogoutUser());
-            router.push('/');
-
-        } catch (error) {
-            console.log(error);
-        }
-    };
 
     // Hàm xử lý đăng nhập
     const onClickLogin = (event: React.MouseEvent<HTMLElement>) => {
@@ -39,86 +24,63 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
     }
 
     return (
-        <header className="sticky top-0 w-full z-10 opacity-95">
-            <nav className="flex justify-between items-center max-w-5xl mx-auto h-12">
-                <ul className="flex flex-1 items-center w-3/5 h-full">
-                    <li className="relative h-full flex">
-                        <a href="/shop/home" className="flex items-center justify-center w-full mr-5">
-                            <Image src="/logo/logo.png" width={16} height={16} className="w-16" alt="" />
+        <header className="home-header">
+            <nav className="home-nav">
+                <ul className="home-menu">
+                    <li>
+                        <a href="/shop/home" className="logo">
+                            <Image src="/logo/logo.png" width={64} height={27} alt="" />
                         </a>
                     </li>
 
-                    <li className="relative h-full flex">
-                        <a href="/shop/home"
-                            className={`flex items-center justify-center w-full py-2 px-3
-                                ${active === "home" ? "text-green-400 hover:text-green-400" : "text-gray-200 hover:text-gray-400"}
-                            `}
-                        >
-                            <span className="mr-1">
-                                STORE
-                            </span>
+                    <li>
+                        <a href="/shop/home" className={`default ${active === "home" ? "active" : ""}`}>
+                            <span>STORE</span>
                             <FaAngleDown />
                         </a>
                     </li>
 
-                    <li className="relative h-full flex">
-                        <a href="/shop/about"
-                            className={`flex items-center justify-center w-full py-2 px-3
-                                ${active === "about" ? "text-green-400 hover:text-green-400" : "text-gray-200 hover:text-gray-400"}
-                            `}
-                        >
-                            <span className="mr-1">
-                                ABOUT
-                            </span>
+                    <li>
+                        <a href="/shop/about" className={`default ${active === "about" ? "active" : ""}`}>
+                            <span>ABOUT</span>
                             <FaAngleDown />
                         </a>
                     </li>
 
-                    <li className="relative h-full flex">
-                        <a href="/shop/home" className="flex items-center justify-center w-full py-2 px-3 text-gray-200 hover:text-gray-400">
-                            <span className="mr-1">
-                                COMMUNITY
-                            </span>
+                    <li>
+                        <a href="/shop/home" className="default">
+                            <span>COMMUNITY</span>
                             <FaAngleDown />
                         </a>
                     </li>
 
-                    <li className="relative h-full flex">
-                        <a href="/shop/home" className="flex items-center justify-center w-full py-2 px-3 text-gray-200 hover:text-gray-400">
-                            <span className="mr-1">
-                                SUPPORT
-                            </span>
+                    <li>
+                        <a href="/shop/home" className="default">
+                            <span>SUPPORT</span>
                             <FaAngleDown />
                         </a>
                     </li>
                 </ul>
 
-                <ul className="flex">
-                    <li className="relative">
+                <ul className="home-menu">
+                    <li>
                         {isAuthenticated ? (
-                            <div>
-                                <button
-                                    onClick={() => setMenuAccount(prev => !prev)}
-                                >
-                                    {user?.userName}
-                                </button>
-
-                                {menuAccount && <div>
-                                    <button
-                                        className="absolute"
-                                        onClick={onClickLogout}
-                                    >
-                                        Logout
-                                    </button>
-                                </div>}
+                            <div className="menu-account-container">
+                                {user?.userName && (
+                                    <UserMenu
+                                        username={user.userName}
+                                        avatarUrl="/logo/logo.png"
+                                    />
+                                )}
                             </div>
                         ) : (
-                            <button
-                                className="py-1 px-3 bg-slate-600 hover:bg-slate-500"
+                            <Button
+                                variant="contained"
+                                color="primary"
                                 onClick={onClickLogin}
                             >
                                 Sign in
-                            </button>
+                            </Button>
                         )}
                     </li>
                 </ul>
