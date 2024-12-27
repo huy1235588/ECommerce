@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import axios from "@/config/axios";
 import axiosLib, { AxiosResponse } from "axios";
+import { FormData } from "@/types/auth";
 
 // Định nghĩa kiểu dữ liệu người dùng (User)
 export type User = {
@@ -53,6 +54,43 @@ const initialState: AuthState = {
     status: undefined,
 };
 
+
+// Login
+export const LoginUser = createAsyncThunk<
+    AuthResponse,
+    FormData,
+    { rejectValue: AuthError }
+>(
+    "/auth/login",
+    async (
+        FormData,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/login',
+                FormData,
+                { withCredentials: true, }
+            );
+
+            return response.data;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                return rejectWithValue({
+                    message: data?.message || "Authentication check failed",
+                    status
+                });
+            }
+
+            return rejectWithValue({
+                message: "Unexpected error occurred",
+                status: 500
+            });
+        }
+    }
+);
 
 // AsyncThunk kiểm tra xác thực người dùng
 export const checkAuthUser = createAsyncThunk<
@@ -116,7 +154,25 @@ const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.error = action.payload?.message || null;
                 state.status = action.payload?.status;
-            });
+            })
+
+            // Xử lý trạng thái đăng nhập
+            .addCase(LoginUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(LoginUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.user || null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(LoginUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message || null;
+                state.status = action.payload?.status;
+            })
     },
 });
 

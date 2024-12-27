@@ -8,8 +8,9 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { resetError } from "@/store/auth";
+import { LoginUser, resetError } from "@/store/auth";
 import { FormData } from "@/types/auth";
+import { useRouter } from "next/navigation";
 
 const initialState: FormData = {
     email: "",
@@ -19,21 +20,18 @@ const initialState: FormData = {
 function AuthLogin() {
     const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
+    const router = useRouter();
 
     const { isLoading, error, status } = useSelector((state: RootState) => state.auth) || null;
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            // const resultAction = await dispatch(LoginUser(formData));
-            // const payload = resultAction.payload as {
-            //     success: boolean,
-            //     message: string,
-            // } | null;
+            const resultAction = await dispatch(LoginUser(formData));
 
-            // if (resultAction.meta.requestStatus === "fulfilled" && payload?.success) {
-            //     // navigate("/");
-            // }
+            if (resultAction.meta.requestStatus === "fulfilled") {
+               router.replace('/');
+            }
 
         } catch (error) {
             console.log(error);
