@@ -5,12 +5,13 @@ import { loginFormControls } from "@/config/auth";
 // import { LoginUser, resetError } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import { LoginUser, resetError } from "@/store/auth";
 import { FormData } from "@/types/auth";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 const initialState: FormData = {
     email: "",
@@ -21,8 +22,14 @@ function AuthLogin() {
     const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
+    const { setImageUrl, setPositionAside } = useAuth();
 
     const { isLoading, error, status } = useSelector((state: RootState) => state.auth) || null;
+
+    useEffect(() => {
+        setImageUrl('/image/banner/elden-ring-2.jpg');
+        setPositionAside('left');
+    }, [setImageUrl, setPositionAside]);
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -30,7 +37,7 @@ function AuthLogin() {
             const resultAction = await dispatch(LoginUser(formData));
 
             if (resultAction.meta.requestStatus === "fulfilled") {
-               router.replace('/');
+                router.replace('/');
             }
 
         } catch (error) {

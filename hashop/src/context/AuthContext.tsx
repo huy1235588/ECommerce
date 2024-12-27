@@ -33,6 +33,10 @@ interface AuthContextProps {
     setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
     notification: ShowNotificationState;
     setNotification: React.Dispatch<React.SetStateAction<ShowNotificationState>>;
+    imageUrl: string;
+    setImageUrl: React.Dispatch<React.SetStateAction<string>>;
+    positionAside: "left" | "right";
+    setPositionAside: React.Dispatch<React.SetStateAction<"left" | "right">>;
 }
 
 // Tạo Context
@@ -48,12 +52,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [notification, setNotification] = useState<ShowNotificationState>({
         notification: null,
         isShowNotification: false,
-    })
+    });
+
+    const [imageUrl, setImageUrl] = useState("");
+    const [positionAside, setPositionAside] = useState<"left" | "right">("left");
 
     return (
         <AuthContext.Provider value={{
             auth, setAuth,
-            notification, setNotification
+            notification, setNotification,
+            imageUrl, setImageUrl,
+            positionAside, setPositionAside,
         }}>
             {children}
         </AuthContext.Provider>

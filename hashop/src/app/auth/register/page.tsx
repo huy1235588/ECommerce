@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { resetError, setUser, User } from "@/store/auth";
 import { AppDispatch } from "@/store/store";
@@ -26,12 +26,18 @@ const initialState: FormData = {
 
 function AuthRegister() {
     const [formData, setFormData] = useState<FormData>(initialState);
-    const { setNotification } = useAuth();
+    const { setNotification, setImageUrl, setPositionAside } = useAuth();
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    // Set banner
+    useEffect(() => {
+        setImageUrl('/image/banner/RedDeadRedemption2.jpg');
+        setPositionAside('right');
+    }, [setImageUrl, setPositionAside]);
+   
     // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

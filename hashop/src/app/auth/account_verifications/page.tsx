@@ -20,9 +20,15 @@ const AccountVerification: React.FC = () => {
     const [isFormValid, setIsFormValid] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
-    const { setNotification } = useAuth();
+    const { setNotification, setImageUrl, setPositionAside } = useAuth();
 
     const email = useSelector((state: RootState) => state.auth.user?.email);
+
+    // Set banner
+    useEffect(() => {
+        setImageUrl('/image/banner/RedDeadRedemption2.jpg');
+        setPositionAside('right');
+    }, [setImageUrl, setPositionAside]);
 
     // Sự kiện submit form
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -51,11 +57,11 @@ const AccountVerification: React.FC = () => {
                 })
                 router.push("/auth/login");
             }
-            
+
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {
                 console.log(error);
-                setError(error.response.data.message);   
+                setError(error.response.data.message);
             }
         }
     };

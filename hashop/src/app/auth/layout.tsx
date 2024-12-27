@@ -12,18 +12,20 @@ export default function AuthLayout({
 }: Readonly<{
     children: React.ReactNode,
 }>) {
-    const { notification, setNotification } = useAuth();
+    const {
+        notification, setNotification,
+        imageUrl,
+        positionAside,
+    } = useAuth();
+
     const pathname = usePathname();
     const isLogin = pathname.includes('login');
-    const urlImg = isLogin
-        ? "/image/banner/elden-ring-2.jpg"
-        : "/image/banner/RedDeadRedemption2.jpg"
 
     return (
         <article className="article">
             <Image
                 className="auth-aside-banner"
-                src={urlImg}
+                src={imageUrl}
                 fill={true}
                 alt="aside"
             />
@@ -42,7 +44,7 @@ export default function AuthLayout({
                 </Link>
             </div>
 
-            <aside className={`auth-aside  ${isLogin ? 'left' : 'right'}`}>
+            <aside className={`auth-aside  ${positionAside}`}>
             </aside>
 
             {/* Main Content */}
