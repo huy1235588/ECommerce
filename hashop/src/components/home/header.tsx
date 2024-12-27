@@ -78,6 +78,9 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
                                 variant="contained"
                                 color="primary"
                                 onClick={onClickLogin}
+                                sx={{
+                                    height: "60%"
+                                }}
                             >
                                 Sign in
                             </Button>
