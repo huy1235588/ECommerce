@@ -92,6 +92,37 @@ export const LoginUser = createAsyncThunk<
     }
 );
 
+// Logout
+export const LogoutUser = createAsyncThunk<
+    AuthResponse,
+    void,
+    { rejectValue: AuthError }
+>(
+    "/auth/logout",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                "/api/auth/logout",
+                { withCredentials: true }
+            );
+            return response.data;
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                return rejectWithValue({
+                    message: data?.message || "Authentication check failed",
+                    status
+                });
+            }
+
+            return rejectWithValue({
+                message: "Unexpected error occurred",
+                status: 500
+            });
+        }
+    }
+);
+
 // AsyncThunk kiểm tra xác thực người dùng
 export const checkAuthUser = createAsyncThunk<
     AuthResponse,
@@ -167,6 +198,24 @@ const authSlice = createSlice({
                 state.isAuthenticated = action.payload.success;
             })
             .addCase(LoginUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message || null;
+                state.status = action.payload?.status;
+            })
+
+            // Xử lý trạng thái đăng xuất
+            .addCase(LogoutUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(LogoutUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.user || null;
+                state.isAuthenticated = false;
+            })
+            .addCase(LogoutUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;

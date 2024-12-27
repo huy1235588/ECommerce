@@ -11,6 +11,10 @@ import {
 import { BiCodeBlock, BiHome, BiLock, BiLogOut, BiSolidUserAccount } from 'react-icons/bi';
 import { FaLanguage } from 'react-icons/fa';
 import { IoMdSettings } from 'react-icons/io';
+import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { LogoutUser } from '@/store/auth';
+import { AppDispatch } from '@/store/store';
 
 interface UserMenuProps {
     username: string;
@@ -18,6 +22,9 @@ interface UserMenuProps {
 }
 
 export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
+    const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
+
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -29,17 +36,17 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
         setAnchorEl(null);
     };
 
-    // // Hàm xử lý đăng xuất
-    // const onClickLogout = async () => {
-    //     try {
-    //         // Gọi action LogoutUser
-    //         // await dispatch(LogoutUser());
-    //         router.refresh();
+    // Hàm xử lý đăng xuất
+    const handleClickLogout = async () => {
+        try {
+            // Gọi action LogoutUser
+            await dispatch(LogoutUser());
+            router.refresh();
 
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     return (
         <>
@@ -128,7 +135,9 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
                 <Divider style={{ backgroundColor: '#444' }} />
 
                 {/* Logout */}
-                <MenuItem>
+                <MenuItem
+                    onClick={handleClickLogout}
+                >
                     <ListItemIcon>
                         <BiLogOut fontSize="20px" />
                     </ListItemIcon>
