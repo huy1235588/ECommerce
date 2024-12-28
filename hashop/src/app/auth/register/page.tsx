@@ -9,10 +9,12 @@ import { registerFormControls } from "@/config/auth";
 import Link from "next/link";
 import { Typography } from "@mui/material";
 import { FormData } from "@/types/auth";
+import { v4 as uuidv4 } from "uuid";
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useSelector } from "react-redux";
+import { useNotification } from "@/context/NotificationContext";
 
 const initialState: FormData = {
     email: "",
@@ -25,9 +27,10 @@ const initialState: FormData = {
 
 function AuthRegister() {
     const [formData, setFormData] = useState<FormData>(initialState);
-    const { setNotification, setImageUrl, setPositionAside } = useAuth();
+    const { setImageUrl, setPositionAside } = useAuth();
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
+    const { notificationDispatch } = useNotification();
     const { error, isLoading } = useSelector((state: RootState) => state.auth);
 
     // Set banner
@@ -44,14 +47,18 @@ function AuthRegister() {
 
             // Kiểm tra phản hồi api
             if (resultAction.meta.requestStatus === "fulfilled") {
+                // tạo Id duy nhất
+                const id = uuidv4();
+
                 // Thông báo thành công
-                setNotification({
-                    notification: {
-                        message: "Registration successful!",
+                notificationDispatch({
+                    type: "ADD_NOTIFICATION",
+                    payload: {
+                        id: id,
                         type: "success",
-                        duration: 3000,
-                    },
-                    isShowNotification: true
+                        message: "Registration successful!",
+                        duration: 5000
+                    }
                 });
 
                 router.push('/auth/account_verifications'); // Chuyển hướng sang trang đăng nhập

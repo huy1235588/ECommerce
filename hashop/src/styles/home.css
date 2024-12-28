@@ -75,7 +75,7 @@ Author       : LeThienHuy.
     display: flex;
     justify-content: space-between;
     align-items: center;
-    max-width: 75rem;
+    max-width: 70rem;
     margin: 0 auto;
     height: 3.5rem;
 }
@@ -119,6 +119,10 @@ Author       : LeThienHuy.
 .menu-account-container {
     /* display: flex; */
     align-items: center;
+}
+
+.menu-account.MuiPopover-root {
+    position: absolute;
 }
 
 .menu-account .MuiPaper-root {

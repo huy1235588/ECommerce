@@ -2,16 +2,17 @@
 
 import CommonForm from "@/components/common/form";
 import { loginFormControls } from "@/config/auth";
-// import { LoginUser, resetError } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
 
 import { clearError, LoginUser } from "@/store/auth";
 import { FormData } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useNotification } from "@/context/NotificationContext";
 
 const initialState: FormData = {
     email: "",
@@ -22,9 +23,10 @@ function AuthLogin() {
     const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const { setImageUrl, setNotification, setPositionAside } = useAuth();
+    const { setImageUrl, setPositionAside } = useAuth();
+    const { notificationDispatch } = useNotification();
 
-    const { user, isLoading, error, status } = useSelector((state: RootState) => state.auth) || null;
+    const { user, isLoading, error, status } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         setImageUrl('/image/banner/elden-ring-2.jpg');
@@ -37,14 +39,18 @@ function AuthLogin() {
             const resultAction = await dispatch(LoginUser(formData));
 
             if (resultAction.meta.requestStatus === "fulfilled") {
+                // tạo Id duy nhất
+                const id = uuidv4();
+
                 // Thông báo thành công
-                setNotification({
-                    notification: {
-                        message: `Welcome ${user?.userName}!`,
+                notificationDispatch({
+                    type: "ADD_NOTIFICATION",
+                    payload: {
+                        id: id,
                         type: "success",
-                        duration: 3000,
-                    },
-                    isShowNotification: true
+                        message: `Welcome ${user?.userName}`,
+                        duration: 5000
+                    }
                 });
 
                 router.replace('/');

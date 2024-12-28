@@ -1,6 +1,5 @@
 'use client'
 
-import Notification from "@/components/common/notification ";
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,7 +16,6 @@ export default function AuthLayout({
 }>) {
     const {
         notFoundPage,
-        notification, setNotification,
         imageUrl,
         positionAside,
     } = useAuth();
@@ -73,20 +71,7 @@ export default function AuthLayout({
                 {children}
             </div>
 
-            {/* Thông báo */}
-            {notification.isShowNotification && notification.notification && (
-                <Notification
-                    message={notification.notification.message}
-                    type={notification.notification.type}
-                    duration={notification.notification.duration}
-                    onClose={() => [
-                        setNotification({
-                            notification: null,
-                            isShowNotification: false
-                        })
-                    ]} // Đóng thông báo
-                />
-            )}
+           
         </article>
     );
 }

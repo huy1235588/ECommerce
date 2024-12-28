@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from "react";
 import "@/styles/components/notification.css";
 import { IoIosClose } from "react-icons/io";
