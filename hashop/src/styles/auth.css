@@ -436,3 +436,41 @@ button.verify-button:disabled {
 /*===================================*
     04.END ACCOUNT VERIFICATION
 *===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    04.START ACCOUNT VERIFICATION
+*===================================*/
+.step-label .MuiStepLabel-labelContainer {
+    color: #61636b;
+}
+
+.step-label .MuiStepLabel-label.Mui-active,
+.step-label .MuiStepLabel-label.Mui-completed {
+    color: #556ad0;
+}
+
+.step-label .MuiStepIcon-root {
+    border: 1px #61636b solid;
+    border-radius: 50%;
+    color: transparent;
+}
+
+.step-label .MuiStepIcon-root.Mui-active,
+.step-label .MuiStepIcon-root.Mui-completed {
+    color: #556ad0;
+}
+
+/*===================================*
+    03.END FORM
+*===================================*/

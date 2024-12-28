@@ -67,7 +67,7 @@ export default function AuthLayout({
             </aside>
 
             {/* Main Content */}
-            <div className={`container ${isLogin ? 'login' : 'register'}`}>
+            <div className={`container ${isLogin ? 'login' : ''}`}>
                 {children}
             </div>
 
