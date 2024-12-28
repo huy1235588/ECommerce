@@ -27,8 +27,19 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
 
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number } | null>(null);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        const target = event.currentTarget.getBoundingClientRect();
+
+        if (!menuPosition) {
+            // Lưu vị trí ban đầu (top, left) của menu
+            setMenuPosition({
+                top: target.bottom,
+                left: target.left ,
+            });
+        }
+
         setAnchorEl(event.currentTarget);
     };
 
@@ -76,6 +87,11 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleMenuClose}
+                anchorReference="anchorPosition" // Đặt menu theo vị trí cố định
+                anchorPosition={menuPosition
+                    ? { top: menuPosition.top, left: menuPosition.left }
+                    : undefined
+                }
                 anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'right',
