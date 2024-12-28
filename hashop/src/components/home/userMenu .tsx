@@ -30,13 +30,13 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
     const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number } | null>(null);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        const target = event.currentTarget.getBoundingClientRect();
+        const rect = event.currentTarget.getBoundingClientRect();
 
         if (!menuPosition) {
             // Lưu vị trí ban đầu (top, left) của menu
             setMenuPosition({
-                top: target.bottom,
-                left: target.left ,
+                top: rect.bottom + window.scrollY, // Vị trí dưới IconButton
+                left: rect.right + window.scrollX, // Căn chỉnh theo chiều ngang
             });
         }
 
@@ -45,6 +45,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
 
     const handleMenuClose = () => {
         setAnchorEl(null);
+        setMenuPosition(null)
     };
 
     // Hàm xử lý đăng xuất
@@ -87,18 +88,18 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleMenuClose}
-                anchorReference="anchorPosition" // Đặt menu theo vị trí cố định
+                anchorReference={menuPosition ? 'anchorPosition' : 'anchorEl'} // Đặt menu theo vị trí cố định
                 anchorPosition={menuPosition
                     ? { top: menuPosition.top, left: menuPosition.left }
                     : undefined
                 }
                 anchorOrigin={{
                     vertical: 'bottom',
-                    horizontal: 'right',
+                    horizontal: 'right'
                 }}
                 transformOrigin={{
                     vertical: 'top',
-                    horizontal: 'right',
+                    horizontal: 'right'
                 }}
                 disableScrollLock={true}
             >
