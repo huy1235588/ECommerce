@@ -116,29 +116,29 @@ Author       : LeThienHuy.
 }
 
 /* Menu account */
-.menu-account-container {
+.user-menu-container {
     /* display: flex; */
     align-items: center;
 }
 
-.menu-account.MuiPopover-root {
+.user-menu.MuiPopover-root {
     position: absolute;
 }
 
-.menu-account .MuiPaper-root {
+.user-menu .MuiPaper-root {
     width: 350px;
     background-color: #1e1e2e;
     color: #fff;
 }
 
-.menu-account .MuiPaper-root .MuiMenuItem-root:hover,
-.menu-account .MuiPaper-root .MuiMenuItem-root:hover .MuiListItemIcon-root {
+.user-menu .MuiPaper-root .MuiMenuItem-root:hover,
+.user-menu .MuiPaper-root .MuiMenuItem-root:hover .MuiListItemIcon-root {
     color: #556de5;
     background-color: #343746;
 }
 
-.menu-account .MuiPaper-root .MuiMenuItem-root,
-.menu-account .MuiPaper-root .MuiMenuItem-root .MuiListItemIcon-root {
+.user-menu .MuiPaper-root .MuiMenuItem-root,
+.user-menu .MuiPaper-root .MuiMenuItem-root .MuiListItemIcon-root {
     color: #5c5f6b;
 }
 /*===================================*

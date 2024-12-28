@@ -83,7 +83,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
             </IconButton>
 
             <Menu
-                className='menu-account'
+                className='user-menu'
                 anchorEl={anchorEl}
                 open={open}
                 onClose={handleMenuClose}
