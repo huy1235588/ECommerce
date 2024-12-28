@@ -13,6 +13,7 @@ import { FormData } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/context/NotificationContext";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const initialState: FormData = {
     email: "",
@@ -26,7 +27,7 @@ function AuthLogin() {
     const { setImageUrl, setPositionAside } = useAuth();
     const { notificationDispatch } = useNotification();
 
-    const { user, isLoading, error, status } = useSelector((state: RootState) => state.auth);
+    const { isLoading, error, status } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         setImageUrl('/image/banner/elden-ring-2.jpg');
@@ -42,13 +43,15 @@ function AuthLogin() {
                 // tạo Id duy nhất
                 const id = uuidv4();
 
+                const userResult = unwrapResult(resultAction).user;
+
                 // Thông báo thành công
                 notificationDispatch({
                     type: "ADD_NOTIFICATION",
                     payload: {
                         id: id,
                         type: "success",
-                        message: `Welcome ${user?.userName}`,
+                        message: `Welcome ${userResult?.userName}`,
                         duration: 5000
                     }
                 });
