@@ -55,6 +55,42 @@ const initialState: AuthState = {
 };
 
 
+// Register
+export const RegisterUser = createAsyncThunk<
+    AuthResponse,
+    FormData,
+    { rejectValue: AuthError }
+>(
+    "/auth/signup",
+    async (
+        FormData,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/signup',
+                FormData,
+            );
+
+            return response.data;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                return rejectWithValue({
+                    message: data?.message || "Register failed",
+                    status
+                });
+            }
+
+            return rejectWithValue({
+                message: "Unexpected error occurred",
+                status: 500
+            });
+        }
+    }
+);
+
 // Login
 export const LoginUser = createAsyncThunk<
     AuthResponse,
@@ -163,23 +199,23 @@ const authSlice = createSlice({
             state.user = action.payload;
             state.isAuthenticated = !!action.payload;
         },
-        resetError: (state) => {
+        clearError: (state) => {
             state.error = null;
         },
     },
     extraReducers: (builder) => {
         builder
-            // Xử lý trạng thái xác thực
-            .addCase(checkAuthUser.pending, (state) => {
+            // Xử lý trạng thái đăng ký
+            .addCase(RegisterUser.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(checkAuthUser.fulfilled, (state, action) => {
+            .addCase(RegisterUser.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.user = action.payload.user || null;
                 state.isAuthenticated = action.payload.success;
             })
-            .addCase(checkAuthUser.rejected, (state, action) => {
+            .addCase(RegisterUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.user = null;
                 state.isAuthenticated = false;
@@ -222,9 +258,27 @@ const authSlice = createSlice({
                 state.error = action.payload?.message || null;
                 state.status = action.payload?.status;
             })
+
+            // Xử lý trạng thái xác thực
+            .addCase(checkAuthUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(checkAuthUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.user || null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(checkAuthUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message || null;
+                state.status = action.payload?.status;
+            })
     },
 });
 
 // Xuất các action và reducer
-export const { setUser, resetError } = authSlice.actions;
+export const { setUser, clearError } = authSlice.actions;
 export default authSlice.reducer;

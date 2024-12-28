@@ -19,6 +19,9 @@ import { CheckUserName } from "@/utils/checkUserName";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { FormControl as FormControlType } from "@/config/auth";
 import { IoMdClose } from "react-icons/io";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/store";
+import { clearError } from "@/store/auth";
 
 /*************************************************************************
  
@@ -33,7 +36,6 @@ interface CommonFormProps {
     buttonText?: string;
     isLoading: boolean;
     isError?: string | null;
-    setError?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const CommonForm: React.FC<CommonFormProps> = ({
@@ -44,8 +46,9 @@ const CommonForm: React.FC<CommonFormProps> = ({
     buttonText = "Submit",
     isLoading,
     isError,
-    setError,
 }) => {
+    const dispatch = useDispatch<AppDispatch>();
+
     const [formState, setFormState] = useState<{
         values: Record<string, string>;       // Lưu trữ giá trị nhập vào của các trường trong form
         errors: Record<string, string>;       // Lưu trữ thông báo lỗi cho mỗi trường
@@ -136,7 +139,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
     };
 
     // Hàm xóa lỗi khi người dùng focus vào input
-    const clearError = (name: string) => {
+    const clearErrorInput = (name: string) => {
         if (name === "userName") return;
 
         setFormState((prev) => ({
@@ -173,7 +176,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
                             } // Đổi trạng thái hiển thị lỗi khi blur
 
                             onFocus={() =>
-                                clearError(control.name)
+                                clearErrorInput(control.name)
                             }
 
                             error={hasError}
@@ -247,7 +250,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
                                 handleInputChange(control.name, e.target.value, control.onChange)
                             }
                             onBlur={() => handleValidation(control.name, value)}
-                            onFocus={() => clearError(control.name)} // Khi focus, ẩn lỗi
+                            onFocus={() => clearErrorInput(control.name)} // Khi focus, ẩn lỗi
                             MenuProps={{
                                 disableScrollLock: true,
                             }}
@@ -286,9 +289,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
                         variant="text"
                         disableRipple={true}
                         onClick={() => {
-                            if (setError) {
-                                setError("");
-                            }
+                            dispatch(clearError());
                         }}
                     >
                         <IoMdClose />

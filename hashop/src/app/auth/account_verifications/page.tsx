@@ -7,11 +7,11 @@ import { BiSolidXCircle } from "react-icons/bi";
 import Link from "next/link";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
-import NotFound from "@/app/not-found";
 import axios from "@/config/axios";
 import axiosLib from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import LoadingPage from "@/components/loadingPage";
 
 const AccountVerification: React.FC = () => {
     const [code, setCode] = useState("");
@@ -20,15 +20,24 @@ const AccountVerification: React.FC = () => {
     const [isFormValid, setIsFormValid] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
-    const { setNotification, setImageUrl, setPositionAside } = useAuth();
+    const [isValid, setIsValid] = useState(false);
+    const { setNotFoundPage, setNotification, setImageUrl, setPositionAside } = useAuth();
 
     const email = useSelector((state: RootState) => state.auth.user?.email);
+    const user = useSelector((state: RootState) => state.auth.user);
 
     // Set banner
     useEffect(() => {
-        setImageUrl('/image/banner/RedDeadRedemption2.jpg');
-        setPositionAside('right');
-    }, [setImageUrl, setPositionAside]);
+        if (!email) {
+            setNotFoundPage(true);
+        }
+        else {
+            setIsValid(true);
+            setImageUrl('/image/banner/RedDeadRedemption2.jpg');
+            setPositionAside('right');
+        }
+
+    }, [setNotFoundPage, setImageUrl, setPositionAside, email, user]);
 
     // Sự kiện submit form
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -124,8 +133,8 @@ const AccountVerification: React.FC = () => {
         }
     }, [timeLeft]);
 
-    if (email === undefined) {
-        return <NotFound />
+    if (!isValid) {
+        return <LoadingPage /> // Loading page
     }
 
     return (
@@ -143,7 +152,7 @@ const AccountVerification: React.FC = () => {
 
             <p className="info-text">
                 Please enter the email verification code to verify your identity
-                <span> {maskEmail(email)} </span>
+                <span> {email ? maskEmail(email) : "Email not available"} </span>
             </p>
 
             <form className="form" onSubmit={handleSubmit}>

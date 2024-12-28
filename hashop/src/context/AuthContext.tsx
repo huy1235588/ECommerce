@@ -2,18 +2,6 @@
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-// Định nghĩa kiểu dữ liệu cho trạng thái
-interface AuthState {
-    user?: User | null;
-    isShowNotification?: boolean;
-}
-
-// Định nghĩa kiểu cho người dùng
-interface User {
-    name: string;
-    email: string;
-}
-
 // Định nghĩa kiểu dữ liệu cho trạng thái thống báo
 interface ShowNotificationState {
     notification: Notification | null;
@@ -29,8 +17,8 @@ interface Notification {
 
 // Định nghĩa kiểu dữ liệu cho Context
 interface AuthContextProps {
-    auth: AuthState;
-    setAuth: React.Dispatch<React.SetStateAction<AuthState>>;
+    notFoundPage: boolean;
+    setNotFoundPage: React.Dispatch<React.SetStateAction<boolean>>;
     notification: ShowNotificationState;
     setNotification: React.Dispatch<React.SetStateAction<ShowNotificationState>>;
     imageUrl: string;
@@ -44,10 +32,7 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 // Tạo Provider
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [auth, setAuth] = useState<AuthState>({
-        user: null,
-        isShowNotification: false,
-    });
+    const [notFoundPage, setNotFoundPage] = useState(false);
 
     const [notification, setNotification] = useState<ShowNotificationState>({
         notification: null,
@@ -59,7 +44,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return (
         <AuthContext.Provider value={{
-            auth, setAuth,
+            notFoundPage, setNotFoundPage,
             notification, setNotification,
             imageUrl, setImageUrl,
             positionAside, setPositionAside,

@@ -61,7 +61,7 @@ Author       : LeThienHuy.
 }
 
 .heading {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     text-align: center;
     letter-spacing: -0.025em;
     font-size: 1.75rem;
@@ -330,9 +330,9 @@ p.error-message {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.2rem 1.25rem;
+    padding: 0.5rem 1rem;
     padding-right: 0.75rem;
-    margin: 1.4rem 0;
+    margin: 1rem 0;
     border: 1px solid #f8514966;
     border-radius: 5px;
     background-image: linear-gradient(#e53e3e1a, #e53e3e1a);

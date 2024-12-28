@@ -8,7 +8,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-import { LoginUser, resetError } from "@/store/auth";
+import { clearError, LoginUser } from "@/store/auth";
 import { FormData } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -22,9 +22,9 @@ function AuthLogin() {
     const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const { setImageUrl, setPositionAside } = useAuth();
+    const { setImageUrl, setNotification, setPositionAside } = useAuth();
 
-    const { isLoading, error, status } = useSelector((state: RootState) => state.auth) || null;
+    const { user, isLoading, error, status } = useSelector((state: RootState) => state.auth) || null;
 
     useEffect(() => {
         setImageUrl('/image/banner/elden-ring-2.jpg');
@@ -37,6 +37,16 @@ function AuthLogin() {
             const resultAction = await dispatch(LoginUser(formData));
 
             if (resultAction.meta.requestStatus === "fulfilled") {
+                // Thông báo thành công
+                setNotification({
+                    notification: {
+                        message: `Welcome ${user?.userName}!`,
+                        type: "success",
+                        duration: 3000,
+                    },
+                    isShowNotification: true
+                });
+
                 router.replace('/');
             }
 
@@ -65,14 +75,14 @@ function AuthLogin() {
                 <Link
                     className="link"
                     href="/auth/forgot-password"
-                    onClick={() => dispatch(resetError())}
+                    onClick={() => dispatch(clearError())}
                 >
                     Forgot password?
                 </Link>
                 <Link
                     className="link"
                     href="/auth/register"
-                    onClick={() => dispatch(resetError())}
+                    onClick={() => dispatch(clearError())}
                 >
                     Create account
                 </Link>

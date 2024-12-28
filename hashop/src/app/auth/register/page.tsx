@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { resetError, setUser, User } from "@/store/auth";
-import { AppDispatch } from "@/store/store";
+import { clearError, RegisterUser } from "@/store/auth";
+import { AppDispatch, RootState } from "@/store/store";
 import CommonForm from "@/components/common/form";
 import { registerFormControls } from "@/config/auth";
 import Link from "next/link";
@@ -11,9 +11,8 @@ import { Typography } from "@mui/material";
 import { FormData } from "@/types/auth";
 
 import { useRouter } from "next/navigation";
-import axios from "@/config/axios";
-import axiosLib from "axios";
 import { useAuth } from "@/context/AuthContext";
+import { useSelector } from "react-redux";
 
 const initialState: FormData = {
     email: "",
@@ -29,52 +28,37 @@ function AuthRegister() {
     const { setNotification, setImageUrl, setPositionAside } = useAuth();
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
-    const [error, setError] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
+    const { error, isLoading } = useSelector((state: RootState) => state.auth);
 
     // Set banner
     useEffect(() => {
         setImageUrl('/image/banner/RedDeadRedemption2.jpg');
         setPositionAside('right');
     }, [setImageUrl, setPositionAside]);
-   
+
     // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            // Set loading
-            setIsLoading(true);
-
-            // Gọi api đăng ký
-            const response = await axios.post('/api/auth/signup', formData);
+            const resultAction = await dispatch(RegisterUser(formData));
 
             // Kiểm tra phản hồi api
-            if (response.data.success) {
+            if (resultAction.meta.requestStatus === "fulfilled") {
+                // Thông báo thành công
                 setNotification({
                     notification: {
                         message: "Registration successful!",
                         type: "success",
                         duration: 3000,
                     },
-                    isShowNotification: true // Thông báo thành công
-                })
+                    isShowNotification: true
+                });
 
-                // Truyền dữ liệu
-                const data: User = {
-                    email: formData.email || undefined,
-                }
-
-                dispatch(setUser(data));
                 router.push('/auth/account_verifications'); // Chuyển hướng sang trang đăng nhập
             }
 
         } catch (error) {
-            if (axiosLib.isAxiosError(error) && error.response) {
-                console.log(error);
-                setError(error.response.data.message);
-            }
-        } finally {
-            setIsLoading(false);
+            console.log(error);
         }
     };
 
@@ -92,7 +76,6 @@ function AuthRegister() {
                 onSubmit={onSubmit}
                 isLoading={isLoading}
                 isError={error}
-                setError={setError}
             />
 
             <Typography variant="body2" sx={{ mt: 2 }}>
@@ -100,7 +83,7 @@ function AuthRegister() {
                 <Link
                     className="link"
                     href="/auth/login"
-                    onClick={() => dispatch(resetError())}
+                    onClick={() => dispatch(clearError())}
                 >
                     Login
                 </Link>
