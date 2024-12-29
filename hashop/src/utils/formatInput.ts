@@ -32,3 +32,10 @@ export const validateName = (pass: string) => {
     if (pass.length >= 255) return "Too long";
     return "";
 };
+
+export const validateNumber = (value: string) => {
+    value = value.trim();
+    if (!value) return "Required";
+    if (!/^[0-9]+$/.test(value)) return "Invalid format";
+    return "";
+};

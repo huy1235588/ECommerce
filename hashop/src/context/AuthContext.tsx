@@ -16,8 +16,6 @@ interface AuthContextProps {
     // Forgot Password
     currentStep: number | null;
     setCurrentStep: React.Dispatch<React.SetStateAction<number | null>>;
-    forgotPassword: string | null;
-    setForgotPassword: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 // Tạo Context
@@ -32,7 +30,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [containerWidth, setContainerWidth] = useState<"w-35" | "w-45">("w-45");
 
     const [currentStep, setCurrentStep] = useState<number | null>(1);
-    const [forgotPassword, setForgotPassword] = useState<string | null>(null);
 
     return (
         <AuthContext.Provider value={{
@@ -40,7 +37,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             imageUrl, setImageUrl,
             positionAside, setPositionAside,
             containerWidth, setContainerWidth,
-            forgotPassword, setForgotPassword,
             currentStep, setCurrentStep
         }}>
             {children}

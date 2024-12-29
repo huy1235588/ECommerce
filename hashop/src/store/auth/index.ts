@@ -3,6 +3,11 @@ import axios from "@/config/axios";
 import axiosLib, { AxiosResponse } from "axios";
 import { FormData } from "@/types/auth";
 
+type verifyEmailPayload = {
+    email: string;
+    code: string;
+}
+
 // Định nghĩa kiểu dữ liệu người dùng (User)
 export type User = {
     _id?: string;
@@ -198,6 +203,43 @@ export const ForgotPasswordUser = createAsyncThunk<
     }
 );
 
+// Forgot password verify
+export const ForgotPasswordVerifyUser = createAsyncThunk<
+    AuthResponse,
+    verifyEmailPayload,
+    { rejectValue: AuthError }
+>(
+    "auth/forgot-password/verify",
+    async (
+        verifyEmailPayload,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/forgot-password/verify',
+                verifyEmailPayload,
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                return rejectWithValue({
+                    message: data?.message || "Verification email failed",
+                    status
+                });
+            }
+
+            return rejectWithValue({
+                message: "Unexpected error occurred",
+                status: 500
+            });
+        }
+    }
+)
+
 // AsyncThunk kiểm tra xác thực người dùng
 export const checkAuthUser = createAsyncThunk<
     AuthResponse,
@@ -311,6 +353,23 @@ const authSlice = createSlice({
             .addCase(ForgotPasswordUser.rejected, (state, action) => {
                 state.isLoading = false;
                 state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
+
+            // Forgot Password Verify
+            .addCase(ForgotPasswordVerifyUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(ForgotPasswordVerifyUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.user || null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(ForgotPasswordVerifyUser.rejected, (state, action) => {
+                state.isLoading = false;
                 state.isAuthenticated = false;
                 state.error = action.payload?.message;
                 state.status = action.payload?.status;

@@ -218,7 +218,7 @@ const forgotPassword = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(404).json({ success: true, message: "User not found" });
+            return res.status(404).json({ success: true, message: "Account does not exist" });
         }
 
         // Khởi tạo reset token
@@ -263,10 +263,9 @@ const forgotPasswordVerify = async (req, res) => {
         });
 
         if (!user) {
-            console.log("Invalid or expired verification code");
             return res.status(404).json({
                 success: false,
-                message: "Invalid or expired verification code"
+                message: "Invalid or expired verification code",                
             });
         }
 
@@ -279,8 +278,7 @@ const forgotPasswordVerify = async (req, res) => {
             success: true,
             message: "Email verified successfully",
             user: {
-                ...user._doc,
-                password: undefined,
+                email: user.email,
             }
         });
 

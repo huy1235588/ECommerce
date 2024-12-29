@@ -450,7 +450,7 @@ button.verify-button:disabled {
 
 */
 /*===================================*
-    04.START ACCOUNT VERIFICATION
+    05.START ACCOUNT VERIFICATION
 *===================================*/
 .step-label .MuiStepLabel-labelContainer {
     color: #61636b;
@@ -473,5 +473,68 @@ button.verify-button:disabled {
 }
 
 /*===================================*
-    03.END FORM
+    05.END ACCOUNT VERIFICATION
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    06.START FORGOT PASSWORD
+*===================================*/
+.forgot-password-container .form-verify .action {
+    position: absolute;
+    top: 50%;
+    right: 4%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.forgot-password-container .form-verify .separate {
+    display: inline-block;
+    width: 1px;
+    height: 1.25rem;
+    border-left: 1px solid #3f3f3f;
+    margin: 0 7px;
+}
+
+.forgot-password-container .form-verify .button-clear {
+    color: #61636b;
+}
+
+.forgot-password-container .form-verify .button-clear:hover {
+    color: #61636ba6;
+}
+
+.forgot-password-container .form-verify .button-resend-email {
+    display: flex;
+    align-items: center;
+    min-width: auto;
+    padding: 0;
+    margin-left: 1px;
+    text-transform: capitalize;
+}
+
+.forgot-password-container .form-verify .button-resend-email.Mui-disabled {
+    color: #647185;
+}
+
+.forgot-password-container .form-verify .button-resend-email:hover {
+    color: #1565c0bc;
+}
+
+.forgot-password-container .form-verify .button-resend-email .button-text {
+    margin-right: 3px;
+}
+/*===================================*
+    06.END FORGOT PASSWORD
 *===================================*/

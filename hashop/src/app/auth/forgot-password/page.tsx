@@ -2,7 +2,6 @@
 
 import CommonForm from "@/components/common/form";
 import { forgotPasswordControls } from "@/config/auth";
-import { useAuth } from "@/context/AuthContext";
 import { ForgotPasswordUser } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import { Typography } from "@mui/material";
@@ -21,7 +20,6 @@ function ForgotPassword() {
     const dispatch = useDispatch<AppDispatch>();
     const { isLoading, error, status } = useSelector((state: RootState) => state.auth);
 
-    const { setCurrentStep } = useAuth();
     const [formData, setFormData] = useState<Record<string, string>>(initialState);
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -30,10 +28,8 @@ function ForgotPassword() {
             const resultAction = await dispatch(ForgotPasswordUser(formData['email']));
 
             if (resultAction.meta.requestStatus === "fulfilled") {
-                // Tăng step
-                setCurrentStep(2);
-
-                router.push("/auth/forgot-password/verify");
+                
+                router.push("/auth/forgot-password/verify");                
             }
         } catch (error) {
             console.log(error);

@@ -9,7 +9,7 @@ import {
 import { countries } from "./countryForm";
 
 export type FormControl = {
-    name: "email" | "country" | "firstName" | "lastName" | "userName" | "password" | "code";
+    name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
     placeholder: string;
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number";
@@ -109,16 +109,5 @@ export const forgotPasswordControls: FormControl[] = [
         type: "email",
         maxLength: 1000,
         onChange: validateEmail,
-    }
-];
-
-export const forgotPasswordVerifyControls: FormControl[] = [
-    {
-        name: "code",
-        placeholder: "Verification code",
-        componentType: "input",
-        type: "number",
-        maxLength: 6,
-        onChange: requiredInput,
     }
 ];

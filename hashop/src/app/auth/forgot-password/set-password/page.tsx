@@ -1,20 +1,29 @@
 'use client'
 
 import { useAuth } from "@/context/AuthContext";
+import { AppDispatch, RootState } from "@/store/store";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 function ForgotPasswordVerify() {
     const router = useRouter();
+    const dispatch = useDispatch<AppDispatch>();
+    const { isLoading, error, status } = useSelector((state: RootState) => state.auth);
+    const email = useSelector((state: RootState) => state.auth.user?.email);
 
-    const { forgotPassword, setNotFoundPage } = useAuth();
+    const { setNotFoundPage, setCurrentStep } = useAuth();
 
     useEffect(() => {
-        if (!forgotPassword) {
+        if (!email) {
             setNotFoundPage(true);
         }
-    }, [forgotPassword, setNotFoundPage])
+        else {
+            setCurrentStep(3);
+        }
+    }, [email, setNotFoundPage, setCurrentStep])
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();

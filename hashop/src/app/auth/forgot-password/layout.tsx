@@ -72,7 +72,7 @@ const ForgotPasswordLayout = ({
                 ))}
             </Stepper>
 
-            <div>
+            <div className="forgot-password-container">
                 {children}
             </div>
         </main >
