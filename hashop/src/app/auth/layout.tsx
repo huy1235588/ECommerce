@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import "@/styles/auth.css?v=1";
 import NotFound from "../not-found";
 import { useEffect, useState } from "react";
@@ -18,11 +18,10 @@ export default function AuthLayout({
         notFoundPage,
         imageUrl,
         positionAside,
+        containerWidth,
     } = useAuth();
 
-    const pathname = usePathname();
     const router = useRouter();
-    const isLogin = pathname.includes('login');
 
     const [isValid, setIsValid] = useState(false);
 
@@ -67,7 +66,7 @@ export default function AuthLayout({
             </aside>
 
             {/* Main Content */}
-            <div className={`container ${isLogin ? 'login' : ''}`}>
+            <div className={`container ${containerWidth}`}>
                 {children}
             </div>
 

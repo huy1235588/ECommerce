@@ -46,7 +46,7 @@ Author       : LeThienHuy.
     .container {
         width: 45%;
     }
-    .container.login {
+    .container.w-35 {
         width: 35%;
     }
 }

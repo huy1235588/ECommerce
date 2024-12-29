@@ -1,7 +1,8 @@
 'use client'
 
 import { useAuth } from "@/context/AuthContext";
-import { Button } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 function ForgotPassword() {
@@ -20,36 +21,47 @@ function ForgotPassword() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="form">
-            <h2>
-                Please enter the account you want to retrieve the password for
-            </h2>
+        <>
+            <form onSubmit={handleSubmit} className="form">
+                <div className="form-container">
 
-            {/* Next Button */}
-            <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                type="submit"
-                className="next-button"
-            >
-                Next
-            </Button>
+                    <Typography variant="body1">
+                        Please enter the account you want to retrieve the password for
+                    </Typography>
 
+                    <TextField
+                        className={`input-form`}
+                        fullWidth
+                        variant="outlined"
+                        label="Username/email"
+                        type="email"
+                        // value={value}
+                        autoComplete="email"
+                    />
+
+                </div>
+
+                {/* Next Button */}
+                <Button
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    className="submit-button next-button"
+                >
+                    Next
+                </Button>
+
+            </form>
             {/* Back to Login */}
-            <Button
-                fullWidth
-                onClick={() => {
-                    router.push('/auth/login');
-                }}
-                variant="contained"
-                color="primary"
-                type="button"
-                className="back-button"
+            <Link
+                className="link"
+                href="/auth/login"
+            // onClick={() => dispatch(clearError())}
             >
                 Back to login
-            </Button>
-        </form>
+            </Link>
+        </>
     );
 }
 

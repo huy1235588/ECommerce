@@ -27,7 +27,7 @@ const initialState: FormData = {
 
 function AuthRegister() {
     const [formData, setFormData] = useState<FormData>(initialState);
-    const { setImageUrl, setPositionAside } = useAuth();
+    const { setImageUrl, setPositionAside, setContainerWidth } = useAuth();
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { notificationDispatch } = useNotification();
@@ -37,7 +37,8 @@ function AuthRegister() {
     useEffect(() => {
         setImageUrl('/image/banner/RedDeadRedemption2.jpg');
         setPositionAside('right');
-    }, [setImageUrl, setPositionAside]);
+        setContainerWidth('w-45');
+    }, [setImageUrl, setPositionAside, setContainerWidth]);
 
     // Xử lý submit form
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

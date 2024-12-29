@@ -24,7 +24,7 @@ function AuthLogin() {
     const [formData, setFormData] = useState<FormData>(initialState);
     const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
-    const { setImageUrl, setPositionAside } = useAuth();
+    const { setImageUrl, setPositionAside, setContainerWidth } = useAuth();
     const { notificationDispatch } = useNotification();
 
     const { isLoading, error, status } = useSelector((state: RootState) => state.auth);
@@ -32,7 +32,8 @@ function AuthLogin() {
     useEffect(() => {
         setImageUrl('/image/banner/elden-ring-2.jpg');
         setPositionAside('left');
-    }, [setImageUrl, setPositionAside]);
+        setContainerWidth('w-35');
+    }, [setImageUrl, setPositionAside, setContainerWidth]);
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

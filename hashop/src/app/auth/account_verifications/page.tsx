@@ -23,7 +23,7 @@ const AccountVerification: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
     const [isValid, setIsValid] = useState(false);
-    const { setNotFoundPage, setImageUrl, setPositionAside } = useAuth();
+    const { setNotFoundPage, setImageUrl, setPositionAside, setContainerWidth } = useAuth();
     const { notificationDispatch } = useNotification();
 
     const email = useSelector((state: RootState) => state.auth.user?.email);
@@ -38,9 +38,10 @@ const AccountVerification: React.FC = () => {
             setIsValid(true);
             setImageUrl('/image/banner/RedDeadRedemption2.jpg');
             setPositionAside('right');
+            setContainerWidth('w-45');
         }
 
-    }, [setNotFoundPage, setImageUrl, setPositionAside, email, user]);
+    }, [setNotFoundPage, setImageUrl, setPositionAside, setContainerWidth, email, user]);
 
     // Sự kiện submit form
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

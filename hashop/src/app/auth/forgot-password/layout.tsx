@@ -10,7 +10,7 @@ const ForgotPasswordLayout = ({
 }: Readonly<{
     children: React.ReactNode,
 }>) => {
-    const { setImageUrl, setPositionAside, notFoundPage, currentStep } = useAuth();
+    const { setImageUrl, setPositionAside, setContainerWidth, notFoundPage, currentStep } = useAuth();
     const [isValid, setIsValid] = useState(false);
 
     useEffect(() => {
@@ -18,8 +18,9 @@ const ForgotPasswordLayout = ({
             setIsValid(true); // Đặt trạng thái hợp lệ
             setImageUrl('/image/banner/elden-ring-2.jpg');
             setPositionAside('left');
+            setContainerWidth('w-35')
         }
-    }, [setImageUrl, setPositionAside, notFoundPage]);
+    }, [setImageUrl, setPositionAside, setContainerWidth, notFoundPage]);
 
     if (!isValid) {
         return <LoadingPage /> // Loading page
@@ -71,7 +72,7 @@ const ForgotPasswordLayout = ({
                 ))}
             </Stepper>
 
-            <div className="form-container">
+            <div>
                 {children}
             </div>
         </main >

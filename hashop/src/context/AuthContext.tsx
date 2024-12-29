@@ -10,6 +10,8 @@ interface AuthContextProps {
     setImageUrl: React.Dispatch<React.SetStateAction<string>>;
     positionAside: "left" | "right";
     setPositionAside: React.Dispatch<React.SetStateAction<"left" | "right">>;
+    containerWidth: "w-35" | "w-45"
+    setContainerWidth: React.Dispatch<React.SetStateAction<"w-35" | "w-45">>;
 
     // Forgot Password
     currentStep: number | null;
@@ -27,6 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const [imageUrl, setImageUrl] = useState("");
     const [positionAside, setPositionAside] = useState<"left" | "right">("left");
+    const [containerWidth, setContainerWidth] = useState<"w-35" | "w-45">("w-45");
 
     const [currentStep, setCurrentStep] = useState<number | null>(1);
     const [forgotPassword, setForgotPassword] = useState<string | null>(null);
@@ -36,6 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             notFoundPage, setNotFoundPage,
             imageUrl, setImageUrl,
             positionAside, setPositionAside,
+            containerWidth, setContainerWidth,
             forgotPassword, setForgotPassword,
             currentStep, setCurrentStep
         }}>

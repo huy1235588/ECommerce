@@ -1,7 +1,8 @@
 'use client'
 
 import { useAuth } from "@/context/AuthContext";
-import { Button } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -27,22 +28,49 @@ function ForgotPasswordVerify() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="form">
-            <h2>
-                Please verify your security question.
-            </h2>
+        <>
+            <form onSubmit={handleSubmit} className="form">
+                <div className="form-container">
 
-            {/* Next Button */}
-            <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                type="submit"
-                className="next-button"
+                    <Typography variant="body1">
+                        Please enter the email verification code to verify your identity.
+                        <br />
+                        {forgotPassword}
+                    </Typography>
+
+                    <TextField
+                        className={`input-form`}
+                        fullWidth
+                        variant="outlined"
+                        label="Username/email"
+                        type="email"
+                        // value={value}
+                        autoComplete="email"
+                    />
+
+                </div>
+
+                {/* Next Button */}
+                <Button
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                    type="submit"
+                    className="submit-button next-button"
+                >
+                    Next
+                </Button>
+
+            </form>
+            {/* Back to Login */}
+            <Link
+                className="link"
+                href="/auth/forgot-password"
+            // onClick={() => dispatch(clearError())}
             >
-                Next
-            </Button>
-        </form>
+                Change email
+            </Link>
+        </>
     );
 }
 
