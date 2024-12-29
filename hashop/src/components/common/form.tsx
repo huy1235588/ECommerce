@@ -31,7 +31,7 @@ import { clearError } from "@/store/auth";
 interface CommonFormProps {
     formControl: FormControlType[];
     formData: Record<string, string>;
-    setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+    setFormData: React.Dispatch<React.SetStateAction<FormData | Record<string, string>>>;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     buttonText?: string;
     isLoading: boolean;

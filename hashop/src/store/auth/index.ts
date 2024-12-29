@@ -159,6 +159,45 @@ export const LogoutUser = createAsyncThunk<
     }
 );
 
+// Forgot password
+export const ForgotPasswordUser = createAsyncThunk<
+    AuthResponse,
+    string,
+    { rejectValue: AuthError }
+>(
+    "/auth/forgot-password",
+    async (
+        email,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/forgot-password',
+                {
+                    email: email
+                },
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                return rejectWithValue({
+                    message: data?.message || "Error sending reset password email",
+                    status
+                });
+            }
+
+            return rejectWithValue({
+                message: "Unexpected error occurred",
+                status: 500
+            });
+        }
+    }
+);
+
 // AsyncThunk kiểm tra xác thực người dùng
 export const checkAuthUser = createAsyncThunk<
     AuthResponse,
@@ -256,6 +295,24 @@ const authSlice = createSlice({
                 state.user = null;
                 state.isAuthenticated = false;
                 state.error = action.payload?.message || null;
+                state.status = action.payload?.status;
+            })
+
+            // Forgot Password
+            .addCase(ForgotPasswordUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(ForgotPasswordUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.user || null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(ForgotPasswordUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
                 state.status = action.payload?.status;
             })
 

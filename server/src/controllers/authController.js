@@ -239,7 +239,13 @@ const forgotPassword = async (req, res) => {
         //     // `${process.env.SERVER_URL}/reset-password/${resetToken}`
         // );
 
-        res.status(200).json({ success: true, message: "Password reset link sent to your email" });
+        res.status(200).json({
+            success: true,
+            message: "Password reset link sent to your email",
+            user: {
+                email: user.email,
+            },
+        });
 
     } catch (error) {
         console.log("Error in forgotPassword ", error);
@@ -316,7 +322,7 @@ const checkAuth = async (req, res) => {
         }
 
         res.status(200).json({
-            success: true, 
+            success: true,
             user
         });
     } catch (error) {
