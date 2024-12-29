@@ -1,21 +1,32 @@
 'use client'
 
+import CommonForm from "@/components/common/form";
+import { forgotPasswordVerifyControls } from "@/config/auth";
 import { useAuth } from "@/context/AuthContext";
-import { Button, TextField, Typography } from "@mui/material";
+import { RootState } from "@/store/store";
+import { Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+
+const initialState = {
+    code: "",
+};
 
 function ForgotPasswordVerify() {
     const router = useRouter();
+    const { isLoading, error, status } = useSelector((state: RootState) => state.auth);
+    const email = useSelector((state: RootState) => state.auth.user?.email);
 
-    const { forgotPassword, setNotFoundPage, setCurrentStep, setForgotPassword } = useAuth();
+    const { setNotFoundPage, setCurrentStep, setForgotPassword } = useAuth();
+    const [formData, setFormData] = useState<Record<string, string>>(initialState);
 
     useEffect(() => {
-        if (!forgotPassword) {
+        if (!email) {
             setNotFoundPage(true);
         }
-    }, [forgotPassword, setNotFoundPage])
+    }, [email, setNotFoundPage])
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -29,39 +40,22 @@ function ForgotPasswordVerify() {
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="form">
-                <div className="form-container">
+            <Typography variant="body1">
+                Please enter the email verification code to verify your identity.
+                <br />
+                {email}
+            </Typography>
 
-                    <Typography variant="body1">
-                        Please enter the email verification code to verify your identity.
-                        <br />
-                        {forgotPassword}
-                    </Typography>
+            <CommonForm
+                formControl={forgotPasswordVerifyControls}
+                buttonText="Next"
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+                isError={(status === 404) ? error : null}
+            />
 
-                    <TextField
-                        className={`input-form`}
-                        fullWidth
-                        variant="outlined"
-                        label="Username/email"
-                        type="email"
-                        // value={value}
-                        autoComplete="email"
-                    />
-
-                </div>
-
-                {/* Next Button */}
-                <Button
-                    fullWidth
-                    variant="contained"
-                    color="primary"
-                    type="submit"
-                    className="submit-button next-button"
-                >
-                    Next
-                </Button>
-
-            </form>
             {/* Back to Login */}
             <Link
                 className="link"
