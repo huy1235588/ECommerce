@@ -3,26 +3,33 @@
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-function ForgotPassword() {
+function ForgotPasswordVerify() {
     const router = useRouter();
 
-    const { setCurrentStep, setForgotPassword } = useAuth();
+    const { forgotPassword, setNotFoundPage, setCurrentStep, setForgotPassword } = useAuth();
+
+    useEffect(() => {
+        if (!forgotPassword) {
+            setNotFoundPage(true);
+        }
+    }, [forgotPassword, setNotFoundPage])
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
 
         // Tăng step
-        setCurrentStep(2);
+        setCurrentStep(3);
 
         setForgotPassword("af");
-        router.push("/auth/forgot-password/verify");
+        router.push("/auth/forgot-password/set-password");
     };
 
     return (
         <form onSubmit={handleSubmit} className="form">
             <h2>
-                Please enter the account you want to retrieve the password for
+                Please verify your security question.
             </h2>
 
             {/* Next Button */}
@@ -35,22 +42,8 @@ function ForgotPassword() {
             >
                 Next
             </Button>
-
-            {/* Back to Login */}
-            <Button
-                fullWidth
-                onClick={() => {
-                    router.push('/auth/login');
-                }}
-                variant="contained"
-                color="primary"
-                type="button"
-                className="back-button"
-            >
-                Back to login
-            </Button>
         </form>
     );
 }
 
-export default ForgotPassword;
+export default ForgotPasswordVerify;

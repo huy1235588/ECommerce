@@ -12,6 +12,8 @@ import axiosLib from "axios";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import LoadingPage from "@/components/loadingPage";
+import { useNotification } from "@/context/NotificationContext";
+import { v4 as uuidv4 } from "uuid";
 
 const AccountVerification: React.FC = () => {
     const [code, setCode] = useState("");
@@ -21,7 +23,8 @@ const AccountVerification: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
     const [isValid, setIsValid] = useState(false);
-    const { setNotFoundPage, setNotification, setImageUrl, setPositionAside } = useAuth();
+    const { setNotFoundPage, setImageUrl, setPositionAside } = useAuth();
+    const { notificationDispatch } = useNotification();
 
     const email = useSelector((state: RootState) => state.auth.user?.email);
     const user = useSelector((state: RootState) => state.auth.user);
@@ -56,14 +59,20 @@ const AccountVerification: React.FC = () => {
             );
 
             if (response.data.success) {
-                setNotification({
-                    notification: {
-                        message: "Verification successful!",
+                // tạo Id duy nhất
+                const id = uuidv4();
+
+                // Thông báo thành công
+                notificationDispatch({
+                    type: "ADD_NOTIFICATION",
+                    payload: {
+                        id: id,
                         type: "success",
-                        duration: 3000,
-                    },
-                    isShowNotification: true // Thông báo thành công
-                })
+                        message: "Verification successful!",
+                        duration: 5000
+                    }
+                });
+
                 router.push("/auth/login");
             }
 

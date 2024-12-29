@@ -1,5 +1,6 @@
 'use client'
 
+import LoadingPage from "@/components/loadingPage";
 import { useAuth } from "@/context/AuthContext";
 import { Step, StepLabel, Stepper } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -9,25 +10,44 @@ const ForgotPasswordLayout = ({
 }: Readonly<{
     children: React.ReactNode,
 }>) => {
-    const { setImageUrl, setPositionAside } = useAuth();
-    const [currentStep, setCurrentStep] = useState(2);
+    const { setImageUrl, setPositionAside, notFoundPage, currentStep } = useAuth();
+    const [isValid, setIsValid] = useState(false);
 
     useEffect(() => {
-        setImageUrl('/image/banner/elden-ring-2.jpg');
-        setPositionAside('left');
-    }, [setImageUrl, setPositionAside]);
+        if (!notFoundPage) {
+            setIsValid(true); // Đặt trạng thái hợp lệ
+            setImageUrl('/image/banner/elden-ring-2.jpg');
+            setPositionAside('left');
+        }
+    }, [setImageUrl, setPositionAside, notFoundPage]);
+
+    if (!isValid) {
+        return <LoadingPage /> // Loading page
+    }
+
+    if (notFoundPage) {
+        return null
+    }
+
 
     const steps = [
-        { id: 1, label: 'Enter Account' },
-        { id: 2, label: 'Security Verification' },
-        { id: 3, label: 'Set Password' },
-    ];
+        {
+            id: 1,
+            label: 'Enter Account',
+            link: '/auth/forgot-password/verify'
+        },
+        {
+            id: 2,
+            label: 'Security Verification',
+            link: '/auth/forgot-password/set-password'
 
-    const nextStep = () => {
-        if (currentStep < 3) {
-            setCurrentStep(currentStep + 1);
-        }
-    };
+        },
+        {
+            id: 3,
+            label: 'Set Password',
+            link: '/auth/login'
+        },
+    ];
 
     return (
         <main className="auth-main">
@@ -36,7 +56,7 @@ const ForgotPasswordLayout = ({
             </h1>
 
             {/* Step Progress Bar */}
-            <Stepper activeStep={currentStep - 1}
+            <Stepper activeStep={currentStep ? (currentStep - 1) : undefined}
                 alternativeLabel
                 sx={{
                     color: 'white'
@@ -51,7 +71,7 @@ const ForgotPasswordLayout = ({
                 ))}
             </Stepper>
 
-            <div>
+            <div className="form-container">
                 {children}
             </div>
         </main >
