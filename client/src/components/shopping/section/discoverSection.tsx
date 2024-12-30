@@ -128,7 +128,7 @@ function DiscoverSection() {
                 <div className="w-[102%]">
                     <Swiper
                         modules={[FreeMode, Autoplay]}
-                        lazyPreloadPrevNext={2}
+                        lazyPreloadPrevNext={3}
                         slidesPerView={slidesPerView} // Số lượng hình ảnh hiển thị trên mỗi slide
                         spaceBetween={30} // Khoảng cách giữa các hình ảnh
                         grabCursor={true} // Hiệu ứng kéo bằng chuột

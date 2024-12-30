@@ -3,6 +3,9 @@
 import HomeAside from "@/components/home/aside/aside";
 import HomeHeader from "@/components/home/header";
 import NavigationBar from "@/components/home/navigation/navigationBar";
+import DiscoverSection from "@/components/home/section/discover/discoverSection";
+import ReleasesSection from "@/components/home/section/release/releaseSection";
+// import HomeHighLight from "@/components/home/section/hightlight/homeHIghtlight";
 import { checkAuthUser } from "@/store/auth";
 import { AppDispatch } from "@/store/store";
 import "@/styles/home.css";
@@ -31,58 +34,18 @@ export default function Home() {
                 <HomeAside />
             </div>
 
+            {/* Highlight */}
+            {/* <h2>
+                Highlights
+            </h2>
+            <HomeHighLight /> */}
+
             <main>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
-                <p>main</p>
+                {/* Discover Section */}
+                <DiscoverSection />
+                
+                {/* Release Section */}
+                <ReleasesSection />
             </main>
         </div>
     );

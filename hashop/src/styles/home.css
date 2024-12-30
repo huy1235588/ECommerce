@@ -291,7 +291,7 @@ Author       : LeThienHuy.
 
 */
 /*===================================*
-    03.START VIDEO
+    04.START VIDEO
 *===================================*/
 .video-container {
     background-color: #000;
@@ -347,5 +347,200 @@ Author       : LeThienHuy.
     height: calc(55vw - ((100vw - 156px) / 10)) !important;
 }
 /*===================================*
-    03.END VIDEO
+    04.END VIDEO
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START HIGHLIGHT
+*===================================*/
+
+/*===================================*
+    05.END HIGHLIGHT
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    06.START DISCOVER
+*===================================*/
+.discover-section {
+    width: 100%;
+    padding: 40px 0;
+    background-color: #fff;
+    color: #000;
+    text-align: center;
+}
+
+.discover-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+}
+
+.discover-swiper-container {
+    overflow: hidden;
+}
+
+.discover-swiper {
+    margin-bottom: 20px;
+}
+.reversed-container {
+    width: 102%;
+}
+
+.discover-swiper.reversed {
+    width: 98%;
+    transform: translateX(-21%);
+    overflow: visible;
+}
+
+.discover-slide {
+    display: block;
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.discover-image {
+    height: 209px;
+    border-radius: 24px;
+    transition: transform 0.3s;
+}
+
+.discover-slide:hover .discover-image {
+    transform: scale(1.25);
+}
+
+.discover-overlay {
+    position: absolute;
+    top: 40%;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 0 20px 10px;
+}
+
+.discover-title-overlay {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.discover-footer {
+    margin-top: 20px;
+}
+
+.discover-see-all {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border-radius: 24px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.discover-see-all:hover {
+    background-color: #45a049;
+}
+
+/*===================================*
+    06.END DISCOVER
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    07.START RELEASE
+*===================================*/
+.release-section {
+    margin: 2.5rem 0;
+}
+
+/* Tabs */
+.release-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.release-tabs .MuiTabs-root {
+    background-color: #000;
+    border-radius: 30px;
+}
+
+.release-tabs .MuiTab-root {
+    color: #fff;
+    border-radius: 30px;
+}
+
+.release-tabs .MuiTab-root.Mui-selected {
+    background-color: #fff;
+    color: #000;
+}
+
+/* Content */
+.release-item.MuiCard-root {
+    background-color: transparent;
+    color: #fff;
+    box-shadow: none;
+}
+
+.release-item-container {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.release-item-content {
+    height: 70px;
+    background-color: transparent;
+}
+
+.release-item-img {
+    transition: transform 0.3s ease-in-out;
+}
+
+.release-item:hover .release-item-img {
+    transform: scale(1.075);
+}
+
+.release-item-container:not(:hover):has(~ .release-item-container:hover),
+.release-item-container:hover ~ .release-item-container:not(:hover) {
+    opacity: 0.2;
+}
+/*===================================*
+    07.END RELEASE
 *===================================*/
