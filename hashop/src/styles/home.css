@@ -142,5 +142,137 @@ Author       : LeThienHuy.
     color: #5c5f6b;
 }
 /*===================================*
-    01.END GENERAL
+    02.END HEADER
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START NAVIGATION
+*===================================*/
+.navbar-container {
+    position: sticky;
+    width: 90%;
+    height: 90px;
+    margin: 10px auto;
+}
+
+.navbar-content {
+    position: relative;
+    height: 100%;
+}
+
+/* Nav controls */
+.nav-control {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 2;
+}
+
+.nav-control button {
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    line-height: 20px;
+    font-size: 14px;
+}
+
+.nav-control .button-cart {
+    background-color: #5c7e10;
+    color: #fff;
+}
+
+.nav-control .button-wishlist {
+    background-color: #4e6270;
+    color: #fff;
+}
+
+.nav-control .button-wishlist:hover {
+    background-color: #7390a5;
+}
+
+.nav-control .button-cart:hover {
+    background-color: #7ea64b;
+}
+
+.nav-control .button-cart svg {
+    margin-right: 5px;
+}
+
+/* Nav area */
+.nav-area {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 49px;
+    border-radius: 5px;
+    background: linear-gradient(
+        90deg,
+        rgba(62, 103, 150, 0.919) 11.38%,
+        rgba(58, 120, 177, 0.8) 25.23%,
+        rgb(15, 33, 110) 100%
+    );
+}
+
+.nav-menu {
+    display: flex;
+    gap: 2;
+    flex: 1;
+}
+
+.nav-menu .menu-item {
+    padding: 10px 8px;
+}
+.nav-menu .menu-item:hover {
+    background-color: #21a2ff66;
+}
+
+.search.MuiInputBase-root {
+    width: 300px;
+    padding: 3px 10px;
+    padding-right: 65px;
+    border-radius: 12px;
+    background-color: #202024;
+    color: #fff;
+}
+
+.search-container button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+}
+
+.search-container .button-clear {
+    right: 2.25rem;
+    color: #7e7e7e;
+}
+
+.search-container .button-clear:hover {
+    color: #7e7e7ea2;
+}
+
+.search-container .search-icon {
+    right: 0.25rem;
+    color: #fff;
+}
+
+.search-container .search-icon:hover {
+    background-color: #405a7a;
+}
+/*===================================*
+    03.END NAVIGATION
 *===================================*/

@@ -1,6 +1,7 @@
 'use client'
 
 import HomeHeader from "@/components/home/header";
+import NavigationBar from "@/components/home/navigation/navigationBar";
 import { checkAuthUser } from "@/store/auth";
 import { AppDispatch } from "@/store/store";
 import "@/styles/home.css";
@@ -16,9 +17,14 @@ export default function Home() {
 
     return (
         <div className="root">
+            {/* Header */}
             <HomeHeader
                 active="ha"
             />
+
+            {/* Navigation */}
+            <NavigationBar />
+
             <main>
                 <p>main</p>
                 <p>main</p>
