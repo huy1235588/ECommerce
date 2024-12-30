@@ -28,12 +28,17 @@ function AuthLogin() {
     const { notificationDispatch } = useNotification();
 
     const { isLoading, error, status } = useSelector((state: RootState) => state.auth);
+    const email = useSelector((state: RootState) => state.auth.user?.email);
 
     useEffect(() => {
         setImageUrl('/image/banner/elden-ring-2.jpg');
         setPositionAside('left');
         setContainerWidth('w-35');
-    }, [setImageUrl, setPositionAside, setContainerWidth]);
+
+        setFormData({
+            email: email ? email : "",
+        })
+    }, [setImageUrl, setPositionAside, setContainerWidth, email]);
 
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

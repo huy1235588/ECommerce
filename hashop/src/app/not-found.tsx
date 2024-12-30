@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "@/styles/not-found.module.css";
 import Image from "next/image";
+import Link from "next/link";
 
 function NotFound() {
     const [currentDateTime, setCurrentDateTime] = useState<Date>(new Date());
@@ -17,7 +18,10 @@ function NotFound() {
 
     return (
         <main className={styles.main}>
-            <a href="/" className={styles.logo}>
+            <Link
+                className={styles.logo}
+                href="/"
+            >
                 <Image
                     src="/logo/logo.png"
                     className={styles.logoImage}
@@ -25,7 +29,7 @@ function NotFound() {
                     width={100}
                     height={45}
                 />
-            </a>
+            </Link>
             <article className={styles.article}>
                 <div>
                     <p className={styles.errorText}>Page doesn&apos;t exist</p>

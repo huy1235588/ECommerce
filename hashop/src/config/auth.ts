@@ -1,6 +1,7 @@
 import {
     getStrongPassword,
     requiredInput,
+    validateConfirmPassword,
     validateEmail,
     validateName,
     validateUserName
@@ -9,7 +10,7 @@ import {
 import { countries } from "./countryForm";
 
 export type FormControl = {
-    name: "email" | "country" | "firstName" | "lastName" | "userName" | "password";
+    name: "email" | "country" | "firstName" | "lastName" | "userName" | "password" | "rePassword";
     placeholder: string;
     componentType: "input" | "textarea" | "select";
     type?: "text" | "email" | "password" | "number";
@@ -18,7 +19,8 @@ export type FormControl = {
     tooltipTile?: string;
     className?: string;
     maxLength?: number;
-    onChange?: (value: string) => string;
+    disableHelperText?: boolean;
+    onChange?: (value: string, value1?: string) => string;
 };
 
 // Form controls for registration
@@ -29,7 +31,7 @@ export const registerFormControls: FormControl[] = [
         autocomplete: "email",
         componentType: "input",
         type: "email",
-        maxLength: 1000,
+        maxLength: 320,
         onChange: validateEmail,
     },
     {
@@ -88,7 +90,7 @@ export const loginFormControls: FormControl[] = [
         placeholder: "Email",
         componentType: "input",
         type: "email",
-        maxLength: 1000,
+        maxLength: 320,
         onChange: validateEmail,
     },
     {
@@ -107,7 +109,29 @@ export const forgotPasswordControls: FormControl[] = [
         placeholder: "Email",
         componentType: "input",
         type: "email",
-        maxLength: 1000,
+        maxLength: 320,
         onChange: validateEmail,
+    }
+];
+
+export const resetPasswordControls: FormControl[] = [
+    {
+        name: "password",
+        placeholder: "Enter password",
+        autocomplete: "new-password",
+        componentType: "input",
+        type: "password",
+        tooltipTile: "Passwords must have 7 to 255 characters, at least 1 number, at least 1 letter, and no whitespace.",
+        maxLength: 1000,
+        onChange: getStrongPassword,
+    },
+    {
+        name: "rePassword",
+        placeholder: "Please enter password again",
+        autocomplete: "new-password",
+        componentType: "input",
+        type: "password",
+        maxLength: 1000,
+        onChange: validateConfirmPassword,
     }
 ];

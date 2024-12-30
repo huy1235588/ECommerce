@@ -207,6 +207,15 @@ Author       : LeThienHuy.
     width: 48%;
 }
 
+/* Input Password */
+.input-form.password .MuiInputBase-input {
+    padding-right: 55px;
+}
+
+.input-form.password.tooltip .MuiInputBase-input {
+    padding-right: 90px;
+}
+
 /* Select */
 .form-field .select-form div {
     color: #e5e7eb;
@@ -234,6 +243,12 @@ Author       : LeThienHuy.
 
 /* Password */
 .eye-password {
+    position: absolute;
+    top: 0.7rem;
+    right: 1rem;
+}
+
+.eye-password.tooltip {
     position: absolute;
     top: 0.7rem;
     right: 3rem;

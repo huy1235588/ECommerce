@@ -206,6 +206,7 @@ function ForgotPasswordVerify() {
                 href="/auth/forgot-password"
                 onClick={() => {
                     setCurrentStep(1);
+                    dispatch(clearError())
                 }}
             >
                 Change email

@@ -22,6 +22,7 @@ import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/store";
 import { clearError } from "@/store/auth";
+import { validateConfirmPassword } from "@/utils/formatInput";
 
 /*************************************************************************
  
@@ -66,7 +67,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
     );
 
     // Trạng thái kiểm soát việc hiển thị mật khẩu
-    const [showPassword, setShowPassword] = useState(false);
+    const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({});
 
     // Kiểm tra tính hợp lệ của toàn bộ form
     const isFormValid = Object.values(formState.isValid).every(Boolean);
@@ -85,11 +86,37 @@ const CommonForm: React.FC<CommonFormProps> = ({
     const handleInputChange = useCallback(async (
         name: string,
         value: string,
-        onChange?: (value: string) => string
+        onChange?: (value: string, value1?: string) => string
     ) => {
-        const validationResult = onChange ? onChange(value) : "";
+        let validationResult = "";
+        // Kiểm tra nhập lại đúng chưa
+        if (name === "rePassword") {
+            const passwordValue = formData["password"];
+            validationResult = onChange ? onChange(value, passwordValue) : "";
+        }
+        // Khi thay đổi password thì kiểm tra repassword
+        else if (name === "password" &&
+            value !== "" &&
+            formData.hasOwnProperty("rePassword") &&
+            formData["rePassword"] !== ""
+        ) {
+            const rePasswordValue = formData["rePassword"];
+            const validationResult1 = onChange ? validateConfirmPassword(value, rePasswordValue) : "";
 
-        // Cập nhật giá trị input
+            // Cập nhật trạng thái input rePassword
+            setFormState((prev) => ({
+                ...prev,
+                isValid: { ...prev.isValid, ["rePassword"]: !validationResult1 },
+                errors: { ...prev.errors, ["rePassword"]: validationResult1 },
+            }));
+
+            validationResult = onChange ? onChange(value) : "";
+        }
+        else {
+            validationResult = onChange ? onChange(value) : "";
+        }
+
+        // Cập nhật trạng thái input
         setFormState((prev) => ({
             ...prev,
             values: { ...prev.values, [name]: value },
@@ -119,18 +146,27 @@ const CommonForm: React.FC<CommonFormProps> = ({
             }));
 
         }
-    }, [setFormData]);
+    }, [setFormData, formData]);
 
     // Hàm kiểm tra lỗi khi input mất focus (blur)
     const handleValidation = async (
         name: string,
         value: string,
-        onChange?: (value: string) => string
+        onChange?: (value: string, value1?: string) => string
     ) => {
         if (name === "userName") return;
 
-        const validationResult = onChange ? onChange(value) : "";
+        let validationResult = "";
+        // Kiểm tra nhập lại đúng chưa
+        if (name === "rePassword") {
+            const passwordValue = formData["password"];
+            validationResult = onChange ? onChange(value, passwordValue) : "";
+        }
+        else {
+            validationResult = onChange ? onChange(value) : "";
+        }
 
+        // Cập nhật trạng thái input
         setFormState((prev) => ({
             ...prev,
             isValid: { ...prev.isValid, [name]: !validationResult },
@@ -148,9 +184,17 @@ const CommonForm: React.FC<CommonFormProps> = ({
         }));
     };
 
+    // Toggle hiển thị password
+    const handlePasswordToggle = (name: string) => {
+        setPasswordVisibility((prev) => ({
+            ...prev,
+            [name]: !prev[name],
+        }));
+    };
+
     // Hàm render các trường nhập liệu tùy theo loại componentType
     const renderInput = (control: FormControlType) => {
-        const value = formState.values[control.name] || "";
+        const value = formData[control.name] || formState.values[control.name] || "";
         const hasError = formState.errors[control.name] !== "";
         const errorMessage = formState.errors[control.name] || "";
 
@@ -159,12 +203,12 @@ const CommonForm: React.FC<CommonFormProps> = ({
                 return (
                     <div style={{ position: "relative" }}>
                         <TextField
-                            className={`input-form ${control.className}`}
+                            className={`input-form ${control.className} ${control.type === "password" ? "password" : ""} ${control.tooltipTile ? "tooltip" : ""}`}
                             fullWidth
                             variant="outlined"
                             label={control.placeholder}
                             name={control.name}
-                            type={control.type !== "password" ? control.type : showPassword ? "text" : "password"}
+                            type={control.type !== "password" ? control.type : passwordVisibility[control.name] ? "text" : "password"}
                             value={value}
                             autoComplete={control.autocomplete}
                             onChange={(e) =>
@@ -180,7 +224,7 @@ const CommonForm: React.FC<CommonFormProps> = ({
                             }
 
                             error={hasError}
-                            helperText={hasError ? errorMessage : ""}
+                            helperText={hasError && !control.disableHelperText ? errorMessage : ""}
                             slotProps={{
                                 htmlInput: {
                                     maxLength: control.maxLength
@@ -190,12 +234,12 @@ const CommonForm: React.FC<CommonFormProps> = ({
                                 },
                                 input: {
                                     endAdornment: control.type === "password" && (
-                                        <InputAdornment className={`eye-password ${buttonText === "Login" ? "login" : ""}`} position="end">
+                                        <InputAdornment className={`eye-password ${buttonText === "Login" ? "login" : ""} ${control.tooltipTile ? "tooltip" : ""}`} position="end">
                                             <IconButton
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={() => handlePasswordToggle(control.name)}
                                                 onMouseDown={(e) => e.preventDefault()}
                                             >
-                                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                                {passwordVisibility[control.name] ? <FaEyeSlash /> : <FaEye />}
                                             </IconButton>
                                         </InputAdornment>
                                     )

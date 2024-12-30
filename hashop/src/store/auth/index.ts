@@ -240,6 +240,45 @@ export const ForgotPasswordVerifyUser = createAsyncThunk<
     }
 )
 
+// Reset password
+export const ResetPasswordUser = createAsyncThunk<
+    AuthResponse,
+    string,
+    { rejectValue: AuthError }
+>(
+    "/auth/reset-password",
+    async (
+        password,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<AuthResponse> = await axios.post(
+                '/api/auth/reset-password',
+                {
+                    password,
+                },
+                { withCredentials: true }
+            )
+
+            return response.data;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                const { status, data } = error.response;
+                return rejectWithValue({
+                    message: data?.message || "Error sending reset password email",
+                    status
+                });
+            }
+
+            return rejectWithValue({
+                message: "Unexpected error occurred",
+                status: 500
+            });
+        }
+    }
+);
+
 // AsyncThunk kiểm tra xác thực người dùng
 export const checkAuthUser = createAsyncThunk<
     AuthResponse,
@@ -370,6 +409,24 @@ const authSlice = createSlice({
             })
             .addCase(ForgotPasswordVerifyUser.rejected, (state, action) => {
                 state.isLoading = false;
+                state.isAuthenticated = false;
+                state.error = action.payload?.message;
+                state.status = action.payload?.status;
+            })
+
+            // Reset Password
+            .addCase(ResetPasswordUser.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(ResetPasswordUser.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.user = action.payload.user || null;
+                state.isAuthenticated = action.payload.success;
+            })
+            .addCase(ResetPasswordUser.rejected, (state, action) => {
+                state.isLoading = false;
+                state.user = null;
                 state.isAuthenticated = false;
                 state.error = action.payload?.message;
                 state.status = action.payload?.status;

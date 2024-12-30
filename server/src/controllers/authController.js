@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const generateTokenAndSetCookie = require('../utils/generateTokenAndSetCookie');
 const { sendEmailVerification, sendEmailWelcome, sendEmailResetPassword, sendEmailResetSuccess } = require('../mail/email');
 const generateRandomClientId = require('../utils/generateRandomClientId');
+const jwt = require('jsonwebtoken');
 
 const checkUserName = async (req, res) => {
     const { userName } = req.body;
@@ -69,9 +70,6 @@ const signup = async (req, res) => {
             verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24h   
         });
         await user.save();
-
-        // jwt
-        generateTokenAndSetCookie(res, user.id);
 
         // Gửi email xác minh
         // await sendEmailVerification(user.userName, user.email, verificationToken);
@@ -182,8 +180,9 @@ const login = async (req, res) => {
         if (!isPasswordMatch) {
             return res.status(404).json({ success: false, message: "Invalid credentials" });
         }
-
-        generateTokenAndSetCookie(res, user.id);
+        // jwt
+        const payload = { userId: user.id };
+        generateTokenAndSetCookie(res, payload);
 
         user.lastLogin = Date.now();
         await user.save();
@@ -265,7 +264,7 @@ const forgotPasswordVerify = async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "Invalid or expired verification code",                
+                message: "Invalid or expired verification code",
             });
         }
 
@@ -273,6 +272,16 @@ const forgotPasswordVerify = async (req, res) => {
         user.resetPasswordExpiresAt = undefined;
 
         await user.save();
+
+        // Tạo JWT token và gửi cookie cho trạng thái xác thực
+        const payload = { email: user.email };
+        const options = {
+            expiresIn: '15min', // Token hết hạn sau 15 phút
+            cookieName: 'resetToken', // Tên cookie tùy chỉnh
+            cookieHttpOnly: false, //Để có thể truy xuất cookie từ JavaScript
+            cookieMaxAge: Date.now() + 15 * 60 * 1000, // cookie hết hạn sau 15 phút
+        };
+        generateTokenAndSetCookie(res, payload, options);
 
         res.status(200).json({
             success: true,
@@ -290,7 +299,17 @@ const forgotPasswordVerify = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { password } = req.body;
+
+        // Lấy token từ cookie
+        const resetToken = req.cookies.resetToken;
+        if (!resetToken) {
+            return res.status(400).json({ success: false, message: "Token is missing" });
+        }
+
+        // Xác thực token
+        const decoded = jwt.verify(resetToken, process.env.JWT_SECRET);
+        const email = decoded.email;
 
         const user = await User.findOne({
             email: email,
@@ -302,9 +321,15 @@ const resetPassword = async (req, res) => {
 
         await user.save();
 
+        // Xóa cookie sau khi đặt lại mật khẩu
+        res.clearCookie('resetToken');
+
         // await sendEmailResetSuccess(user.userName, user.email);
 
-        res.status(200).json({ success: true, message: "Password reset successfully" });
+        res.status(200).json({
+            success: true,
+            message: "Password reset successfully",
+        });
 
     } catch (error) {
         console.log("Error in resetPassword ", error);

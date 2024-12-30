@@ -2,7 +2,7 @@
 
 import CommonForm from "@/components/common/form";
 import { forgotPasswordControls } from "@/config/auth";
-import { ForgotPasswordUser } from "@/store/auth";
+import { clearError, ForgotPasswordUser } from "@/store/auth";
 import { AppDispatch, RootState } from "@/store/store";
 import { Typography } from "@mui/material";
 import Link from "next/link";
@@ -28,8 +28,8 @@ function ForgotPassword() {
             const resultAction = await dispatch(ForgotPasswordUser(formData['email']));
 
             if (resultAction.meta.requestStatus === "fulfilled") {
-                
-                router.push("/auth/forgot-password/verify");                
+
+                router.push("/auth/forgot-password/verify");
             }
         } catch (error) {
             console.log(error);
@@ -56,7 +56,7 @@ function ForgotPassword() {
             <Link
                 className="link"
                 href="/auth/login"
-            // onClick={() => dispatch(clearError())}
+                onClick={() => dispatch(clearError())}
             >
                 Back to login
             </Link>

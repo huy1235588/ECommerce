@@ -15,6 +15,13 @@ export const getStrongPassword = (pass: string) => {
     return "";
 };
 
+export const validateConfirmPassword = (password: string, confirmPassword?: string) => {
+    if (!confirmPassword) return "Required";
+    if (confirmPassword.trim().length === 0) return "Required";
+    if (confirmPassword !== password) return "Passwords do not match";
+    return "";
+};
+
 export const requiredInput = (value: string) => {
     return value.trim() ? "" : "Required";
 }
