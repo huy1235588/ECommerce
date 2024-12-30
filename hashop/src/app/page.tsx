@@ -1,5 +1,6 @@
 'use client'
 
+import HomeAside from "@/components/home/aside/aside";
 import HomeHeader from "@/components/home/header";
 import NavigationBar from "@/components/home/navigation/navigationBar";
 import { checkAuthUser } from "@/store/auth";
@@ -22,8 +23,13 @@ export default function Home() {
                 active="ha"
             />
 
-            {/* Navigation */}
-            <NavigationBar />
+            <div className="aside-container">
+                {/* Navigation */}
+                <NavigationBar />
+
+                {/* Aside */}
+                <HomeAside />
+            </div>
 
             <main>
                 <p>main</p>

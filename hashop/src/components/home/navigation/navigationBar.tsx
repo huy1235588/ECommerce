@@ -11,7 +11,7 @@ const StyledInput = styled(InputBase)({
     width: '150px',
 });
 
-const NavBar: React.FC = () => {
+const NavigationBar: React.FC = () => {
     const inputRefSearch = useRef<HTMLInputElement>(null);
     const [valueSearch, setValueSearch] = useState("");
 
@@ -86,4 +86,4 @@ const NavBar: React.FC = () => {
     );
 };
 
-export default NavBar;
+export default NavigationBar;
