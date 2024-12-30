@@ -117,7 +117,6 @@ Author       : LeThienHuy.
 
 /* Menu account */
 .user-menu-container {
-    /* display: flex; */
     align-items: center;
 }
 
@@ -125,8 +124,9 @@ Author       : LeThienHuy.
     position: absolute;
 }
 
-.user-menu .MuiPaper-root {
+.user-menu.MuiPopover-root .MuiPaper-root {
     width: 350px;
+    max-height: calc(100% - 32px);
     background-color: #1e1e2e;
     color: #fff;
 }
