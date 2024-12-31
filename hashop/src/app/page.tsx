@@ -26,13 +26,11 @@ export default function Home() {
                 active="ha"
             />
 
-            <div className="aside-container">
-                {/* Navigation */}
-                <NavigationBar />
+            {/* Navigation */}
+            <NavigationBar />
 
-                {/* Aside */}
-                <HomeAside />
-            </div>
+            {/* Aside */}
+            <HomeAside />
 
             {/* Highlight */}
             {/* <h2>
@@ -43,7 +41,7 @@ export default function Home() {
             <main>
                 {/* Discover Section */}
                 <DiscoverSection />
-                
+
                 {/* Release Section */}
                 <ReleasesSection />
             </main>

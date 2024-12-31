@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Tabs, Tab, Card, CardMedia, CardContent, Typography, Box } from "@mui/material";
+import { Tabs, Tab, Card, CardMedia, CardContent, Typography, Box, Skeleton } from "@mui/material";
 import Grid from '@mui/material/Grid2';
 import Link from "next/link";
 
@@ -116,26 +116,7 @@ const ReleasesSection: React.FC = () => {
     const renderGameCards = (data: GameItem[]) => (
         <Grid container spacing={3} justifyContent="center">
             {data.map((game, index) => (
-                <Grid className="release-item-container"
-                    key={index}
-                    size={{ sm: 6, md: 4, lg: 2, }}
-                >
-                    <Link href={game.link ? game.link : '/'} style={{ textDecoration: 'none' }}>
-
-                        <Card className="release-item">
-                            <CardMedia className="release-item-img"
-                                component="img"
-                                image={game.src}
-                                alt={game.title}
-                            />
-                            <CardContent className="release-item-content">
-                                <Typography variant="body1" align="center">
-                                    {game.title}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                </Grid>
+                <GameCard key={index} game={game} />
             ))}
         </Grid>
     );
@@ -178,6 +159,51 @@ const ReleasesSection: React.FC = () => {
                 {activeTab === "comingSoon" && renderGameCards(comingSoonData)}
             </Box>
         </section>
+    );
+};
+
+const GameCard: React.FC<{ game: GameItem }> = ({ game }) => {
+    const [isLoading, setIsLoading] = useState(true);
+
+    const handleImageLoad = () => {
+        setIsLoading(false);
+    };
+
+    const handleImageError = () => {
+        setIsLoading(false);
+    };
+
+    return (
+        <Grid
+            className="release-item-container"
+            size={{ sm: 6, md: 4, lg: 2 }}
+        >
+            <Link href={game.link ? game.link : '/'} style={{ textDecoration: 'none' }}>
+                <Card className="release-item">
+                    <div style={{ position: 'relative' }}>
+                        {isLoading && (
+                            <Skeleton className="loading-img" variant="rectangular" animation="wave" />
+                        )}
+                        <CardMedia
+                            className="release-item-img"
+                            component="img"
+                            image={game.src}
+                            alt={game.title}
+                            onLoad={handleImageLoad}
+                            onError={handleImageError}
+                            style={{
+                                display: isLoading ? 'none' : 'block',
+                            }}
+                        />
+                    </div>
+                    <CardContent className="release-item-content">
+                        <Typography variant="body1" align="center">
+                            {game.title}
+                        </Typography>
+                    </CardContent>
+                </Card>
+            </Link>
+        </Grid>
     );
 };
 
