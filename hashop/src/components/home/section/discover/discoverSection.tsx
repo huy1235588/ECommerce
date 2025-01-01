@@ -40,7 +40,7 @@ function DiscoverSection() {
 
     return (
         <section className="discover-section">
-            <h2 className="discover-title">Discover fun for all</h2>
+            <h2 className="heading-section">Discover fun for all</h2>
 
             <div className="discover-swiper-container">
                 <Swiper

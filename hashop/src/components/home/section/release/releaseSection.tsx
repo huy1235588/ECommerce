@@ -123,9 +123,9 @@ const ReleasesSection: React.FC = () => {
 
     return (
         <section className="release-section">
-            <Typography variant="h4" align="center" gutterBottom>
+            <h2 className="heading-section">
                 New Releases and Coming Soon
-            </Typography>
+            </h2>
 
             {/* Tabs */}
             <div className="release-tabs">
