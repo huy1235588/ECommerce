@@ -5,6 +5,7 @@ import store from '@/store/store';
 import GlobalProvider from '@/context/GlobalProvider';
 import Notification from '@/components/common/notification ';
 import { useNotification } from '@/context/NotificationContext';
+import CheckAuth from '@/components/auth/checkAuth';
 
 export default function MyApp({
     children,
@@ -16,7 +17,9 @@ export default function MyApp({
     return (
         <Provider store={store}>
             <GlobalProvider>
-                {children}
+                <CheckAuth>
+                    {children}
+                </CheckAuth>
 
                 {notificationState.notifications.map((notification) => (
                     <Notification
