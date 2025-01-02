@@ -29,6 +29,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
     const open = Boolean(anchorEl);
     const [menuPosition, setMenuPosition] = React.useState<{ top: number; left: number } | null>(null);
 
+    // Hàm xử lý mở menu
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         const rect = event.currentTarget.getBoundingClientRect();
 
@@ -43,6 +44,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, avatarUrl }) => {
         setAnchorEl(event.currentTarget);
     };
 
+    // Hàm xử lý đóng menu
     const handleMenuClose = () => {
         setAnchorEl(null);
         setMenuPosition(null)

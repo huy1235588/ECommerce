@@ -35,7 +35,7 @@ const CheckAuth: React.FC<CheckAuthProps> = ({ children }) => {
 
     // Tự động điều hướng admin từ các trang không phải admin tới dashboard
     if (isAuthenticated && user?.role === 'admin' && !pathName.includes('admin')) {
-        router.push('/admin/dashboard'); // Chuyển hướng tới dashboard
+        router.push('/admin/dashboards'); // Chuyển hướng tới dashboard
         return null; // Không render gì khi đang điều hướng
     }
 
