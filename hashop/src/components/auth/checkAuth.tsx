@@ -22,21 +22,24 @@ const CheckAuth: React.FC<CheckAuthProps> = ({ children }) => {
         dispatch(checkAuthUser());
     }, [dispatch]);
 
-    // Ngăn người dùng chưa đăng nhập truy cập các trang admin
+    // Xử lý điều hướng dựa trên trạng thái xác thực và role
+    useEffect(() => {
+        if (!isAuthenticated && pathName.includes('admin')) {
+            router.push('/auth/login'); // Chuyển hướng tới trang đăng nhập
+        } else if (user?.role !== 'admin' && pathName.includes('admin')) {
+            router.push('/not-found'); // Chuyển hướng tới trang "Không tìm thấy"
+        } else if (isAuthenticated && user?.role === 'admin' && !pathName.includes('admin')) {
+            router.push('/admin/dashboards'); // Chuyển hướng tới dashboard
+        }
+    }, [isAuthenticated, user, pathName, router]);
+
+    // Hiển thị nội dung con nếu không cần điều hướng
     if (!isAuthenticated && pathName.includes('admin')) {
-        router.push('/auth/login'); // Chuyển hướng tới trang đăng nhập
-        return null; // Không render gì khi đang điều hướng
+        return null; // Không render gì trong khi đang điều hướng
     }
 
-    // Ngăn người dùng không phải admin truy cập các trang admin
     if (user?.role !== 'admin' && pathName.includes('admin')) {
         return <NotFound />; // Hiển thị trang "Không tìm thấy"
-    }
-
-    // Tự động điều hướng admin từ các trang không phải admin tới dashboard
-    if (isAuthenticated && user?.role === 'admin' && !pathName.includes('admin')) {
-        router.push('/admin/dashboards'); // Chuyển hướng tới dashboard
-        return null; // Không render gì khi đang điều hướng
     }
 
     return <>{children}</>; // Render nội dung con khi điều kiện thỏa mãn

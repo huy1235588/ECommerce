@@ -1,3 +1,4 @@
+import { useThemeContext } from '@/context/ThemeContext';
 import { LogoutUser } from '@/store/auth';
 import { AppDispatch } from '@/store/store';
 import '@/styles/admin.css';
@@ -6,7 +7,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { BiArrowToLeft, BiArrowToRight, BiCodeBlock, BiHome, BiLock, BiLogOut, BiSearch, BiSolidUserAccount } from "react-icons/bi";
-import { FaLanguage } from 'react-icons/fa';
+import { FaCheck, FaChevronRight, FaLanguage } from 'react-icons/fa';
 import { IoMdClose, IoMdNotifications, IoMdSettings } from "react-icons/io";
 import { useDispatch } from 'react-redux';
 
@@ -15,14 +16,54 @@ interface HeaderProps {
     isOpen: boolean;
 }
 
+type Language = {
+    code: string;
+    name: string;
+};
+
+type DisplaySetting = {
+    name: string;
+    mode: 'light' | 'dark';
+};
+
+// Mảng các ngôn ngữ
+const languages: Language[] = [
+    {
+        code: 'en',
+        name: 'English'
+    },
+    {
+        code: 'vi',
+        name: 'Vietnamese'
+    }
+];
+
+// display setting
+const displaySettings: DisplaySetting[] = [
+    {
+        name: 'Light Mode',
+        mode: 'light'
+    },
+    {
+        name: 'Dark Mode',
+        mode: 'dark'
+    }
+];
+
 const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
+    const { setTheme } = useThemeContext();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const searchRef = useRef<HTMLInputElement>(null);
     const [searchValue, setSearchValue] = useState<string>('');
+
+    const [submenuAnchorEl, setSubmenuAnchorEl] = useState<null | HTMLElement>(null);
+    const [submenuOpen, setSubmenuOpen] = useState<string | null>(null); // Quản lý submenu mở
+    const [selectedLanguage, setSelectedLanguage] = useState<Language>({ code: 'en', name: 'English' }); // Ngôn ngữ đã chọn
+    const [selectedDisplaySetting, setSelectedDisplaySetting] = useState<string>(displaySettings[0].name); // Display setting đã chọn
 
     // Hàm xử lý thay đổi giá trị search
     const handleChange = (value: string) => {
@@ -39,6 +80,18 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
         setAnchorEl(null);
     };
 
+    // Hàm xử lý mở submenu
+    const handleSubmenuOpen = (submenu: string, event: React.MouseEvent<HTMLElement>) => {
+        setSubmenuAnchorEl(event.currentTarget);
+        setSubmenuOpen(submenu); // Mở submenu tương ứng
+    };
+
+    // Hàm xử lý đóng submenu
+    const handleSubmenuClose = () => {
+        setSubmenuOpen(null); // Đóng submenu
+        setSubmenuAnchorEl(null);
+    };
+
     // Hàm xử lý đăng xuất
     const handleClickLogout = async () => {
         try {
@@ -49,6 +102,19 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
         } catch (error) {
             console.log(error);
         }
+    };
+
+    // Hàm xử lý thay đổi ngôn ngữ
+    const handleLanguageChange = (language: Language) => {
+        setSelectedLanguage(language); // Cập nhật ngôn ngữ đã chọn
+        handleSubmenuClose(); // Đóng submenu sau khi chọn
+    };
+
+    // Hàm xử lý thay đổi display setting
+    const handleDisplaySettingChange = (setting: DisplaySetting) => {
+        setSelectedDisplaySetting(setting.name); // Cập nhật display setting đã chọn
+        setTheme(setting.mode)
+        handleSubmenuClose(); // Đóng submenu sau khi chọn
     };
 
     return (
@@ -158,17 +224,33 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                         <Typography variant="subtitle1" style={{ padding: '10px 16px', fontWeight: 'bold' }}>
                             System Settings
                         </Typography>
-                        <MenuItem>
+                        <MenuItem onClick={(e) => handleSubmenuOpen("language", e)}>
                             <ListItemIcon>
                                 <FaLanguage fontSize="20px" />
                             </ListItemIcon>
                             Change Language
+                            <div className="menu-item-right">
+                                <Typography variant="body2" style={{ color: '#666' }}>
+                                    {selectedLanguage.name}
+                                </Typography>
+                                <ListItemIcon className='menu-item-right-icon'>
+                                    <FaChevronRight />
+                                </ListItemIcon>
+                            </div>
                         </MenuItem>
-                        <MenuItem>
+                        <MenuItem onClick={(e) => handleSubmenuOpen("settings", e)}>
                             <ListItemIcon>
                                 <IoMdSettings fontSize="20px" />
                             </ListItemIcon>
                             Display Settings
+                            <div className='menu-item-right'>
+                                <Typography variant="body2" style={{ color: '#666' }}>
+                                    {selectedDisplaySetting}
+                                </Typography>
+                                <ListItemIcon className='menu-item-right-icon'>
+                                    <FaChevronRight />
+                                </ListItemIcon>
+                            </div>
                         </MenuItem>
                         <Divider style={{ backgroundColor: '#444' }} />
 
@@ -181,6 +263,66 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                             </ListItemIcon>
                             Log out
                         </MenuItem>
+                    </Menu>
+
+                    {/* Submenu for Language */}
+                    <Menu
+                        className='user-menu user-submenu'
+                        anchorEl={submenuAnchorEl}
+                        open={submenuOpen === "language"}
+                        onClose={handleSubmenuClose}
+                        anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "left",
+                        }}
+                        transformOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                        }}
+                    >
+                        {languages.map((language, index) => (
+                            <MenuItem
+                                className={`user-submenu-item ${selectedLanguage.code === language.code ? 'selected' : ''}`}
+                                key={index}
+                                onClick={() => handleLanguageChange(language)}
+                            >
+                                {language.name}
+
+                                <ListItemIcon className='submenu-item-right-icon'>
+                                    {selectedLanguage.code === language.code && <FaCheck />}
+                                </ListItemIcon>
+                            </MenuItem>
+                        ))}
+                    </Menu>
+
+                    {/* Submenu for Display Settings */}
+                    <Menu
+                        className='user-menu user-submenu'
+                        anchorEl={submenuAnchorEl}
+                        open={submenuOpen === "settings"}
+                        onClose={handleSubmenuClose}
+                        anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "left",
+                        }}
+                        transformOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                        }}
+                    >
+                        {displaySettings.map((setting, index) => (
+                            <MenuItem
+                                className={`user-submenu-item ${selectedDisplaySetting === setting.name ? 'selected' : ''}`}
+                                key={index}
+                                onClick={() => handleDisplaySettingChange(setting)}
+                            >
+                                {setting.name}
+
+                                <ListItemIcon className='submenu-item-right-icon'>
+                                    {selectedDisplaySetting === setting.name && <FaCheck />}
+                                </ListItemIcon>
+                            </MenuItem>
+                        ))}
                     </Menu>
                 </div>
             </Toolbar>

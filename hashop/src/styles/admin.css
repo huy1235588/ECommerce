@@ -194,6 +194,7 @@ img {
 .content-left {
     display: flex;
     align-items: center;
+    margin-left: 0.25rem;
 }
 
 .navbar-menu.MuiAppBar-root {
@@ -219,6 +220,7 @@ img {
     color: #fff;
     border-radius: 4px;
     padding: 0 8px;
+    margin-left: 2rem;
     display: flex;
     align-items: center;
 }
@@ -274,7 +276,36 @@ img {
 
 .user-menu .MuiPaper-root .MuiMenuItem-root,
 .user-menu .MuiPaper-root .MuiMenuItem-root .MuiListItemIcon-root {
-    color: #5c5f6b;
+    color: #8f96b6;
+}
+
+/* Menu item right */
+.menu-item-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: auto;
+}
+
+.menu-item-right .menu-item-right-icon.MuiListItemIcon-root {
+    min-width: 16px;
+    margin-left: 0.25rem;
+}
+
+/* User Submenu */
+.user-submenu {
+    width: 214px;
+    border-radius: 10px;
+}
+
+.user-submenu .user-submenu-item.selected {
+    color: #556de5;
+}
+
+.user-submenu .user-submenu-item .submenu-item-right-icon.MuiListItemIcon-root {
+    color: #556de5;
+    min-width: 16px;
+    margin-left: auto;
 }
 /*===================================*
     02.END HEADER
