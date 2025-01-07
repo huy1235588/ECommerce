@@ -1,0 +1,18 @@
+{
+    "admin": {
+        "header": {
+            "my_information": "Trang chủ cá nhân",
+            "personal_homepage": "Quản lý thông tin",
+            "information_management": "Quản lý thông tin",
+            "privacy_settings": "Thiết lập quyền riêng tư",
+            "manage_blocklist": "Quản lý danh sách đen",
+            "system_settings": "Thiết lập hệ thống",
+            "change_language": "Thay đổi ngôn ngữ",
+            "display_settings": "Cài đặt hiển thị",
+            "log_out": "Đăng xuất",
+            "search_placeholder": "Tìm kiếm phía trước",
+            "dark_mode": "Chế độ tối",
+            "light_mode": "Chế độ sáng"
+        }
+    }
+}

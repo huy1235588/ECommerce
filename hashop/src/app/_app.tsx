@@ -6,6 +6,7 @@ import GlobalProvider from '@/context/GlobalProvider';
 import Notification from '@/components/common/notification ';
 import { useNotification } from '@/context/NotificationContext';
 import CheckAuth from '@/components/auth/checkAuth';
+import '@/libs/i18n';
 
 export default function MyApp({
     children,

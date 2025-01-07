@@ -1,0 +1,18 @@
+{
+    "admin": {
+        "header": {
+            "my_information": "My Information",
+            "personal_homepage": "Personal Homepage",
+            "information_management": "Information Management",
+            "privacy_settings": "Privacy Settings",
+            "manage_blocklist": "Manage Blocklist",
+            "system_settings": "System Settings",
+            "change_language": "Change Language",
+            "display_settings": "Display Settings",
+            "log_out": "Log out",
+            "search_placeholder": "Search in front",
+            "dark_mode": "Dark Mode",
+            "light_mode": "Light Mode"
+        }
+    }
+}

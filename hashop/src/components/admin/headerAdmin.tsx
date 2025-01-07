@@ -5,6 +5,7 @@ import { AppBar, ClickAwayListener, Divider, IconButton, InputBase, ListItemIcon
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useRef, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BiArrowToLeft, BiArrowToRight, BiCodeBlock, BiHome, BiLock, BiLogOut, BiSearch, BiSolidUserAccount } from "react-icons/bi";
 import { FaCheck, FaChevronRight, FaLanguage } from 'react-icons/fa';
 import { IoMdClose, IoMdNotifications, IoMdSettings } from "react-icons/io";
@@ -44,48 +45,49 @@ type SubmenuProps<T> = {
     anchorEl: HTMLElement | null;
 };
 
-// Mảng các ngôn ngữ
-const languages: Language[] = [
-    {
-        id: 1,
-        code: 'en',
-        name: 'English'
-    },
-    {
-        id: 2,
-        code: 'vi',
-        name: 'Vietnamese'
-    },
-    {
-        id: 3,
-        code: 'fr',
-        name: 'French'
-    },
-    {
-        id: 4,
-        code: 'es',
-        name: 'Spanish'
-    }
-];
-
-// display setting
-const displaySettings: DisplaySetting[] = [
-    {
-        id: 1,
-        name: 'Light Mode',
-        mode: 'light'
-    },
-    {
-        id: 2,
-        name: 'Dark Mode',
-        mode: 'dark'
-    }
-];
-
 const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { setTheme } = useThemeContext();
+    const { i18n, t } = useTranslation();
+
+    // Mảng các ngôn ngữ
+    const languages: Language[] = [
+        {
+            id: 1,
+            code: 'en',
+            name: 'English'
+        },
+        {
+            id: 2,
+            code: 'vi',
+            name: 'Vietnamese'
+        },
+        {
+            id: 3,
+            code: 'fr',
+            name: 'French'
+        },
+        {
+            id: 4,
+            code: 'es',
+            name: 'Spanish'
+        }
+    ];
+
+    // display setting
+    const displaySettings: DisplaySetting[] = [
+        {
+            id: 1,
+            mode: 'light',
+            name: t('admin.header.light_mode'),
+        },
+        {
+            id: 2,
+            mode: 'dark',
+            name: t('admin.header.dark_mode'),
+        }
+    ];
 
     const [menuState, setMenuState] = useState<MenuState>({
         isMenuOpen: false,
@@ -100,6 +102,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     const [selectedLanguage, setSelectedLanguage] = useState<Language>({ id: 1, code: 'en', name: 'English' }); // Ngôn ngữ đã chọn
     const [selectedDisplaySetting, setSelectedDisplaySetting] = useState<DisplaySetting>(displaySettings[0]); // Display setting đã chọn
 
+
     // Hàm xử lý thay đổi giá trị search
     const handleChange = (value: string) => {
         setSearchValue(value);
@@ -112,8 +115,6 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
 
     // Hàm xử lý mở submenu
     const openSubmenu = (submenu: string, event: React.MouseEvent<HTMLElement>) => {
-        console.log(event.currentTarget.getBoundingClientRect());
-
         setMenuState({
             isMenuOpen: true,
             submenu,
@@ -141,7 +142,11 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     // Hàm xử lý thay đổi ngôn ngữ
     const handleLanguageChange = (language: Language) => {
         setSelectedLanguage(language);
-        closeMenu();
+        i18n.changeLanguage(language.code).then(() => {
+            closeMenu();
+        }).catch((error) => {
+            console.error('Error changing language:', error);
+        });
     };
 
     // Hàm xử lý thay đổi display setting
@@ -224,7 +229,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                             ref={searchRef}
                             value={searchValue}
                             onChange={(e) => handleChange(e.target.value)}
-                            placeholder="Search in front"
+                            placeholder={t('admin.header.search_placeholder')}
                         />
 
                         <IconButton
@@ -271,37 +276,37 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                                 <MenuList>
                                     {/* My Information */}
                                     <Typography variant="subtitle1" className="menu-section-title">
-                                        My Information
+                                        {t('admin.header.my_information')}
                                     </Typography>
                                     <MenuItem className='menu-item'>
                                         <ListItemIcon>
                                             <BiHome fontSize="20px" />
                                         </ListItemIcon>
-                                        Personal Homepage
+                                        {t('admin.header.personal_homepage')}
                                     </MenuItem>
                                     <MenuItem className='menu-item'>
                                         <ListItemIcon>
                                             <BiSolidUserAccount fontSize="20px" />
                                         </ListItemIcon>
-                                        Information Management
+                                        {t('admin.header.information_management')}
                                     </MenuItem>
                                     <MenuItem className='menu-item'>
                                         <ListItemIcon>
                                             <BiLock fontSize="20px" />
                                         </ListItemIcon>
-                                        Privacy Settings
+                                        {t('admin.header.privacy_settings')}
                                     </MenuItem>
                                     <MenuItem className='menu-item'>
                                         <ListItemIcon>
                                             <BiCodeBlock fontSize="20px" />
                                         </ListItemIcon>
-                                        Manage Blocklist
+                                        {t('admin.header.manage_blocklist')}
                                     </MenuItem>
                                     <Divider className="menu-divider" />
 
                                     {/* System Settings */}
                                     <Typography variant="subtitle1" className="menu-section-title">
-                                        System Settings
+                                        {t('admin.header.system_settings')}
                                     </Typography>
 
                                     {/* Change Language */}
@@ -309,7 +314,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                                         <ListItemIcon>
                                             <FaLanguage fontSize="20px" />
                                         </ListItemIcon>
-                                        Change Language
+                                        {t('admin.header.change_language')}
                                         <div className="menu-item-right">
                                             <Typography variant="body2" className="menu-item-text">
                                                 {selectedLanguage.name}
@@ -325,7 +330,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                                         <ListItemIcon>
                                             <IoMdSettings fontSize="20px" />
                                         </ListItemIcon>
-                                        Display Settings
+                                        {t('admin.header.display_settings')}
                                         <div className="menu-item-right">
                                             <Typography variant="body2" className="menu-item-text">
                                                 {selectedDisplaySetting.name}
@@ -344,7 +349,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                                         <ListItemIcon>
                                             <BiLogOut fontSize="20px" />
                                         </ListItemIcon>
-                                        Log out
+                                        {t('admin.header.log_out')}
                                     </MenuItem>
                                 </MenuList>
 
