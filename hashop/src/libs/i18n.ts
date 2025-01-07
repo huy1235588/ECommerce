@@ -1,27 +1,40 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Hàm tải dữ liệu dịch từ file JSON
+// Hàm xác định ngữ cảnh
+const isServer = typeof window === 'undefined';
+
 const loadTranslations = async (lng: string) => {
-    const response = await fetch(`/locales/${lng}/translation.json`);
-    const translations = await response.json();
-    return translations;
+    let response;
+
+    if (isServer) {
+        // Khi chạy trên server, sử dụng URL tuyệt đối
+        const absolutePath = `http://localhost:3000/locales/${lng}/translation.json`;
+        response = await fetch(absolutePath);
+    } else {
+        // Khi chạy trên client, sử dụng URL tương đối
+        response = await fetch(`/locales/${lng}/translation.json`);
+    }
+
+    if (!response.ok) {
+        throw new Error(`Failed to load translations for language: ${lng}`);
+    }
+
+    return await response.json();
 };
 
-// Khởi tạo i18n và cấu hình
 i18n
     .use(initReactI18next)
     .init({
-        lng: 'en', // Ngôn ngữ mặc định
-        fallbackLng: 'en', // Ngôn ngữ dự phòng
+        lng: 'en',
+        fallbackLng: 'en',
         resources: {},
         interpolation: {
-            escapeValue: false, // React đã bảo vệ tự động khỏi XSS
+            escapeValue: false,
         },
-        load: 'currentOnly', // Chỉ tải ngôn ngữ hiện tại
+        load: 'currentOnly',
     });
 
-// Tải dữ liệu dịch vào i18n
 const loadLanguages = async () => {
     const langs = ['en', 'vi'];
     for (const lng of langs) {
