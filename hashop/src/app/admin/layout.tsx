@@ -3,6 +3,7 @@
 import HeaderAdmin from "@/components/admin/headerAdmin";
 import SidebarAdmin from "@/components/admin/sidebarAdmin";
 import React, { useState } from "react";
+import "@/styles/admin.css?v=1.0.0";
 
 export default function AdminLayout({
     children,

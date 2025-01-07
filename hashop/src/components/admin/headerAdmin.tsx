@@ -1,11 +1,10 @@
 import { useThemeContext } from '@/context/ThemeContext';
 import { LogoutUser } from '@/store/auth';
 import { AppDispatch } from '@/store/store';
-import '@/styles/admin.css';
-import { AppBar, Divider, IconButton, InputBase, ListItemIcon, Menu, MenuItem, Toolbar, Typography } from "@mui/material";
+import { AppBar, ClickAwayListener, Divider, IconButton, InputBase, ListItemIcon, MenuItem, MenuList, Paper, Toolbar, Typography } from "@mui/material";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { BiArrowToLeft, BiArrowToRight, BiCodeBlock, BiHome, BiLock, BiLogOut, BiSearch, BiSolidUserAccount } from "react-icons/bi";
 import { FaCheck, FaChevronRight, FaLanguage } from 'react-icons/fa';
 import { IoMdClose, IoMdNotifications, IoMdSettings } from "react-icons/io";
@@ -16,35 +15,68 @@ interface HeaderProps {
     isOpen: boolean;
 }
 
+// Kiểu dữ liệu cho menu
+type MenuState = {
+    isMenuOpen: boolean;
+    submenu: string | null;
+    anchorEl: HTMLElement | null;
+};
+
+// Kiểu dữ liệu cho ngôn ngữ
 type Language = {
+    id: number;
     code: string;
     name: string;
 };
 
+// Kiểu dữ liệu cho display setting
 type DisplaySetting = {
+    id: number;
     name: string;
     mode: 'light' | 'dark';
+};
+
+// Hàm tạo submenu
+type SubmenuProps<T> = {
+    items: T[];
+    selectedItem: T;
+    onSelect: (item: T) => void;
+    anchorEl: HTMLElement | null;
 };
 
 // Mảng các ngôn ngữ
 const languages: Language[] = [
     {
+        id: 1,
         code: 'en',
         name: 'English'
     },
     {
+        id: 2,
         code: 'vi',
         name: 'Vietnamese'
+    },
+    {
+        id: 3,
+        code: 'fr',
+        name: 'French'
+    },
+    {
+        id: 4,
+        code: 'es',
+        name: 'Spanish'
     }
 ];
 
 // display setting
 const displaySettings: DisplaySetting[] = [
     {
+        id: 1,
         name: 'Light Mode',
         mode: 'light'
     },
     {
+        id: 2,
         name: 'Dark Mode',
         mode: 'dark'
     }
@@ -55,15 +87,18 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { setTheme } = useThemeContext();
 
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(anchorEl);
-    const searchRef = useRef<HTMLInputElement>(null);
-    const [searchValue, setSearchValue] = useState<string>('');
+    const [menuState, setMenuState] = useState<MenuState>({
+        isMenuOpen: false,
+        submenu: null,
+        anchorEl: null
+    });
+    const anchorRef = useRef<HTMLButtonElement>(null);
 
-    const [submenuAnchorEl, setSubmenuAnchorEl] = useState<null | HTMLElement>(null);
-    const [submenuOpen, setSubmenuOpen] = useState<string | null>(null); // Quản lý submenu mở
-    const [selectedLanguage, setSelectedLanguage] = useState<Language>({ code: 'en', name: 'English' }); // Ngôn ngữ đã chọn
-    const [selectedDisplaySetting, setSelectedDisplaySetting] = useState<string>(displaySettings[0].name); // Display setting đã chọn
+    const [searchValue, setSearchValue] = useState<string>('');
+    const searchRef = useRef<HTMLInputElement>(null);
+
+    const [selectedLanguage, setSelectedLanguage] = useState<Language>({ id: 1, code: 'en', name: 'English' }); // Ngôn ngữ đã chọn
+    const [selectedDisplaySetting, setSelectedDisplaySetting] = useState<DisplaySetting>(displaySettings[0]); // Display setting đã chọn
 
     // Hàm xử lý thay đổi giá trị search
     const handleChange = (value: string) => {
@@ -71,25 +106,24 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     };
 
     // Hàm xử lý mở menu
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    // Hàm xử lý đóng menu
-    const handleMenuClose = () => {
-        setAnchorEl(null);
+    const toggleMenu = () => {
+        setMenuState((prev) => ({ ...prev, isMenuOpen: !prev.isMenuOpen }));
     };
 
     // Hàm xử lý mở submenu
-    const handleSubmenuOpen = (submenu: string, event: React.MouseEvent<HTMLElement>) => {
-        setSubmenuAnchorEl(event.currentTarget);
-        setSubmenuOpen(submenu); // Mở submenu tương ứng
+    const openSubmenu = (submenu: string, event: React.MouseEvent<HTMLElement>) => {
+        console.log(event.currentTarget.getBoundingClientRect());
+
+        setMenuState({
+            isMenuOpen: true,
+            submenu,
+            anchorEl: event.currentTarget
+        });
     };
 
-    // Hàm xử lý đóng submenu
-    const handleSubmenuClose = () => {
-        setSubmenuOpen(null); // Đóng submenu
-        setSubmenuAnchorEl(null);
+    // Hàm xử lý đóng menu
+    const closeMenu = () => {
+        setMenuState({ isMenuOpen: false, submenu: null, anchorEl: null });
     };
 
     // Hàm xử lý đăng xuất
@@ -106,15 +140,65 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
 
     // Hàm xử lý thay đổi ngôn ngữ
     const handleLanguageChange = (language: Language) => {
-        setSelectedLanguage(language); // Cập nhật ngôn ngữ đã chọn
-        handleSubmenuClose(); // Đóng submenu sau khi chọn
+        setSelectedLanguage(language);
+        closeMenu();
     };
 
     // Hàm xử lý thay đổi display setting
     const handleDisplaySettingChange = (setting: DisplaySetting) => {
-        setSelectedDisplaySetting(setting.name); // Cập nhật display setting đã chọn
+        setSelectedDisplaySetting(setting); // Cập nhật display setting đã chọn
         setTheme(setting.mode)
-        handleSubmenuClose(); // Đóng submenu sau khi chọn
+        closeMenu(); // Đóng submenu sau khi chọn
+    };
+
+    // Xử lý focus khi mở menu
+    useEffect(() => {
+        if (!menuState.isMenuOpen) {
+            anchorRef.current?.focus();
+        }
+
+    }, [menuState.isMenuOpen]);
+
+    const Submenu = <T extends { id: number; name: string }>({
+        items,
+        selectedItem,
+        onSelect,
+        anchorEl
+    }: SubmenuProps<T>) => {
+        const anchorRect = anchorEl?.getBoundingClientRect();
+        const style = anchorRect
+            ? {
+                position: 'absolute',
+                top: `${anchorRect.top}px`,
+            }
+            : {};
+
+        return (
+            <ClickAwayListener onClickAway={() => onSelect(selectedItem)}>
+                <Paper className="user-submenu"
+                    elevation={4}
+                    style={{
+                        ...style,
+                        position: 'absolute',
+                        top: `calc(${anchorRect?.top}px - 65px)`,
+                    }}
+                >
+                    <MenuList>
+                        {items.map((item, index) => (
+                            <MenuItem
+                                className="user-submenu-item"
+                                key={index}
+                                selected={selectedItem.id === item.id}
+                                onClick={() => onSelect(item)}
+                            >
+                                {item.name}
+                                {selectedItem.name === item.name && <FaCheck />}
+                            </MenuItem>
+                        ))}
+                    </MenuList>
+                </Paper>
+            </ClickAwayListener>
+        );
     };
 
     return (
@@ -164,7 +248,10 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                     </IconButton>
 
                     {/* Account */}
-                    <IconButton onClick={handleMenuOpen}>
+                    <IconButton
+                        ref={anchorRef}
+                        onClick={toggleMenu}
+                    >
                         <Image
                             src="/image/avatar/img2.jpg"
                             width={30}
@@ -175,155 +262,114 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
                     </IconButton>
 
                     {/* Account Menu */}
-                    <Menu
-                        className='user-menu'
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleMenuClose}
-                        anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right'
-                        }}
-                        transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'right'
-                        }}
-                        disableScrollLock={true}
-                    >
-                        {/* My Information */}
-                        <Typography variant="subtitle1" style={{ padding: '10px 16px', fontWeight: 'bold' }}>
-                            My Information
-                        </Typography>
-                        <MenuItem>
-                            <ListItemIcon>
-                                <BiHome fontSize="20px" />
-                            </ListItemIcon>
-                            Personal Homepage
-                        </MenuItem>
-                        <MenuItem>
-                            <ListItemIcon>
-                                <BiSolidUserAccount fontSize="20px" />
-                            </ListItemIcon>
-                            Information Management
-                        </MenuItem>
-                        <MenuItem>
-                            <ListItemIcon>
-                                <BiLock fontSize="20px" />
-                            </ListItemIcon>
-                            Privacy Settings
-                        </MenuItem>
-                        <MenuItem>
-                            <ListItemIcon>
-                                <BiCodeBlock fontSize="20px" />
-                            </ListItemIcon>
-                            Manage Blocklist
-                        </MenuItem>
-                        <Divider style={{ backgroundColor: '#444' }} />
-
-                        {/* System Settings */}
-                        <Typography variant="subtitle1" style={{ padding: '10px 16px', fontWeight: 'bold' }}>
-                            System Settings
-                        </Typography>
-                        <MenuItem onClick={(e) => handleSubmenuOpen("language", e)}>
-                            <ListItemIcon>
-                                <FaLanguage fontSize="20px" />
-                            </ListItemIcon>
-                            Change Language
-                            <div className="menu-item-right">
-                                <Typography variant="body2" style={{ color: '#666' }}>
-                                    {selectedLanguage.name}
-                                </Typography>
-                                <ListItemIcon className='menu-item-right-icon'>
-                                    <FaChevronRight />
-                                </ListItemIcon>
-                            </div>
-                        </MenuItem>
-                        <MenuItem onClick={(e) => handleSubmenuOpen("settings", e)}>
-                            <ListItemIcon>
-                                <IoMdSettings fontSize="20px" />
-                            </ListItemIcon>
-                            Display Settings
-                            <div className='menu-item-right'>
-                                <Typography variant="body2" style={{ color: '#666' }}>
-                                    {selectedDisplaySetting}
-                                </Typography>
-                                <ListItemIcon className='menu-item-right-icon'>
-                                    <FaChevronRight />
-                                </ListItemIcon>
-                            </div>
-                        </MenuItem>
-                        <Divider style={{ backgroundColor: '#444' }} />
-
-                        {/* Logout */}
-                        <MenuItem
-                            onClick={handleClickLogout}
-                        >
-                            <ListItemIcon>
-                                <BiLogOut fontSize="20px" />
-                            </ListItemIcon>
-                            Log out
-                        </MenuItem>
-                    </Menu>
-
-                    {/* Submenu for Language */}
-                    <Menu
-                        className='user-menu user-submenu'
-                        anchorEl={submenuAnchorEl}
-                        open={submenuOpen === "language"}
-                        onClose={handleSubmenuClose}
-                        anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "left",
-                        }}
-                        transformOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                        }}
-                    >
-                        {languages.map((language, index) => (
-                            <MenuItem
-                                className={`user-submenu-item ${selectedLanguage.code === language.code ? 'selected' : ''}`}
-                                key={index}
-                                onClick={() => handleLanguageChange(language)}
+                    {menuState.isMenuOpen && (
+                        <ClickAwayListener onClickAway={closeMenu}>
+                            <Paper
+                                className="user-menu"
+                                elevation={4}
                             >
-                                {language.name}
+                                <MenuList>
+                                    {/* My Information */}
+                                    <Typography variant="subtitle1" className="menu-section-title">
+                                        My Information
+                                    </Typography>
+                                    <MenuItem className='menu-item'>
+                                        <ListItemIcon>
+                                            <BiHome fontSize="20px" />
+                                        </ListItemIcon>
+                                        Personal Homepage
+                                    </MenuItem>
+                                    <MenuItem className='menu-item'>
+                                        <ListItemIcon>
+                                            <BiSolidUserAccount fontSize="20px" />
+                                        </ListItemIcon>
+                                        Information Management
+                                    </MenuItem>
+                                    <MenuItem className='menu-item'>
+                                        <ListItemIcon>
+                                            <BiLock fontSize="20px" />
+                                        </ListItemIcon>
+                                        Privacy Settings
+                                    </MenuItem>
+                                    <MenuItem className='menu-item'>
+                                        <ListItemIcon>
+                                            <BiCodeBlock fontSize="20px" />
+                                        </ListItemIcon>
+                                        Manage Blocklist
+                                    </MenuItem>
+                                    <Divider className="menu-divider" />
 
-                                <ListItemIcon className='submenu-item-right-icon'>
-                                    {selectedLanguage.code === language.code && <FaCheck />}
-                                </ListItemIcon>
-                            </MenuItem>
-                        ))}
-                    </Menu>
+                                    {/* System Settings */}
+                                    <Typography variant="subtitle1" className="menu-section-title">
+                                        System Settings
+                                    </Typography>
 
-                    {/* Submenu for Display Settings */}
-                    <Menu
-                        className='user-menu user-submenu'
-                        anchorEl={submenuAnchorEl}
-                        open={submenuOpen === "settings"}
-                        onClose={handleSubmenuClose}
-                        anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "left",
-                        }}
-                        transformOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                        }}
-                    >
-                        {displaySettings.map((setting, index) => (
-                            <MenuItem
-                                className={`user-submenu-item ${selectedDisplaySetting === setting.name ? 'selected' : ''}`}
-                                key={index}
-                                onClick={() => handleDisplaySettingChange(setting)}
-                            >
-                                {setting.name}
+                                    {/* Change Language */}
+                                    <MenuItem className='menu-item' onClick={(e) => openSubmenu("language", e)}>
+                                        <ListItemIcon>
+                                            <FaLanguage fontSize="20px" />
+                                        </ListItemIcon>
+                                        Change Language
+                                        <div className="menu-item-right">
+                                            <Typography variant="body2" className="menu-item-text">
+                                                {selectedLanguage.name}
+                                            </Typography>
+                                            <ListItemIcon className="menu-item-right-icon">
+                                                <FaChevronRight />
+                                            </ListItemIcon>
+                                        </div>
+                                    </MenuItem>
 
-                                <ListItemIcon className='submenu-item-right-icon'>
-                                    {selectedDisplaySetting === setting.name && <FaCheck />}
-                                </ListItemIcon>
-                            </MenuItem>
-                        ))}
-                    </Menu>
+                                    {/* Display Settings */}
+                                    <MenuItem className='menu-item' onClick={(e) => openSubmenu("settings", e)}>
+                                        <ListItemIcon>
+                                            <IoMdSettings fontSize="20px" />
+                                        </ListItemIcon>
+                                        Display Settings
+                                        <div className="menu-item-right">
+                                            <Typography variant="body2" className="menu-item-text">
+                                                {selectedDisplaySetting.name}
+                                            </Typography>
+                                            <ListItemIcon className="menu-item-right-icon">
+                                                <FaChevronRight />
+                                            </ListItemIcon>
+                                        </div>
+                                    </MenuItem>
+
+
+                                    <Divider className="menu-divider" />
+
+                                    {/* Logout */}
+                                    <MenuItem className='menu-item' onClick={handleClickLogout}>
+                                        <ListItemIcon>
+                                            <BiLogOut fontSize="20px" />
+                                        </ListItemIcon>
+                                        Log out
+                                    </MenuItem>
+                                </MenuList>
+
+                                {/* Submenu for Langue */}
+                                {menuState.submenu === 'language' && (
+                                    <Submenu
+                                        items={languages}
+                                        selectedItem={selectedLanguage}
+                                        onSelect={handleLanguageChange}
+                                        anchorEl={menuState.anchorEl}
+                                    />
+                                )}
+
+                                {/* Submenu for Display Settings */}
+                                {menuState.submenu === 'settings' && (
+                                    <Submenu
+                                        items={displaySettings}
+                                        selectedItem={selectedDisplaySetting}
+                                        onSelect={handleDisplaySettingChange}
+                                        anchorEl={menuState.anchorEl}
+                                    />
+                                )}
+                            </Paper>
+                        </ClickAwayListener>
+                    )}
                 </div>
             </Toolbar>
         </AppBar>
