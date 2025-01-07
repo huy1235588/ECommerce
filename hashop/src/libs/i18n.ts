@@ -36,7 +36,7 @@ i18n
     });
 
 const loadLanguages = async () => {
-    const langs = ['en', 'vi'];
+    const langs = ['en', 'vn'];
     for (const lng of langs) {
         const translations = await loadTranslations(lng);
         i18n.addResourceBundle(lng, 'translation', translations, true, true);

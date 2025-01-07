@@ -1,3 +1,4 @@
+import { Language } from '@/app/admin/layout';
 import { useThemeContext } from '@/context/ThemeContext';
 import { LogoutUser } from '@/store/auth';
 import { AppDispatch } from '@/store/store';
@@ -14,6 +15,9 @@ import { useDispatch } from 'react-redux';
 interface HeaderProps {
     toggleSidebar: () => void; // Function to toggle sidebar
     isOpen: boolean;
+    languages: Language[]; // Array of languages
+    selectedLanguage: Language; // Selected language
+    setSelectedLanguage: (language: Language) => void; // Function to set selected language
 }
 
 // Kiểu dữ liệu cho menu
@@ -23,13 +27,6 @@ type MenuState = {
     anchorEl: HTMLElement | null;
 };
 
-// Kiểu dữ liệu cho ngôn ngữ
-type Language = {
-    id: number;
-    code: string;
-    name: string;
-};
-
 // Kiểu dữ liệu cho display setting
 type DisplaySetting = {
     id: number;
@@ -37,7 +34,7 @@ type DisplaySetting = {
     mode: 'light' | 'dark';
 };
 
-// Hàm tạo submenu
+// Kiểu dữ liệu cho submenu
 type SubmenuProps<T> = {
     items: T[];
     selectedItem: T;
@@ -45,35 +42,16 @@ type SubmenuProps<T> = {
     anchorEl: HTMLElement | null;
 };
 
-const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
+const HeaderAdmin: React.FC<HeaderProps> = ({
+    toggleSidebar, isOpen,
+    languages,
+    selectedLanguage,
+    setSelectedLanguage
+}) => {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { setTheme } = useThemeContext();
     const { i18n, t } = useTranslation();
-
-    // Mảng các ngôn ngữ
-    const languages: Language[] = [
-        {
-            id: 1,
-            code: 'en',
-            name: 'English'
-        },
-        {
-            id: 2,
-            code: 'vi',
-            name: 'Vietnamese'
-        },
-        {
-            id: 3,
-            code: 'fr',
-            name: 'French'
-        },
-        {
-            id: 4,
-            code: 'es',
-            name: 'Spanish'
-        }
-    ];
 
     // display setting
     const displaySettings: DisplaySetting[] = [
@@ -99,9 +77,7 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     const [searchValue, setSearchValue] = useState<string>('');
     const searchRef = useRef<HTMLInputElement>(null);
 
-    const [selectedLanguage, setSelectedLanguage] = useState<Language>({ id: 1, code: 'en', name: 'English' }); // Ngôn ngữ đã chọn
     const [selectedDisplaySetting, setSelectedDisplaySetting] = useState<DisplaySetting>(displaySettings[0]); // Display setting đã chọn
-
 
     // Hàm xử lý thay đổi giá trị search
     const handleChange = (value: string) => {
@@ -142,11 +118,13 @@ const HeaderAdmin: React.FC<HeaderProps> = ({ toggleSidebar, isOpen }) => {
     // Hàm xử lý thay đổi ngôn ngữ
     const handleLanguageChange = (language: Language) => {
         setSelectedLanguage(language);
-        i18n.changeLanguage(language.code).then(() => {
-            closeMenu();
-        }).catch((error) => {
-            console.error('Error changing language:', error);
-        });
+        i18n.changeLanguage(language.code)
+            .then(() => {
+                closeMenu();
+            })
+            .catch((error) => {
+                console.error('Error changing language:', error);
+            });
     };
 
     // Hàm xử lý thay đổi display setting

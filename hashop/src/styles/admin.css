@@ -423,6 +423,32 @@ img {
     padding: 0.75rem;
     color: #fff;
 }
+
+/* Menu */
+.lang-menu.MuiPaper-root {
+    position: absolute;
+    top: 66px;
+    right: 10px;
+    width: 180px;
+    background-color: #1e1e2e;
+    color: #fff;
+}
+
+.lang-menu-item.MuiMenuItem-root {
+    padding: 0.75rem 1rem;
+}
+
+.lang-menu-item.MuiMenuItem-root.Mui-selected {
+    color: #556de5;
+}
+
+.lang-menu-item-text.MuiTypography-root {
+    margin-left: 0.75rem;
+}
+
+.lang-menu-item-check {
+    margin-left: auto;
+}
 /*===================================*
     03.END SIDEBAR
 *===================================*/
