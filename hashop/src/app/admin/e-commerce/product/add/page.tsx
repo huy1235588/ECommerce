@@ -89,7 +89,27 @@ function ECommerceAddProductPage() {
 
     return (
         <div className="">
-            <h1>Add Product</h1>
+            <div className="page-header">
+                {/* Breadcrumb */}
+                <nav aria-label="breadcrumb" className="breadcrumb-nav">
+                    <ol className="breadcrumb-list">
+                        <li className="breadcrumb-item">
+                            <a href="/admin/e-commerce/product">
+                                Products
+                            </a>
+                        </li>
+                        <li className="breadcrumb-item active" aria-current="page">
+                            Add Product
+                        </li>
+                    </ol>
+                </nav>
+
+                <div className="page-header-content">
+                    {/* Header */}
+                    <h1>Add Product</h1>
+                </div>
+
+            </div>
 
             {/* Add Product Form */}
             <form className="form">
