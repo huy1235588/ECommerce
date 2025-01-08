@@ -181,7 +181,7 @@ const login = async (req, res) => {
             return res.status(404).json({ success: false, message: "Invalid credentials" });
         }
         // jwt
-        const payload = { userId: user.id };
+        const payload = { userId: user.id, role: user.role };
         generateTokenAndSetCookie(res, payload);
 
         user.lastLogin = Date.now();

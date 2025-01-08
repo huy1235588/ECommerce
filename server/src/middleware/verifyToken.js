@@ -11,7 +11,14 @@ const verifyToken = (req, res, next) => {
         if (!decoded) {
             return res.status(401).json({ success: false, message: "Unauthorized - invalid token" });
         }
+
+        if (decoded.exp <= Date.now() / 1000) {
+            return res.status(401).json({ success: false, message: "Unauthorized - token expired" });
+        }
+
+        console.log("decoded", decoded);
         req.userId = decoded.userId;
+        req.role = decoded.role;
         next();
     } catch (error) {
         console.log("Error in verifyToken ", error);

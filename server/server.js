@@ -4,6 +4,7 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const dotnet = require('dotenv');
 const authRoute = require('./src/routers/authRoute');
+const userRoute = require('./src/routers/userRoute');
 
 dotnet.config();
 
@@ -40,6 +41,7 @@ app.use(cookieParser()); // Phân tích các cookie trong yêu cầu HTTP (req.c
 app.use(express.json()); // Phân tích dữ liệu JSON trong body của yêu cầu HTTP (req.body)
 
 app.use('/api/auth', authRoute);
+app.use('/api/user', userRoute);
 
 const PORT = process.env.PORT || 3002; // Cổng
 
