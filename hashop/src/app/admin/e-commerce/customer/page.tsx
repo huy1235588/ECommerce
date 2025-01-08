@@ -76,7 +76,8 @@ function CustomersPage() {
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    pagination pageSizeOptions={[5]}
+                    pagination
+                    pageSizeOptions={[5]}
                     slots={{
                         toolbar: GridToolbar,
                     }}
