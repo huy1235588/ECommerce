@@ -75,11 +75,6 @@ const productValidation = [
     body('publisher').not().isEmpty().withMessage('Publisher is required'),
     body('platform').not().isEmpty().withMessage('Platform is required'),
 
-    // Kiểm tra xem rating có phải là số không
-    body('rating')
-        .not().isEmpty().withMessage('Rating is required')
-        .isFloat({ min: 0, max: 5 }).withMessage('Rating must be a number between 0 and 5'),
-
     // Kiểm tra xem trạng thái sản phẩm có phải là boolean không
     body('isActive')
         .not().isEmpty().withMessage('isActive is required')
