@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const dotnet = require('dotenv');
 const authRoute = require('./src/routers/authRoute');
 const userRoute = require('./src/routers/userRoute');
+const productRouter = require('./src/routers/productRoute');
 
 dotnet.config();
 
@@ -42,6 +43,7 @@ app.use(express.json()); // Phân tích dữ liệu JSON trong body của yêu c
 
 app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
+app.use('/api/product', productRouter);
 
 const PORT = process.env.PORT || 3002; // Cổng
 
