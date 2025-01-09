@@ -143,15 +143,20 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
                                     <CardMedia
                                         component="img"
                                         sx={{
-                                            width: '30%',
-                                            height: 150,
+                                            width: 300,
+                                            // height: 150,
                                             objectFit: 'cover',
                                         }}
                                         image={url}
                                         alt={`Image ${index + 1}`}
                                     />
 
-                                    <div>
+                                    <Box
+                                        sx={{
+                                            flex: 1,
+                                            marginLeft: 1,
+                                        }}
+                                    >
                                         {/* Tên file */}
                                         <Typography
                                             variant="caption"
@@ -172,7 +177,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
                                             sx={{
                                                 display: "block",
                                                 ml: 1,
-                                                color: "text.secondary",
+                                                color: "#666",
                                                 fontSize: "0.75rem",
                                             }}
                                         >
@@ -185,14 +190,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
                                                 `${images[index].size} B`
                                             )}
                                         </Typography>
-                                    </div>
+                                    </Box>
 
                                     <IconButton
                                         color="error"
                                         onClick={() => handleImageRemove(url)}
                                         sx={{
                                             height: "100%",
-                                            marginLeft: "auto",
+                                            marginRight: 1,
                                         }}
                                     >
                                         <GridDeleteIcon />
