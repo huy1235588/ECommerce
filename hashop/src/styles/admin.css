@@ -361,7 +361,7 @@ img {
 
 .logo-sidebar {
     display: flex;
-    justify-content: start;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
     padding: 1.25rem 1rem 0.75rem;

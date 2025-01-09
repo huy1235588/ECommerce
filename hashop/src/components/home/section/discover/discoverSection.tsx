@@ -1,3 +1,5 @@
+'use client'
+
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, FreeMode } from "swiper/modules";
 import "swiper/swiper-bundle.css";
@@ -30,10 +32,12 @@ const discoverData2: GameItem[] = [
 ];
 
 function DiscoverSection() {
-    const [slidesPerView, setSlidesPerView] = useState<number>(window.innerWidth / 384);
+    const [slidesPerView, setSlidesPerView] = useState<number>(1);
 
     useEffect(() => {
         const handleResize = () => setSlidesPerView(window.innerWidth / 358);
+
+        handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);

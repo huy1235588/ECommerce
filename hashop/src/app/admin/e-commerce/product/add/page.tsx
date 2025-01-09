@@ -4,7 +4,7 @@ import { GenreData, PlatformData, Product } from "@/types/product";
 import { Button, Checkbox, FormControlLabel, Grid2, SelectChangeEvent } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import "@/styles/pages/admin/product.css"
 import InputForm from "@/components/ui/inputForm";
 import MultipleSelectForm from "@/components/ui/multipleSelectForm";
