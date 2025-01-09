@@ -9,8 +9,19 @@ import "@/styles/pages/admin/product.css"
 import InputForm from "@/components/ui/inputForm";
 import MultipleSelectForm from "@/components/ui/multipleSelectForm";
 import DateTimePickerForm from "@/components/ui/dateTimePickerForm";
+import axios from "@/config/axios";
+import axiosLib from "axios";
+import { Dayjs } from "dayjs";
+import validateProduct from "@/utils/validate";
+
+type ErrorForm = {
+    path: string | null;
+    msg: string;
+};
 
 function ECommerceAddProductPage() {
+    const [errors, setErrors] = useState<ErrorForm[]>([]);
+
     // Form data state
     const [formData, setFormData] = useState<Product>({
         title: '',
@@ -47,19 +58,28 @@ function ECommerceAddProductPage() {
     // Xử lý submit form
     const handleSubmit = async () => {
         try {
-            const response = await fetch('/api/add-product', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-            const result = await response.json();
-            console.log(result);
-            alert('Product added successfully!');
+            // Kiểm tra dữ liệu form
+            const formDataErrors = validateProduct(formData);
+            if (formDataErrors.length > 0) {
+                setErrors(formDataErrors);
+                return;
+            }
+
+            const response = await axios.post('/api/product/add', formData);
+
+            if (response.status === 200) {
+                const result = await response.data;
+
+                console.log(result);
+                alert('Product added successfully!');
+            }
+
         } catch (error) {
-            console.error('Error adding product:', error);
-            alert('Failed to add product.');
+            if (axiosLib.isAxiosError(error) && error.response) {
+                alert('Failed to add product.');
+
+                setErrors(error.response.data.errors);
+            }
         }
     };
 
@@ -87,8 +107,34 @@ function ECommerceAddProductPage() {
         });
     };
 
+    // Hàm xử lý thay đổi giá trị của DateTimePicker
+    const handleDateTimeChange = (name: string, value: Dayjs | null) => {
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    // Hàm xử lý lỗi
+    const handleSetError = (name: string, value: string) => {
+        const newErrors = errors.map((error) => {
+            if (error.path === name) {
+                return {
+                    ...error,
+                    path: null,
+                    msg: value
+                };
+            }
+
+            return error;
+        });
+
+        setErrors(newErrors);
+    };
+
     return (
         <div className="">
+            {/* Page Header */}
             <div className="page-header">
                 {/* Breadcrumb */}
                 <nav aria-label="breadcrumb" className="breadcrumb-nav">
@@ -123,6 +169,9 @@ function ECommerceAddProductPage() {
                         placeholder="Title"
                         value={formData.title}
                         onChange={handleChange}
+                        error={errors.some((error) => error.path === 'title')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'title')?.msg}
                     />
 
                     {/* Type */}
@@ -134,6 +183,9 @@ function ECommerceAddProductPage() {
                         placeholder="Type"
                         value={formData.type}
                         onChange={handleChange}
+                        error={errors.some((error) => error.path === 'type')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'type')?.msg}
                     />
 
                     {/* Description */}
@@ -146,6 +198,9 @@ function ECommerceAddProductPage() {
                         placeholder="Description"
                         value={formData.description}
                         onChange={handleChange}
+                        error={errors.some((error) => error.path === 'description')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'description')?.msg}
                     />
 
                     {/* Price and Discount */}
@@ -176,6 +231,9 @@ function ECommerceAddProductPage() {
                                     margin: "0"
                                 }}
                                 onChange={handleChange}
+                                error={errors.some((error) => error.path === 'price')}
+                                setError={handleSetError}
+                                errorText={errors.find((error) => error.path === 'price')?.msg}
                             />
                         </Grid2>
 
@@ -201,66 +259,78 @@ function ECommerceAddProductPage() {
                                     min: 0,
                                     max: 100
                                 }}
+                                error={errors.some((error) => error.path === 'discount')}
+                                setError={handleSetError}
+                                errorText={errors.find((error) => error.path === 'discount')?.msg}
                             />
                         </Grid2>
                     </Grid2>
 
                     {/* Discount Date */}
-                    <Grid2
-                        container
-                        spacing={2}
-                        width={"100%"}
-                        margin={{
-                            xs: "16px 0 8px",
-                            sm: "16px 0 8px"
-                        }}
-                    >
-                        {/* Discount Start Date */}
+                    {/* Nếu Discount lớn hơn 0 thì hiển thị ngày giảm giá */}
+                    {formData.discount && formData.discount > 0 ? (
                         <Grid2
-                            size={{
-                                xs: 6,
-                                sm: 6
+                            container
+                            spacing={2}
+                            width={"100%"}
+                            margin={{
+                                xs: "16px 0 8px",
+                                sm: "16px 0 8px"
                             }}
                         >
-                            <DateTimePickerForm
-                                label="Discount Start Date"
-                                value={formData.discountStartDate}
-                                onChange={(newValue) =>
-                                    setFormData({ ...formData, discountStartDate: newValue })
-                                }
-                                sx={{
-                                    margin: "0",
+                            {/* Discount Start Date */}
+                            <Grid2
+                                size={{
+                                    xs: 6,
+                                    sm: 6
                                 }}
-                            />
-                        </Grid2>
+                            >
+                                <DateTimePickerForm
+                                    label="Discount Start Date"
+                                    name="discountStartDate"
+                                    value={formData.discountStartDate}
+                                    onChange={handleDateTimeChange}
+                                    sx={{
+                                        margin: "0",
+                                    }}
+                                    error={errors.some((error) => error.path === 'discountStartDate')}
+                                    setError={handleSetError}
+                                    errorText={errors.find((error) => error.path === 'discountStartDate')?.msg}
+                                />
+                            </Grid2>
 
-                        {/* Discount End Date */}
-                        <Grid2
-                            size={{
-                                xs: 6,
-                                sm: 6
-                            }}
-                        >
-                            <DateTimePickerForm
-                                label="Discount End Date"
-                                value={formData.discountEndDate}
-                                onChange={(newValue) =>
-                                    setFormData({ ...formData, discountEndDate: newValue })
-                                }
-                                sx={{
-                                    margin: "0",
+                            {/* Discount End Date */}
+                            <Grid2
+                                size={{
+                                    xs: 6,
+                                    sm: 6
                                 }}
-                            />
+                            >
+                                <DateTimePickerForm
+                                    name="discountEndDate"
+                                    label="Discount End Date"
+                                    value={formData.discountEndDate}
+                                    onChange={handleDateTimeChange}
+                                    sx={{
+                                        margin: "0",
+                                    }}
+                                    error={errors.some((error) => error.path === 'discountEndDate')}
+                                    setError={handleSetError}
+                                    errorText={errors.find((error) => error.path === 'discountEndDate')?.msg}
+                                />
+                            </Grid2>
                         </Grid2>
-                    </Grid2>
+                    ) : null}
 
                     {/* Release Date */}
                     <DateTimePickerForm
+                        name="releaseDate"
                         label="Release Date"
                         value={formData.releaseDate}
-                        onChange={(newValue) =>
-                            setFormData({ ...formData, releaseDate: newValue })
-                        }
+                        onChange={handleDateTimeChange}
+                        error={errors.some((error) => error.path === 'releaseDate')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'releaseDate')?.msg}
                     />
 
                     <Grid2
@@ -290,6 +360,9 @@ function ECommerceAddProductPage() {
                                 sx={{
                                     margin: "0",
                                 }}
+                                error={errors.some((error) => error.path === 'developer')}
+                                setError={handleSetError}
+                                errorText={errors.find((error) => error.path === 'developer')?.msg}
                             />
                         </Grid2>
 
@@ -311,6 +384,9 @@ function ECommerceAddProductPage() {
                                 sx={{
                                     margin: "0",
                                 }}
+                                error={errors.some((error) => error.path === 'publisher')}
+                                setError={handleSetError}
+                                errorText={errors.find((error) => error.path === 'publisher')?.msg}
                             />
                         </Grid2>
                     </Grid2>
@@ -325,6 +401,9 @@ function ECommerceAddProductPage() {
                         menuItems={PlatformData} // Các mục menu để chọn
                         onChange={handleSelectChange} // Hàm xử lý thay đổi giá trị
                         onDelete={handleDeleteValueSelect} // Hàm xử lý xóa giá trị
+                        error={errors.some((error) => error.path === 'platform')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'platform')?.msg}
                     />
 
                     {/* Genres */}
@@ -337,6 +416,9 @@ function ECommerceAddProductPage() {
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
+                        error={errors.some((error) => error.path === 'genres')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'genres')?.msg}
                     />
 
                     {/* Tags */}
@@ -349,6 +431,9 @@ function ECommerceAddProductPage() {
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
+                        error={errors.some((error) => error.path === 'tags')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'tags')?.msg}
                     />
 
                     {/* Features */}
@@ -361,6 +446,9 @@ function ECommerceAddProductPage() {
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
+                        error={errors.some((error) => error.path === 'features')}
+                        setError={handleSetError}
+                        errorText={errors.find((error) => error.path === 'features')?.msg}
                     />
 
                     {/* Active */}

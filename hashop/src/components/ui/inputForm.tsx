@@ -12,6 +12,9 @@ interface InputFormProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     sx?: SxProps;
     htmlInput?: InputHTMLAttributes<HTMLInputElement>;
+    error?: boolean;
+    setError: (name:string, value: string) => void;
+    errorText?: string;
 }
 
 const InputForm: React.FC<InputFormProps> = (
@@ -26,6 +29,9 @@ const InputForm: React.FC<InputFormProps> = (
         onChange,
         sx,
         htmlInput,
+        error,
+        setError,
+        errorText,
     }
 ) => {
 
@@ -68,10 +74,22 @@ const InputForm: React.FC<InputFormProps> = (
                 type={type}
                 placeholder={placeholder}
                 value={value}
-                onChange={onChange}
+                onChange={(e) => {
+                    onChange(e);
+                    setError(name, "");
+                }}
                 fullWidth
+                error={error}
+                helperText={errorText}
                 slotProps={{
-                    htmlInput: htmlInput
+                    htmlInput: htmlInput,
+                    formHelperText: {
+                        sx: {
+                            position: "absolute",
+                            bottom: "-1.5rem",
+                            marginLeft: "0.125rem",
+                        }
+                    }
                 }}
             />
         </Box>

@@ -56,15 +56,43 @@ const productValidation = [
         .not().isEmpty().withMessage('Discount is required')
         .isInt({ min: 0 }).withMessage('Discount must be a positive number'),
 
-    // Kiểm tra xem ngày bắt đầu giảm giá có hợp lệ không
+    // Nếu discount lớn hơn 0 thì mới kiểm tra ngày bắt đầu và kết thúc giảm giá
     body('discountStartDate')
-        .not().isEmpty().withMessage('Discount start date is required')
-        .isISO8601().withMessage('Invalid date format'),
+        .custom((value, { req }) => {
+            if (req.body.discount > 0 && !value) {
+                throw new Error('Discount start date is required');
+            }
 
-    // Kiểm tra xem ngày kết thúc giảm giá có hợp lệ không
+            // Kiểm tra định dạng ngày 
+            else if (!new Date(value).toISOString()) {
+                throw new Error('Invalid date format');
+            }
+
+            // Kiểm tra ngày bắt đầu giảm giá phải lớn hơn ngày hiện tại
+            else if (value < new Date().toISOString()) {
+                throw new Error('Discount start date must be greater than current date');
+            }
+            
+            return true;
+        }),
     body('discountEndDate')
-        .not().isEmpty().withMessage('Discount end date is required')
-        .isISO8601().withMessage('Invalid date format'),
+        .custom((value, { req }) => {
+            if (req.body.discount > 0 && !value) {
+                throw new Error('Discount end date is required');
+            }
+
+            // Kiểm tra định dạng ngày
+            else if (!new Date(value).toISOString()) {
+                throw new Error('Invalid date format');
+            }
+
+            // Kiểm tra ngày kết thúc giảm giá phải lớn hơn ngày bắt đầu giảm giá
+            else if (value < req.body.discountStartDate) {
+                throw new Error('Discount end date must be greater than discount start date');
+            }
+
+            return true;
+        }),
 
     // Kiểm tra xem ngày phát hành có hợp lệ không
     body('releaseDate')
@@ -73,7 +101,15 @@ const productValidation = [
 
     body('developer').not().isEmpty().withMessage('Developer is required'),
     body('publisher').not().isEmpty().withMessage('Publisher is required'),
-    body('platform').not().isEmpty().withMessage('Platform is required'),
+
+    // Kiểm tra platform có ít nhất 1 phần tử không
+    body('platform').isArray().withMessage('Platform must be an array')
+        .custom(value => {
+            if (value.length < 1) {
+                throw new Error('Platform must have at least 1 item');
+            }
+            return true;
+        }),
 
     // Kiểm tra xem trạng thái sản phẩm có phải là boolean không
     body('isActive')
@@ -97,17 +133,35 @@ const productValidation = [
     // Kiểm tra array định dạng của video [mp4, avi, mkv, mov, webm]
     validateFiles('videos', ALLOWED_VIDEO_EXTENSIONS),
 
-    // Kiểm tra xem genres có phải là mảng không
+    // Kiểm tra xem genres có ít nhất 1 phần tử không
     body('genres')
-        .isArray().withMessage('Genres must be an array'),
+        .isArray().withMessage('Genres must be an array')
+        .custom(value => {
+            if (value.length < 1) {
+                throw new Error('Genres must have at least 1 item');
+            }
+            return true;
+        }),
 
-    // Kiểm tra xem tags có phải là mảng không
+    // Kiểm tra xem tags có ít nhất 3 phần tử không
     body('tags')
-        .isArray().withMessage('Tags must be an array'),
+        .isArray().withMessage('Tags must be an array')
+        .custom(value => {
+            if (value.length < 3) {
+                throw new Error('Tags must have at least 5 items');
+            }
+            return true;
+        }),
 
-    // Kiểm tra xem features có phải là mảng không
+    // Kiểm tra xem features có ít nhất 1 phần tử không
     body('features')
-        .isArray().withMessage('Features must be an array'),
+        .isArray().withMessage('Features must be an array')
+        .custom(value => {
+            if (value.length < 1) {
+                throw new Error('Features must have at least 1 item');
+            }
+            return true;
+        }),
 
     // Thêm custom validation để xử lý lỗi trả về
     (req, res, next) => {

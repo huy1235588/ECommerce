@@ -1,19 +1,27 @@
-import { Box, InputLabel, SxProps } from "@mui/material";
+import { Box, InputLabel, SxProps, FormHelperText } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 
 interface DateTimePickerFormProps {
     label: string;
+    name: string;
     value: Dayjs | null;
-    onChange: (date: Dayjs | null) => void;
+    onChange: (name: string, date: Dayjs | null) => void;
     sx?: SxProps;
+    error?: boolean;
+    setError: (name: string, value: string) => void;
+    errorText?: string;
 }
 
 const DateTimePickerForm: React.FC<DateTimePickerFormProps> = ({
     label,
+    name,
     value,
     onChange,
     sx,
+    error,
+    setError,
+    errorText,
 }) => {
     return (
         <Box
@@ -29,13 +37,29 @@ const DateTimePickerForm: React.FC<DateTimePickerFormProps> = ({
 
             <DateTimePicker
                 value={value}
-                onChange={onChange}
+                name={name}
+                onChange={(value) => {
+                    onChange(name, value);
+                    setError(name, "");
+                }}
                 slotProps={{
                     textField: {
-                        fullWidth: true
+                        fullWidth: true,
+                        error: error,
                     }
                 }}
             />
+
+            {error && errorText && (
+                <FormHelperText
+                    error
+                    style={{
+                        position: "absolute",
+                    }}
+                >
+                    {errorText}
+                </FormHelperText>
+            )}
         </Box>
     );
 }

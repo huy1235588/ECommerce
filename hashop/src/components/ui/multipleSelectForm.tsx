@@ -1,4 +1,4 @@
-import { Box, Checkbox, Chip, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, SelectChangeEvent } from "@mui/material";
+import { Box, Checkbox, Chip, FormHelperText, InputLabel, ListItemText, MenuItem, OutlinedInput, Select, SelectChangeEvent } from "@mui/material";
 import { IoClose } from "react-icons/io5";
 
 interface MultipleSelectFormProps {
@@ -11,6 +11,9 @@ interface MultipleSelectFormProps {
     menuItems: string[];
     onChange: (e: SelectChangeEvent<string[]>) => void;
     onDelete: (value: string) => void;
+    error?: boolean;
+    setError: (name: string, value: string) => void;
+    errorText?: string;
 }
 
 // The following code is a reusable component that creates a multiple select form.
@@ -36,6 +39,9 @@ const MultipleSelectForm: React.FC<MultipleSelectFormProps> = (
         menuItems,
         onChange,
         onDelete,
+        error,
+        setError,
+        errorText,
     }
 ) => {
     return (
@@ -73,7 +79,10 @@ const MultipleSelectForm: React.FC<MultipleSelectFormProps> = (
                 multiple
                 displayEmpty
                 value={value}
-                onChange={onChange}
+                onChange={(e) => {
+                    onChange(e);
+                    setError(name, "");
+                }}
                 input={<OutlinedInput />}
                 renderValue={(selected) => (
                     selected.length === 0 ? (
@@ -98,6 +107,7 @@ const MultipleSelectForm: React.FC<MultipleSelectFormProps> = (
                     width: "100%",
                     maxHeight: "200px",
                 }}
+                error={error}
             >
                 {menuItems.map((name) => (
                     <MenuItem key={name} value={name}>
@@ -108,6 +118,17 @@ const MultipleSelectForm: React.FC<MultipleSelectFormProps> = (
                     </MenuItem>
                 ))}
             </Select>
+
+            {error && errorText && (
+                <FormHelperText
+                    error
+                    style={{
+                        position: "absolute",
+                    }}
+                >
+                    {errorText}
+                </FormHelperText>
+            )}
         </Box>
     );
 };
