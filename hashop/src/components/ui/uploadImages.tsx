@@ -9,6 +9,7 @@ interface ImageUploaderProps {
     name: string;
     label: string;
     labelOptional?: string;
+    onChange?: (name: string, value: File | null) => void;
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = (
@@ -17,6 +18,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
         name,
         label,
         labelOptional = "",
+        onChange,
     }
 ) => {
     const [image, setImage] = useState<File | null>(null);
@@ -27,12 +29,14 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
         if (file) {
             setImage(file);
             setPreview(URL.createObjectURL(file));
+            onChange?.(name, file);
         }
     };
 
     const handleImageRemove = () => {
         setImage(null);
         setPreview(null);
+        onChange?.(name, null);
     };
 
     return (

@@ -4,28 +4,32 @@ import { GridDeleteIcon } from '@mui/x-data-grid';
 import { FiUpload } from "react-icons/fi";
 import "@/styles/components/uploadImage.css";
 
-interface ImageUploaderProps {
+interface FileUploaderProps {
     id: string;
     name: string;
     label: string;
     labelOptional?: string;
+    acceptFile: string;
+    type: 'img' | 'video' | 'iframe';
 }
 
-const ImageUploader: React.FC<ImageUploaderProps> = (
+const FileUploader: React.FC<FileUploaderProps> = (
     {
         id,
         name,
         label,
         labelOptional = "",
+        acceptFile,
+        type,
     }
 ) => {
-    const [images, setImages] = useState<File[]>([]);
+    const [files, setFiles] = useState<File[]>([]);
     const [preview, setPreview] = useState<string[]>([]);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
             const fileArray = Array.from(e.target.files);
-            setImages(prev => [...prev, ...fileArray]);
+            setFiles(prev => [...prev, ...fileArray]);
             const urlArray = fileArray.map(file => URL.createObjectURL(file));
             setPreview(prev => [
                 ...prev,
@@ -35,7 +39,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
     };
 
     const handleImageRemove = (url: string) => {
-        setImages(prev => {
+        setFiles(prev => {
             return prev.filter(file => URL.createObjectURL(file) !== url);
         });
         setPreview((prev) => {
@@ -90,7 +94,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
                 <input
                     id={id}
                     name={name}
-                    accept="image/*"
+                    accept={acceptFile}
                     multiple
                     style={{ display: 'none' }}
                     type="file"
@@ -141,10 +145,9 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
                                     }}
                                 >
                                     <CardMedia
-                                        component="img"
+                                        component={type}
                                         sx={{
                                             width: 300,
-                                            // height: 150,
                                             objectFit: 'cover',
                                         }}
                                         image={url}
@@ -168,7 +171,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
                                                 fontSize: "1.5rem",
                                             }}
                                         >
-                                            {images[index].name}
+                                            {files[index].name}
                                         </Typography>
 
                                         {/* Kích cỡ file */}
@@ -182,12 +185,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
                                             }}
                                         >
                                             {/* Chuyển đổi sang KB, MB, GB tuỳ vào độ lớn */}
-                                            {images[index].size > 1024 * 1024 ? (
-                                                `${(images[index].size / (1024 * 1024)).toFixed(2)} MB`
-                                            ) : images[index].size > 1024 ? (
-                                                `${(images[index].size / 1024).toFixed(2)} KB`
+                                            {files[index].size > 1024 * 1024 ? (
+                                                `${(files[index].size / (1024 * 1024)).toFixed(2)} MB`
+                                            ) : files[index].size > 1024 ? (
+                                                `${(files[index].size / 1024).toFixed(2)} KB`
                                             ) : (
-                                                `${images[index].size} B`
+                                                `${files[index].size} B`
                                             )}
                                         </Typography>
                                     </Box>
@@ -214,4 +217,4 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
     );
 };
 
-export default ImageUploader;
+export default FileUploader;

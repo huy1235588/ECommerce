@@ -4,7 +4,7 @@ import { GenreData, PlatformData, Product } from "@/types/product";
 import { Button, Checkbox, FormControlLabel, Grid2, SelectChangeEvent } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "@/styles/pages/admin/product.css"
 import InputForm from "@/components/ui/inputForm";
 import MultipleSelectForm from "@/components/ui/multipleSelectForm";
@@ -14,7 +14,8 @@ import axiosLib from "axios";
 import { Dayjs } from "dayjs";
 import validateProduct from "@/utils/validate";
 import UploadImages from "@/components/ui/uploadImages";
-import UploadMultipleImage from "@/components/ui/uploadMultipleImage";
+import FileUploader from "@/components/ui/fileUploader";
+import DynamicInput from "@/components/ui/dynamicInput";
 
 type ErrorForm = {
     path: string | null;
@@ -39,10 +40,12 @@ function ECommerceAddProductPage() {
         platform: [],
         rating: 0,
         isActive: false,
-        headerImage: '',
         genres: [],
         tags: [],
         features: [],
+        headerImage: '',
+        images: [],
+        videos: []
     });
 
     // Xử lý thay đổi dữ liệu form
@@ -117,6 +120,14 @@ function ECommerceAddProductPage() {
         });
     };
 
+    // Hàm xử lý thay đổi giá trị của DynamicInput
+    const handleChangeDynamicInput = (name: string, values: string[]) => {
+        setFormData({
+            ...formData,
+            [name]: values
+        });
+    };
+
     // Hàm xử lý lỗi
     const handleSetError = (name: string, value: string) => {
         const newErrors = errors.map((error) => {
@@ -133,6 +144,8 @@ function ECommerceAddProductPage() {
 
         setErrors(newErrors);
     };
+
+ 
 
     return (
         <div className="">
@@ -458,20 +471,25 @@ function ECommerceAddProductPage() {
                         id="header-image"
                         name="headerImage"
                         label="Header Image"
-                    // value={formData.headerImage}
-                    // onChange={(value) => setFormData({ ...formData, headerImage: value })}
-                    // error={errors.some((error) => error.path === 'headerImage')}
-                    // setError={handleSetError}
-                    // errorText={errors.find((error) => error.path === 'headerImage')?.msg}                    
+                        onChange={(url) => setFormData({ ...formData, headerImage: url })}
                     />
 
                     {/* Images */}
-                    <UploadMultipleImage
+                    <FileUploader
                         id="images"
                         name="images"
                         label="Images"
+                        acceptFile="image/*"
+                        type="img"
                     />
 
+                    {/* Videos */}
+                    <DynamicInput
+                        name="videos"
+                        label="Videos"
+                        placeholder="Video URL"
+                        onChange={handleChangeDynamicInput}
+                    />
 
                     {/* Active */}
                     <FormControlLabel
