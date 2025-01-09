@@ -13,6 +13,8 @@ import axios from "@/config/axios";
 import axiosLib from "axios";
 import { Dayjs } from "dayjs";
 import validateProduct from "@/utils/validate";
+import UploadImages from "@/components/ui/uploadImages";
+import UploadMultipleImage from "@/components/ui/uploadMultipleImage";
 
 type ErrorForm = {
     path: string | null;
@@ -451,6 +453,26 @@ function ECommerceAddProductPage() {
                         errorText={errors.find((error) => error.path === 'features')?.msg}
                     />
 
+                    {/* Header Image */}
+                    <UploadImages
+                        id="header-image"
+                        name="headerImage"
+                        label="Header Image"
+                    // value={formData.headerImage}
+                    // onChange={(value) => setFormData({ ...formData, headerImage: value })}
+                    // error={errors.some((error) => error.path === 'headerImage')}
+                    // setError={handleSetError}
+                    // errorText={errors.find((error) => error.path === 'headerImage')?.msg}                    
+                    />
+
+                    {/* Images */}
+                    <UploadMultipleImage
+                        id="images"
+                        name="images"
+                        label="Images"
+                    />
+
+
                     {/* Active */}
                     <FormControlLabel
                         control={
@@ -466,9 +488,6 @@ function ECommerceAddProductPage() {
                             marginLeft: 0.125
                         }}
                     />
-
-                    {/* Header Image */}
-
 
                     {/* Submit */}
                     <Button
