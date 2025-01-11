@@ -286,10 +286,67 @@ function ECommerceAddProductPage() {
             // Tách chuỗi thành mảng
             const listAppId = inputValue.split(",");
 
+            const titleList = [];
+
             // Duyệt qua từng phần tử trong mảng
             for (let i = 0; i < listAppId.length; i++) {
                 // Gọi hàm scan data
                 await handleScanData(listAppId[i]);
+
+                // Nếu title null thì bỏ qua
+                if (!formData.title) {
+                    setErrorButtonDialog(`App ID ${listAppId[i]} not found!`);
+                    continue;
+                }
+
+                // Tạo filter
+                const filter = {
+                    title: formData.title
+                };
+
+                // Kiểm tra tile có tồn tại
+                const response = await axios.post('/graphql', {
+                    query: `query FilterProducts (
+                        $title: String!
+                    ) {
+                        filterProducts(title: $title) {
+                            _id
+                            title
+                        }
+                    }`,
+                    variables: filter
+                });
+
+                if (response.status === 200) {
+                    // Lấy dữ liệu từ response
+                    const result = await response.data.data.filterProducts;
+
+                    // Nếu title không tồn tại thì nhấn submit form
+                    if (result.length === 0) {
+                        setTimeout(() => {
+                            handleSubmit();
+                        }, 0);
+                    }
+
+                    // Nếu title tồn tại thì hiển thị thông báo
+
+                    // TODO: Ý tưởng cho phần else:
+                    // 1. Thêm title vào mảng titleList để hiển thị các title đã tồn tại
+                    // 2. Reset form data để chuẩn bị cho lần scan tiếp theo
+                    // 3. Hiển thị thông báo noti hoặc dialog với danh sách title đã tồn tại
+                    // 4. Có thể thêm option để skip hoặc override các title đã tồn tại
+
+                    // else {
+                    //     const title = result[0].title;
+                    //     titleList.push(`${listAppId[i]}: ${title} already exists!`);
+                    // }
+                }
+
+                // // Khi xong một vòng lặp thì reset form data, errors và success
+                // setFormData(initialFormData);
+                // setErrors([]);
+                // setErrorButtonDialog("");
+                // setSuccessButtonDialog("");
             }
 
         } catch (error) {
@@ -358,7 +415,7 @@ function ECommerceAddProductPage() {
                             setSuccess={setSuccessButtonDialog}
                             error={errorButtonDialog}
                             setError={setErrorButtonDialog}
-                        />
+                        />                        
                     </Box>
                 </div>
             </div>
