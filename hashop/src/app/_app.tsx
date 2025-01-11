@@ -3,7 +3,7 @@
 import { Provider } from 'react-redux';
 import store from '@/store/store';
 import GlobalProvider from '@/context/GlobalProvider';
-import Notification from '@/components/common/notification ';
+import Notification from '@/components/common/notification';
 import { useNotification } from '@/context/NotificationContext';
 import CheckAuth from '@/components/auth/checkAuth';
 import '@/libs/i18n';

@@ -102,6 +102,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                         variant="outlined"
                         value={inputValue}
                         onChange={handleChange}
+                        error={error !== ""}
                     />
                 </DialogContent>
 
