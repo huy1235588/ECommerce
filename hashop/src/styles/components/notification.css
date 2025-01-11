@@ -16,6 +16,7 @@
     transition: all 0.3s ease;
     z-index: 9999;
     animation: slideIn 0.5s ease forwards; /* Hiệu ứng khi vào */
+    margin-top: 1rem;
 }
 
 .notification:active {

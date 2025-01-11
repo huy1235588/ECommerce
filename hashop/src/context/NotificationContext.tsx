@@ -7,6 +7,7 @@ interface Notification {
     type: "success" | "error" | "info" | "warning";
     message: string;
     duration?: number;
+    maxNotifications?: number;
 }
 
 // Định nghĩa kiểu trạng thái và hành động
@@ -22,9 +23,26 @@ type NotificationAction =
 const notificationReducer = (state: NotificationState, action: NotificationAction): NotificationState => {
     switch (action.type) {
         case "ADD_NOTIFICATION":
-            return { ...state, notifications: [...state.notifications, action.payload] };
+            const newNotifications = [
+                ...state.notifications,
+                action.payload
+            ];
+
+            // Nếu số lượng thông báo vượt quá giới hạn, xóa thông báo cũ nhất
+            const maxNotifications = action.payload.maxNotifications ?? 5;
+            if (newNotifications.length > maxNotifications) {
+                newNotifications.shift();
+            }
+
+            return {
+                ...state,
+                notifications: newNotifications
+            };
         case "REMOVE_NOTIFICATION":
-            return { ...state, notifications: state.notifications.filter((n) => n.id !== action.payload) };
+            return {
+                ...state,
+                notifications: state.notifications.filter((n) => n.id !== action.payload)
+            };
         default:
             return state;
     }

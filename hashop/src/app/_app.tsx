@@ -22,21 +22,23 @@ export default function MyApp({
                     {children}
                 </CheckAuth>
 
-                {notificationState.notifications.map((notification) => (
-                    <Notification
-                        key={notification.id}
-                        message={notification.message}
-                        type={notification.type}
-                        duration={notification.duration}
-                        onClose={() => [
-                            notificationDispatch({
-                                type: 'REMOVE_NOTIFICATION',
-                                payload: notification.id
-                            })
-                        ]} // Đóng thông báo
-                    />
-                ))}
-
+                <div className="notification-container">
+                    {notificationState.notifications.map((notification, index) => (
+                        <Notification
+                            key={notification.id}
+                            message={notification.message}
+                            type={notification.type}
+                            duration={notification.duration}
+                            onClose={() => [
+                                notificationDispatch({
+                                    type: 'REMOVE_NOTIFICATION',
+                                    payload: notification.id
+                                })
+                            ]}
+                            style={{ top: `${index * 80}px` }} // Đảm bảo các thông báo không đè lên nhau
+                        />
+                    ))}
+                </div>
             </GlobalProvider>
         </Provider>
     );

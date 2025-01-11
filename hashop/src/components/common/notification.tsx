@@ -8,7 +8,9 @@ interface NotificationProps {
     message: string; // Nội dung thông báo
     type?: "success" | "error" | "info" | "warning"; // Loại thông báo
     duration?: number; // Thời gian tự động đóng (ms)
+    maxNotifications?: number; // Số lượng thông báo tối đa
     onClose?: () => void; // Hàm gọi khi thông báo đóng
+    style?: React.CSSProperties; // CSS cho thông báo
 }
 
 const Notification: React.FC<NotificationProps> = ({
@@ -16,6 +18,7 @@ const Notification: React.FC<NotificationProps> = ({
     type = "info",
     duration,
     onClose,
+    style = {},
 }) => {
     useEffect(() => {
         if (duration) {
@@ -30,7 +33,10 @@ const Notification: React.FC<NotificationProps> = ({
     }, [duration, onClose]);
 
     return (
-        <div className={`notification ${type}`}>
+        <div 
+            className={`notification ${type}`}
+            style={{ ...style }}
+        >
             <span>{message}</span>
             {onClose && (
                 <button onClick={onClose}>
