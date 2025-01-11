@@ -1,5 +1,5 @@
 const express = require('express');
-const { addProduct, getProducts, uploadProductHeaderImage } = require('../controllers/productController');
+const { addProduct, getProducts, uploadProductHeaderImage, getCountByColumn } = require('../controllers/productController');
 const { productValidation } = require('../utils/validator');
 const multer = require('multer');
 const path = require('path');
@@ -30,7 +30,7 @@ const upload = multer({
             // Tạo thư mục lưu trữ ảnh sản phẩm
             const folderPath = `uploads/${product._id}/`;
             // Nếu thư mục không tồn tại thì tạo mới
-            if(!fs.existsSync(folderPath)) {
+            if (!fs.existsSync(folderPath)) {
                 fs.mkdirSync(folderPath, { recursive: true });
             }
 
@@ -43,16 +43,22 @@ const upload = multer({
     })
 });
 
+// Router thêm sản phẩm vào Database
 router.post('/add',
     productValidation,
     addProduct
 );
 
+// Router upload ảnh sản phẩm
 router.post('/uploadImage',
     upload.single('headerImage'),
     uploadProductHeaderImage
 );
 
+// Router lấy tất cả sản phẩm
 router.get('/all', getProducts);
+
+// Router kiểm tra sản phẩm đã tồn tại chưa
+router.get('/item/count', getCountByColumn);
 
 module.exports = router;

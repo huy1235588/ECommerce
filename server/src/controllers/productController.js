@@ -59,8 +59,26 @@ const getProducts = async (req, res) => {
     }
 }
 
+// Đếm số lượng sản phẩm theo cột
+const getCountByColumn = async (req, res) => {
+    try {
+        const { column, value } = req.query;
+
+        if (!column || !value) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const count = await Product.countDocuments({ [column]: value });
+
+        res.json(count);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     addProduct,
     getProducts,
     uploadProductHeaderImage,
+    getCountByColumn,
 };
