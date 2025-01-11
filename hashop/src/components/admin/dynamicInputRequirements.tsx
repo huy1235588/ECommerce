@@ -125,7 +125,9 @@ const DynamicInputRequirements: React.FC<DynamicInputRequirementsProps> = ({
             }}
         >
             {Object.entries(inputValues).map(([key, valuesItem]) => (
-                <>
+                <Box
+                    key={key}
+                >
                     <Typography
                         variant="h4"
                         gutterBottom
@@ -224,7 +226,7 @@ const DynamicInputRequirements: React.FC<DynamicInputRequirementsProps> = ({
                             ))}
                         </Box>
                     </Box>
-                </>
+                </Box>
             ))}
 
             <Button

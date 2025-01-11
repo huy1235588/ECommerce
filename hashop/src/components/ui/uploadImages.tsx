@@ -47,26 +47,32 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
 
     // Xử lý khi value thay đổi
     useEffect(() => {
+        // Xoá hình ảnh hiện tại nếu value là chuỗi
+        if (image !== null && typeof value === "string") {
+            setImage(null);
+            setPreview(null);
+        }
+
+        // Nếu value không rỗng và không phải là URL
         if (value !== "" && value !== null && image === null) {
             // Tạo tên file từ title
             const fileName = title.replace(/ /g, "_") + ".png";
 
             // Tạo hình ảnh từ URL
-            const fetchedImage = () => {
-                fetch(value as string)
-                    .then((res) => res.blob())
-                    .then((blob) => {
-                        const file = new File([blob], fileName, { type: "image/png" });
-                        setImage(file);
-                        setPreview(URL.createObjectURL(file));
-                        onChange?.(file);
-                    })
-                    .catch((err) => console.error(err))
-            };
+            const fetchedImage = async () => {
+                const response = await fetch(value as string);
+                const blob = await response.blob();
+                const file = new File([blob], fileName, { type: "image/png" });
 
+                setImage(file);
+                setPreview(URL.createObjectURL(file));
+                onChange?.(file);
+            };
+            
+            // Gọi hàm fetchedImage
             fetchedImage();
         }
-    }, [value, image]);
+    }, [value, title, image, onChange]);
 
     return (
         <Box

@@ -28,6 +28,7 @@ function NotFound() {
                     alt="logo"
                     width={100}
                     height={45}
+                    priority
                 />
             </Link>
             <article className={styles.article}>

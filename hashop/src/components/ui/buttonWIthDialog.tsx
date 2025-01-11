@@ -1,6 +1,7 @@
 // components/ButtonWithDialog.tsx
 import React, { useState } from "react";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField } from "@mui/material";
+import { IoClose } from "react-icons/io5";
 
 interface ButtonWithDialogProps {
     buttonText: string;
@@ -10,6 +11,7 @@ interface ButtonWithDialogProps {
     success: string;
     setSuccess: (success: string) => void;
     error: string;
+    setError: (error: string) => void;
 }
 
 const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
@@ -20,6 +22,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
     success,
     setSuccess,
     error,
+    setError,
 }) => {
     const [open, setOpen] = useState(false);
     const [inputValue, setInputValue] = useState("");
@@ -39,11 +42,13 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
         setSuccess("");
+        setError("");
     };
 
     // Hàm xử lý khi nhấn nút submit
     const handleSubmit = () => {
         onSubmit(inputValue);
+        setError("");
     };
 
     return (
@@ -61,6 +66,21 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                     }
                 }}
             >
+                <IconButton
+                    onClick={handleClose}
+                    sx={{
+                        position: "absolute",
+                        top: "0rem",
+                        right: "0rem",
+                        borderRadius: "0%",
+                        ":hover": {
+                            backgroundColor: "var(--close-bg)",
+                        }
+                    }}
+                >
+                    <IoClose />
+                </IconButton>
+
                 <DialogTitle>
                     {title}
                 </DialogTitle>

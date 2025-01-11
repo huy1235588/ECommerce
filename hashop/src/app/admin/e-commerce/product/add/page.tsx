@@ -26,6 +26,45 @@ type ErrorForm = {
     msg: string;
 };
 
+// Khởi tạo formData ban đầu
+const initialFormData: Product = {
+    title: '',
+    type: '',
+    description: '',
+    price: 0,
+    discount: 0,
+    discountStartDate: null,
+    discountEndDate: null,
+    releaseDate: null,
+    developer: [],
+    publisher: [],
+    platform: [],
+    rating: 0,
+    isActive: false,
+    genres: [],
+    tags: [],
+    features: [],
+    headerImage: null,
+    screenshots: [],
+    videos: [{
+        thumbnail: '',
+        mp4: '',
+        webm: ''
+    }],
+    systemRequirements: {
+        win: [
+            { title: "OS", minimum: "", recommended: "" },
+            { title: "Processor", minimum: "", recommended: "" },
+            { title: "Memory", minimum: "", recommended: "" },
+            { title: "Graphics", minimum: "", recommended: "" },
+            { title: "DirectX", minimum: "", recommended: "" },
+            { title: "Storage", minimum: "", recommended: "" },
+            { title: "Sound Card", minimum: "", recommended: "" },
+            { title: "Additional Notes", minimum: "", recommended: "" },
+        ],
+    },
+};
+
 function ECommerceAddProductPage() {
     const [errors, setErrors] = useState<ErrorForm[]>([]);
     const { setLoading } = useLoading();
@@ -33,43 +72,7 @@ function ECommerceAddProductPage() {
     const [successButtonDialog, setSuccessButtonDialog] = useState<string>("");
 
     // Form data state
-    const [formData, setFormData] = useState<Product>({
-        title: '',
-        type: '',
-        description: '',
-        price: 0,
-        discount: 0,
-        discountStartDate: null,
-        discountEndDate: null,
-        releaseDate: null,
-        developer: [],
-        publisher: [],
-        platform: [],
-        rating: 0,
-        isActive: false,
-        genres: [],
-        tags: [],
-        features: [],
-        headerImage: null,
-        screenshots: [],
-        videos: [{
-            thumbnail: '',
-            mp4: '',
-            webm: ''
-        }],
-        systemRequirements: {
-            win: [
-                { title: "OS", minimum: "", recommended: "" },
-                { title: "Processor", minimum: "", recommended: "" },
-                { title: "Memory", minimum: "", recommended: "" },
-                { title: "Graphics", minimum: "", recommended: "" },
-                { title: "DirectX", minimum: "", recommended: "" },
-                { title: "Storage", minimum: "", recommended: "" },
-                { title: "Sound Card", minimum: "", recommended: "" },
-                { title: "Additional Notes", minimum: "", recommended: "" },
-            ],
-        }
-    });
+    const [formData, setFormData] = useState<Product>(initialFormData);
 
     // Xử lý thay đổi dữ liệu form
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -199,6 +202,9 @@ function ECommerceAddProductPage() {
 
             // Kiểm tra response
             if (response.status === 200) {
+                //Xoá dữ liệu cũ
+                setFormData(initialFormData);
+                
                 // Lấy dữ liệu từ response
                 const result = response.data;
 
@@ -269,6 +275,7 @@ function ECommerceAddProductPage() {
                         success={successButtonDialog}
                         setSuccess={setSuccessButtonDialog}
                         error={errorButtonDialog}
+                        setError={setErrorButtonDialog}
                     />
                 </div>
             </div>
