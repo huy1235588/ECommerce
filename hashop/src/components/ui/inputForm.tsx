@@ -8,12 +8,12 @@ interface InputFormProps {
     labelOptional?: string;
     type: string;
     placeholder: string;
-    value?: string | number;
+    value?: string | string[] | number;
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     sx?: SxProps;
     htmlInput?: InputHTMLAttributes<HTMLInputElement>;
     error?: boolean;
-    setError: (name:string, value: string) => void;
+    setError: (name: string, value: string) => void;
     errorText?: string;
 }
 
@@ -34,6 +34,11 @@ const InputForm: React.FC<InputFormProps> = (
         errorText,
     }
 ) => {
+
+    // Nếu value là mảng thì chuyển thành chuỗi
+    if (Array.isArray(value)) {
+        value = value.join(", ");
+    }
 
     return (
         <Box

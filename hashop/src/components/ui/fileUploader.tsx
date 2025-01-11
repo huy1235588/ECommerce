@@ -7,6 +7,7 @@ import "@/styles/components/uploadImage.css";
 interface FileUploaderProps {
     id: string;
     name: string;
+    values: string[];
     label: string;
     labelOptional?: string;
     acceptFile: string;
@@ -17,6 +18,7 @@ const FileUploader: React.FC<FileUploaderProps> = (
     {
         id,
         name,
+        values,
         label,
         labelOptional = "",
         acceptFile,
@@ -115,33 +117,18 @@ const FileUploader: React.FC<FileUploaderProps> = (
                         userSelect: 'none',
                     }}
                 >
-                    {preview.length === 0 ? (
+                    {values.length > 0 || preview.length > 0 ? (
                         <>
-                            <FiUpload />
-
-                            <Typography
-                                variant="caption"
-                                sx={{
-                                    display: 'block',
-                                    mt: 1,
-                                    color: 'text.secondary',
-                                }}
-                            >
-                                Min: 1280x720 px, Max: 2560x1440 px, Max Size: 2MB
-                            </Typography>
-                        </>
-
-                    ) :
-                        <>
-                            {preview.map((url, index) => (
-                                <Card key={index}
+                            {[...values, ...preview].map((url, index) => (
+                                <Card
+                                    key={index}
                                     onClick={(e) => {
                                         e.preventDefault();
                                     }}
                                     sx={{
                                         display: "flex",
                                         alignItems: "center",
-                                        width: "100%"
+                                        width: "100%",
                                     }}
                                 >
                                     <CardMedia
@@ -160,7 +147,6 @@ const FileUploader: React.FC<FileUploaderProps> = (
                                             marginLeft: 1,
                                         }}
                                     >
-                                        {/* Tên file */}
                                         <Typography
                                             variant="caption"
                                             sx={{
@@ -171,10 +157,9 @@ const FileUploader: React.FC<FileUploaderProps> = (
                                                 fontSize: "1.5rem",
                                             }}
                                         >
-                                            {files[index].name}
+                                            {files[index]?.name || `Image ${index + 1}`}
                                         </Typography>
 
-                                        {/* Kích cỡ file */}
                                         <Typography
                                             variant="caption"
                                             sx={{
@@ -184,14 +169,13 @@ const FileUploader: React.FC<FileUploaderProps> = (
                                                 fontSize: "0.75rem",
                                             }}
                                         >
-                                            {/* Chuyển đổi sang KB, MB, GB tuỳ vào độ lớn */}
-                                            {files[index].size > 1024 * 1024 ? (
-                                                `${(files[index].size / (1024 * 1024)).toFixed(2)} MB`
-                                            ) : files[index].size > 1024 ? (
-                                                `${(files[index].size / 1024).toFixed(2)} KB`
-                                            ) : (
-                                                `${files[index].size} B`
-                                            )}
+                                            {files[index]
+                                                ? files[index].size > 1024 * 1024
+                                                    ? `${(files[index].size / (1024 * 1024)).toFixed(2)} MB`
+                                                    : files[index].size > 1024
+                                                        ? `${(files[index].size / 1024).toFixed(2)} KB`
+                                                        : `${files[index].size} B`
+                                                : 'N/A'}
                                         </Typography>
                                     </Box>
 
@@ -208,7 +192,22 @@ const FileUploader: React.FC<FileUploaderProps> = (
                                 </Card>
                             ))}
                         </>
-                    }
+                    ) : (
+                        <>
+                            <FiUpload />
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    display: 'block',
+                                    mt: 1,
+                                    color: 'text.secondary',
+                                }}
+                            >
+                                Min: 1280x720 px, Max: 2560x1440 px, Max Size: 2MB
+                            </Typography>
+                        </>
+                    )}
+
 
                 </label>
             </Box>

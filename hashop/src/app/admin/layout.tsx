@@ -4,6 +4,8 @@ import HeaderAdmin from "@/components/admin/headerAdmin";
 import SidebarAdmin from "@/components/admin/sidebarAdmin";
 import React, { useState } from "react";
 import "@/styles/admin.css?v=1.0.0";
+import { useLoading } from "@/context/LoadingContext";
+import LoadingSpinner from "@/components/common/loadingSpinner";
 
 // Kiểu dữ liệu cho ngôn ngữ
 export type Language = {
@@ -36,6 +38,7 @@ export default function AdminLayout({
     children: React.ReactNode
 }>) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const { isLoading } = useLoading();
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -68,8 +71,12 @@ export default function AdminLayout({
                 <article className="content">
                     {children}
                 </article>
-            </main>
 
+                {/* Loading */}
+                {isLoading && (
+                    <LoadingSpinner />
+                )}
+            </main>
         </>
     );
 };

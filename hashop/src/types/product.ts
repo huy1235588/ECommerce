@@ -1,5 +1,13 @@
 import { Dayjs } from "dayjs";
 
+export const TypeData = [
+    'Game',
+    'DLC',
+    'Software',
+    'Bundle',
+    'Other'
+];
+
 export const PlatformData = [
     'Windows',
     'Mac',
@@ -66,37 +74,53 @@ export const FeatureData = [
     'Other'
 ];
 
+export type ProductVideos = {
+    thumbnail: string,
+    mp4: string,
+    webm: string,
+}
+
+export type ProductSystemRequirements = {
+    title: "OS" | "Processor" | "Memory" | "Graphics" | "DirectX" | "Storage" | "Sound Card" | "Additional Notes",
+    minimum: string,
+    recommended: string
+}
+
+export type ProductOS = {
+    win: ProductSystemRequirements[],
+    mac?: ProductSystemRequirements[],
+    linux?: ProductSystemRequirements[]
+}
+
 export type Product = {
     _id?: number;
     title: string;
     type: string;
     description?: string;
     price: number;
+
     discount?: number;
     discountStartDate: Dayjs | null;
     discountEndDate: Dayjs | null;
+
     releaseDate: Dayjs | null;
-    developer: string;
-    publisher: string;
+
+    developer: string[];
+    publisher: string[];
     platform: string[];
+
     rating?: number;
     isActive?: boolean;
-    headerImage: string;
 
-    images?: Array<{
-        path: string;
-        alt?: string;
-    }>;
-
-    videos?: Array<{
-        path: string;
-        poster: string;
-        alt?: string;
-    }>;
+    headerImage: File | string | null;
+    screenshots: string[];
+    videos: ProductVideos[];
 
     genres?: string[];
     tags?: string[];
     features?: string[];
+
+    systemRequirements: ProductOS;
 
     createdAt?: Date;
     updatedAt?: Date;

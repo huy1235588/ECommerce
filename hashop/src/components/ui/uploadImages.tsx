@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Typography, IconButton, Card, CardMedia, InputLabel } from '@mui/material';
 import { GridDeleteIcon } from '@mui/x-data-grid';
 import { FiUpload } from "react-icons/fi";
@@ -7,15 +7,19 @@ import "@/styles/components/uploadImage.css";
 interface ImageUploaderProps {
     id: string;
     name: string;
+    value: File | string | null;
+    title: string;
     label: string;
     labelOptional?: string;
-    onChange?: (name: string, value: File | null) => void;
+    onChange?: (value: File | null) => void;
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = (
     {
         id,
         name,
+        value,
+        title,
         label,
         labelOptional = "",
         onChange,
@@ -24,20 +28,45 @@ const ImageUploader: React.FC<ImageUploaderProps> = (
     const [image, setImage] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
 
+    // Hàm xử lý upload hình ảnh
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setImage(file);
             setPreview(URL.createObjectURL(file));
-            onChange?.(name, file);
+            onChange?.(file);
         }
     };
 
+    // Hàm xử lý xóa hình ảnh
     const handleImageRemove = () => {
         setImage(null);
         setPreview(null);
-        onChange?.(name, null);
+        onChange?.(null);
     };
+
+    // Xử lý khi value thay đổi
+    useEffect(() => {
+        if (value !== "" && value !== null && image === null) {
+            // Tạo tên file từ title
+            const fileName = title.replace(/ /g, "_") + ".png";
+
+            // Tạo hình ảnh từ URL
+            const fetchedImage = () => {
+                fetch(value as string)
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        const file = new File([blob], fileName, { type: "image/png" });
+                        setImage(file);
+                        setPreview(URL.createObjectURL(file));
+                        onChange?.(file);
+                    })
+                    .catch((err) => console.error(err))
+            };
+
+            fetchedImage();
+        }
+    }, [value, image]);
 
     return (
         <Box

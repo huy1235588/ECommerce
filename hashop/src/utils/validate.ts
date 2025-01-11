@@ -60,21 +60,6 @@ const validateProduct = (product: Product) => {
 
     // Nếu discount lớn hơn 0 thì kiểm tra discountStartDate và discountEndDate
     if (product.discount !== undefined && product.discount > 0) {
-        // Kiểm tra ngày bắt đầu giảm giá có hợp lệ
-        if (product.discountStartDate === undefined || product.discountStartDate === null) {
-            errors.push({
-                path: "discountStartDate",
-                msg: "Discount start date is invalid"
-            });
-        }
-        // Kiểm tra ngày bắt đầu giảm giá phải lớn hơn ngày hiện tại
-        else if (product.discountStartDate.isBefore(dayjs())) {
-            errors.push({
-                path: "discountStartDate",
-                msg: "Discount start date must be greater than the current date"
-            });
-        }
-
         // Kiểm tra ngày kết thúc giảm giá có hợp lệ
         if (product.discountEndDate === undefined || product.discountEndDate === null) {
             errors.push({
@@ -82,11 +67,11 @@ const validateProduct = (product: Product) => {
                 msg: "Discount end date is invalid"
             });
         }
-        // Kiểm tra ngày kết thúc giảm giá phải lớn hơn ngày bắt đầu giảm giá
-        else if (product.discountEndDate.isBefore(product.discountStartDate)) {
+        // Kiểm tra ngày kết thúc giảm giá phải lớn hơn ngày hiện tại
+        else if (dayjs().isAfter(product.discountEndDate)) {
             errors.push({
                 path: "discountEndDate",
-                msg: "Discount end date must be greater than the discount start date"
+                msg: "Discount end date must be greater than the current date"
             });
         }
     }
@@ -99,26 +84,26 @@ const validateProduct = (product: Product) => {
         });
     }
 
-    // Kiểm tra developer không rỗng
-    if (product.developer === "") {
+    // Kiểm tra developer ít nhất 1 item
+    if (product.developer === undefined || product.developer.length === 0) {
         errors.push({
             path: "developer",
-            msg: "Developer must not be empty"
+            msg: "Developer must have at least 1 item"
         });
     }
 
-    // Kiểm tra publisher không rỗng
-    if (product.publisher === "") {
+    // Kiểm tra publisher ít nhất 1 item
+    if (product.publisher === undefined || product.publisher.length === 0) {
         errors.push({
             path: "publisher",
-            msg: "Publisher must not be empty"
+            msg: "Publisher must have at least 1 item"
         });
     }
 
     // Kiểm tra platform ít nhất 1 item
     if (product.platform === undefined || product.platform.length === 0) {
         errors.push({
-            path: "platforms",
+            path: "platform",
             msg: "Platforms must have at least 1 item"
         });
     }

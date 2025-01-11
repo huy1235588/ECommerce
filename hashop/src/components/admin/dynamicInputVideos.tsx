@@ -1,28 +1,37 @@
-// components/DynamicInput.tsx
 "use client";
 
 import React, { useState } from "react";
 import { TextField, IconButton, Button, Box, Typography } from "@mui/material";
 import { MdDeleteOutline } from "react-icons/md";
+import { ProductVideos } from "@/types/product";
 
-interface DynamicInputProps {
+interface DynamicInputVideoProps {
     name: string;
     label: string;
-    placeholder: string;
-    onChange?: (name: string, value: string[]) => void;
+    values?: ProductVideos[];
+    onChange?: (name: string, value: ProductVideos[]) => void;
 }
 
-const DynamicInput: React.FC<DynamicInputProps> = ({
+const DynamicInputVideo: React.FC<DynamicInputVideoProps> = ({
     name,
     label,
-    placeholder,
+    values,
     onChange,
 }) => {
-    const [inputs, setInputs] = useState<string[]>([""]);
+    const [inputs, setInputs] = useState<ProductVideos[]>([{
+        thumbnail: "",
+        mp4: "",
+        webm: "",
+    }]);
 
     // Hàm thêm input mới
     const handleAddInput = () => {
-        const newInputs = [...inputs, ""];
+        const newInputs = [...inputs, {
+            thumbnail: "",
+            mp4: "",
+            webm: "",
+        }];
+
         setInputs(newInputs);
         onChange?.(name, newInputs);
     };
@@ -35,9 +44,14 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     };
 
     // Hàm xử lý khi input thay đổi
-    const handleInputChange = (index: number, value: string) => {
+    const handleInputChange = (
+        index: number,
+        videoProperties: "thumbnail" | "mp4" | "webm",
+        value: string,
+    ) => {
         const newInputs = [...inputs];
-        newInputs[index] = value;
+        newInputs[index][videoProperties] = value;
+
         setInputs(newInputs);
         onChange?.(name, newInputs);
     };
@@ -53,15 +67,35 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
                 {label}
             </Typography>
 
-            {inputs.map((input, index) => (
+            {(values ?? []).map((value, index) => (
                 <Box key={index} sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    {/* Thumbnail */}
                     <TextField
                         fullWidth
-                        placeholder={placeholder}
+                        placeholder="Thumbnail"
                         variant="outlined"
-                        value={input}
-                        onChange={(e) => handleInputChange(index, e.target.value)}
+                        value={value.thumbnail}
+                        onChange={(e) => handleInputChange(index, "thumbnail", e.target.value)}
                     />
+
+                    {/* Mp4 */}
+                    <TextField
+                        fullWidth
+                        placeholder="Mp4 URL"
+                        variant="outlined"
+                        value={value.mp4}
+                        onChange={(e) => handleInputChange(index, "mp4", e.target.value)}
+                    />
+
+                    {/* Webm */}
+                    <TextField
+                        fullWidth
+                        placeholder="Webm URL"
+                        variant="outlined"
+                        value={value.webm}
+                        onChange={(e) => handleInputChange(index, "webm", e.target.value)}
+                    />
+
                     <IconButton
                         onClick={() => handleDeleteInput(index)}
                         aria-label="delete"
@@ -71,6 +105,7 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
                     </IconButton>
                 </Box>
             ))}
+
             <Button
                 variant="contained"
                 onClick={handleAddInput}
@@ -82,4 +117,4 @@ const DynamicInput: React.FC<DynamicInputProps> = ({
     );
 };
 
-export default DynamicInput;
+export default DynamicInputVideo;
