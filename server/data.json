@@ -121,6 +121,149 @@
     }
   },
   {
+    "appId": 814380,
+    "title": "Sekiro™: Shadows Die Twice - GOTY Edition",
+    "type": "Game",
+    "price": "$59.99",
+    "description": "Game of the Year - The Game Awards 2019 Best Action Game of 2019 - IGN Carve your own clever path to vengeance in the award winning adventure from developer FromSoftware, creators of Bloodborne and the Dark Souls series. Take Revenge. Restore Your Honor. Kill Ingeniously.",
+    "releaseDate": "Mar 22, 2019",
+    "developer": [
+      "FromSoftware, Inc."
+    ],
+    "publisher": [
+      "Activision (Excluding Japan and Asia)",
+      "FromSoftware, Inc. (Japan)",
+      "方块游戏 (Asia)"
+    ],
+    "platform": [
+      "Windows"
+    ],
+    "tags": [
+      "Souls-like",
+      "Difficult",
+      "Action",
+      "Singleplayer",
+      "Ninja",
+      "Stealth",
+      "Adventure",
+      "Third Person",
+      "Open World",
+      "Story Rich",
+      "Violent",
+      "Atmospheric",
+      "Assassin",
+      "Dark Fantasy",
+      "Hack and Slash",
+      "RPG",
+      "Gore",
+      "Great Soundtrack",
+      "Rhythm",
+      "Dark"
+    ],
+    "genres": [
+      "Action",
+      "Adventure"
+    ],
+    "features": [
+      "Single-player",
+      "Steam Achievements",
+      "Steam Trading Cards",
+      "Steam Cloud",
+      "Remote Play on Tablet",
+      "Remote Play on TV",
+      "Family Sharing"
+    ],
+    "headerImage": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/header.jpg?t=1726158438",
+    "screenshots": [
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_0f7b0f8ed9ffc49aba26f9328caa9a1d59ad60f0.1920x1080.jpg?t=1726158438",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_2685dd844a2a523b6c7ec207d46a538db6a908cd.1920x1080.jpg?t=1726158438",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_15f0e9982621aed44900215ad283811af0779b1d.1920x1080.jpg?t=1726158438",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_1e6f5540866a5564d65df915c22fe1e57e336a6f.1920x1080.jpg?t=1726158438",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_3d6b38c382c0eafb02dc90d22f33fd292e4e5cf3.1920x1080.jpg?t=1726158438"
+    ],
+    "videos": [
+      {
+        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256806899/movie.293x165.jpg?t=1603837979",
+        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256806899/movie480.mp4?t=1603837979",
+        "webm": "https://video.fastly.steamstatic.com/store_trailers/256806899/movie480_vp9.webm?t=1603837979"
+      },
+      {
+        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256770769/movie.293x165.jpg?t=1576898083",
+        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256770769/movie480.mp4?t=1576898083",
+        "webm": "https://video.fastly.steamstatic.com/store_trailers/256770769/movie480.webm?t=1576898083"
+      },
+      {
+        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256745700/movie.293x165.jpg?t=1553549458",
+        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256745700/movie480.mp4?t=1553549458",
+        "webm": "https://video.fastly.steamstatic.com/store_trailers/256745700/movie480.webm?t=1553549458"
+      },
+      {
+        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256745081/movie.293x165.jpg?t=1553549470",
+        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256745081/movie480.mp4?t=1553549470",
+        "webm": "https://video.fastly.steamstatic.com/store_trailers/256745081/movie480.webm?t=1553549470"
+      },
+      {
+        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256742444/movie.293x165.jpg?t=1553549486",
+        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256742444/movie480.mp4?t=1553549486",
+        "webm": "https://video.fastly.steamstatic.com/store_trailers/256742444/movie480.webm?t=1553549486"
+      },
+      {
+        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256729567/movie.293x165.jpg?t=1553549495",
+        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256729567/movie480.mp4?t=1553549495",
+        "webm": "https://video.fastly.steamstatic.com/store_trailers/256729567/movie480.webm?t=1553549495"
+      },
+      {
+        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256724898/movie.293x165.jpg?t=1553099552",
+        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256724898/movie480.mp4?t=1553099552",
+        "webm": "https://video.fastly.steamstatic.com/store_trailers/256724898/movie480.webm?t=1553099552"
+      }
+    ],
+    "systemRequirements": {
+      "win": [
+        {
+          "title": "OS",
+          "minimum": "",
+          "recommended": ""
+        },
+        {
+          "title": "Processor",
+          "minimum": "Intel Core i3-2100 | AMD FX-6300",
+          "recommended": "Intel Core i5-2500K | AMD Ryzen 5 1400"
+        },
+        {
+          "title": "Memory",
+          "minimum": "4 GB RAM",
+          "recommended": "8 GB RAM"
+        },
+        {
+          "title": "Graphics",
+          "minimum": "NVIDIA GeForce GTX 760 | AMD Radeon HD 7950",
+          "recommended": "NVIDIA GeForce GTX 970 | AMD Radeon RX 570"
+        },
+        {
+          "title": "DirectX",
+          "minimum": "Version 11",
+          "recommended": "Version 11"
+        },
+        {
+          "title": "Network",
+          "minimum": "Broadband Internet connection",
+          "recommended": "Broadband Internet connection"
+        },
+        {
+          "title": "Storage",
+          "minimum": "25 GB available space",
+          "recommended": "25 GB available space"
+        },
+        {
+          "title": "Additional Notes",
+          "minimum": "",
+          "recommended": ""
+        }
+      ]
+    }
+  },
+  {
     "appId": 1245620,
     "title": "ELDEN RING",
     "type": "Game",
@@ -273,149 +416,6 @@
           "title": "Storage",
           "minimum": "60 GB available space",
           "recommended": "60 GB available space"
-        },
-        {
-          "title": "Additional Notes",
-          "minimum": "",
-          "recommended": ""
-        }
-      ]
-    }
-  },
-  {
-    "appId": 814380,
-    "title": "Sekiro™: Shadows Die Twice - GOTY Edition",
-    "type": "Game",
-    "price": null,
-    "description": "Game of the Year - The Game Awards 2019 Best Action Game of 2019 - IGN Carve your own clever path to vengeance in the award winning adventure from developer FromSoftware, creators of Bloodborne and the Dark Souls series. Take Revenge. Restore Your Honor. Kill Ingeniously.",
-    "releaseDate": "Mar 22, 2019",
-    "developer": [
-      "FromSoftware, Inc."
-    ],
-    "publisher": [
-      "Activision (Excluding Japan and Asia)",
-      "FromSoftware, Inc. (Japan)",
-      "方块游戏 (Asia)"
-    ],
-    "platform": [
-      "Windows"
-    ],
-    "tags": [
-      "Souls-like",
-      "Difficult",
-      "Action",
-      "Singleplayer",
-      "Ninja",
-      "Stealth",
-      "Adventure",
-      "Third Person",
-      "Open World",
-      "Story Rich",
-      "Violent",
-      "Atmospheric",
-      "Assassin",
-      "Dark Fantasy",
-      "Hack and Slash",
-      "RPG",
-      "Gore",
-      "Great Soundtrack",
-      "Rhythm",
-      "Dark"
-    ],
-    "genres": [
-      "Action",
-      "Adventure"
-    ],
-    "features": [
-      "Single-player",
-      "Steam Achievements",
-      "Steam Trading Cards",
-      "Steam Cloud",
-      "Remote Play on Tablet",
-      "Remote Play on TV",
-      "Family Sharing"
-    ],
-    "headerImage": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/header.jpg?t=1726158438",
-    "screenshots": [
-      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_0f7b0f8ed9ffc49aba26f9328caa9a1d59ad60f0.1920x1080.jpg?t=1726158438",
-      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_2685dd844a2a523b6c7ec207d46a538db6a908cd.1920x1080.jpg?t=1726158438",
-      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_15f0e9982621aed44900215ad283811af0779b1d.1920x1080.jpg?t=1726158438",
-      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_1e6f5540866a5564d65df915c22fe1e57e336a6f.1920x1080.jpg?t=1726158438",
-      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/814380/ss_3d6b38c382c0eafb02dc90d22f33fd292e4e5cf3.1920x1080.jpg?t=1726158438"
-    ],
-    "videos": [
-      {
-        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256806899/movie.293x165.jpg?t=1603837979",
-        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256806899/movie480.mp4?t=1603837979",
-        "webm": "https://video.fastly.steamstatic.com/store_trailers/256806899/movie480_vp9.webm?t=1603837979"
-      },
-      {
-        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256770769/movie.293x165.jpg?t=1576898083",
-        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256770769/movie480.mp4?t=1576898083",
-        "webm": "https://video.fastly.steamstatic.com/store_trailers/256770769/movie480.webm?t=1576898083"
-      },
-      {
-        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256745700/movie.293x165.jpg?t=1553549458",
-        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256745700/movie480.mp4?t=1553549458",
-        "webm": "https://video.fastly.steamstatic.com/store_trailers/256745700/movie480.webm?t=1553549458"
-      },
-      {
-        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256745081/movie.293x165.jpg?t=1553549470",
-        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256745081/movie480.mp4?t=1553549470",
-        "webm": "https://video.fastly.steamstatic.com/store_trailers/256745081/movie480.webm?t=1553549470"
-      },
-      {
-        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256742444/movie.293x165.jpg?t=1553549486",
-        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256742444/movie480.mp4?t=1553549486",
-        "webm": "https://video.fastly.steamstatic.com/store_trailers/256742444/movie480.webm?t=1553549486"
-      },
-      {
-        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256729567/movie.293x165.jpg?t=1553549495",
-        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256729567/movie480.mp4?t=1553549495",
-        "webm": "https://video.fastly.steamstatic.com/store_trailers/256729567/movie480.webm?t=1553549495"
-      },
-      {
-        "thumbnail": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256724898/movie.293x165.jpg?t=1553099552",
-        "mp4": "https://video.fastly.steamstatic.com/store_trailers/256724898/movie480.mp4?t=1553099552",
-        "webm": "https://video.fastly.steamstatic.com/store_trailers/256724898/movie480.webm?t=1553099552"
-      }
-    ],
-    "systemRequirements": {
-      "win": [
-        {
-          "title": "OS",
-          "minimum": "",
-          "recommended": ""
-        },
-        {
-          "title": "Processor",
-          "minimum": "Intel Core i3-2100 | AMD FX-6300",
-          "recommended": "Intel Core i5-2500K | AMD Ryzen 5 1400"
-        },
-        {
-          "title": "Memory",
-          "minimum": "4 GB RAM",
-          "recommended": "8 GB RAM"
-        },
-        {
-          "title": "Graphics",
-          "minimum": "NVIDIA GeForce GTX 760 | AMD Radeon HD 7950",
-          "recommended": "NVIDIA GeForce GTX 970 | AMD Radeon RX 570"
-        },
-        {
-          "title": "DirectX",
-          "minimum": "Version 11",
-          "recommended": "Version 11"
-        },
-        {
-          "title": "Network",
-          "minimum": "Broadband Internet connection",
-          "recommended": "Broadband Internet connection"
-        },
-        {
-          "title": "Storage",
-          "minimum": "25 GB available space",
-          "recommended": "25 GB available space"
         },
         {
           "title": "Additional Notes",

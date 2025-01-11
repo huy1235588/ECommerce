@@ -118,6 +118,13 @@ const crawlByURL = async (req, res) => {
                     : null;
             };
 
+            // Hàm lấy text từ element
+            const getElementText = (element) => {
+                return element
+                    ? cleanText(element.innerText)
+                    : null;
+            }
+
             // Hàm lấy danh sách từ selector
             const getListText = (selector, childSelector) => {
                 const container = document.querySelector(selector);
@@ -183,25 +190,28 @@ const crawlByURL = async (req, res) => {
             let price, discount, discountStartDate, discountEndDate;
 
             // Lấy container chính của thông tin mua game
-            const purchaseContainer = "#game_area_purchase > div.game_area_purchase_game_wrapper:nth-child(2) > div.game_area_purchase_game";
+            const purchaseWrappers = document.querySelectorAll("#game_area_purchase > div.game_area_purchase_game_wrapper");
 
-            // Kiểm tra trường hợp giá có giảm
-            const discountBlock = `${purchaseContainer} > div.game_purchase_action > div > div.discount_block.game_purchase_discount`;
+            // Kiểm tra có ít nhất 1 phần tử
+            if (purchaseWrappers.length > 0) {
+                // Lấy phần tử đầu tiên
+                const purchaseContainer = purchaseWrappers[0];
 
-            // Lấy element của block giảm giá
-            const discountBlockElement = document.querySelector(discountBlock);
+                // Kiểm tra trường hợp giá có giảm
+                const discountBlock = purchaseContainer.querySelector("div.game_purchase_action > div > div.discount_block.game_purchase_discount");
 
-            // Nếu có giảm giá
-            if (discountBlockElement) {
-                price = getText(`${discountBlock} > div.discount_prices > div.discount_original_price`);
-                discount = getText(`${discountBlock} > div.discount_pct`);
-                discountStartDate = Date.now();
-                discountEndDate = `${getText(`${purchaseContainer} > p.game_purchase_discount_countdown`)} ${new Date().getFullYear()}`;
-            } else {
-                // Nếu không có giảm giá, lấy giá gốc
-                price = getText(`${purchaseContainer} > div.game_purchase_action > div.game_purchase_action_bg > div.game_purchase_price.price`);
+                // Nếu có giảm giá
+                if (discountBlock) {
+                    price = getElementText(discountBlock.querySelector("div.discount_prices > div.discount_original_price"));
+                    discount = getElementText(discountBlock.querySelector("div.discount_pct"));
+                    discountStartDate = Date.now();
+                    discountEndDate = `${getElementText(purchaseContainer.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
+                } else {
+                    // Nếu không có giảm giá, lấy giá gốc
+                    priceElement = purchaseContainer.querySelector("div.game_purchase_action > div.game_purchase_action_bg > div.game_purchase_price.price");
+                    price = getElementText(priceElement);
+                }
             }
-
 
             // Lấy thông tin hệ thống yêu cầu
             const getSystemRequirements = () => {
