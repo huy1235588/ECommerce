@@ -5,26 +5,50 @@ const Product = require('../models/productModel');
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif'];
 const ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.avi', '.mkv', '.mov', '.webm'];
 
-// Hàm kiểm tra xem đúng định dạng file extension không
-const isValidFileExtension = (file, allowedExtensions) => {
-    const fileExtension = path.extname(file);
-    return allowedExtensions.includes(fileExtension);
+// Hàm kiểm tra định dạng file
+const isValidFileExtension = (fileUrl, allowedExtensions) => {
+    try {
+        const urlPath = new URL(fileUrl).pathname;
+        const fileExtension = path.extname(urlPath).toLowerCase();
+        return allowedExtensions.includes(fileExtension);
+    } catch {
+        return false;
+    }
 };
 
-// Hàm kiểm tra xem file có tồn tại không
 const validateFiles = (field, allowedExtensions) => {
+    const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1);
     return body(field)
-        .isArray({ min: 1 }).withMessage(`${field.charAt(0).toUpperCase() + field.slice(1)} is required`)
-        .custom(value => {
-            value.forEach((file, index) => {
-                if (!file.path) {
-                    throw new Error(`${field} at index ${index} must have a path`);
+        .isArray({ min: 1 }).withMessage(`${capitalize(field)} is required`)
+        .custom(files => {
+            return files.every((file, index) => {
+                // Kiểm tra xem field có phải là videos không
+                if (field === 'videos') {
+                    const { mp4, webm, thumbnail } = file;
+
+                    // Kiểm tra xem mp4, webm, thumbnail có tồn tại không
+                    if (!mp4 || !webm || !thumbnail) {
+                        throw new Error(`${field} at index ${index} must have mp4, webm, and thumbnail`);
+                    }
+
+                    // Kiểm tra định dạng của mp4, webm, thumbnail
+                    if (
+                        !isValidFileExtension(mp4, ['.mp4']) ||
+                        !isValidFileExtension(webm, ['.webm']) ||
+                        !isValidFileExtension(thumbnail, ALLOWED_IMAGE_EXTENSIONS)
+                    ) {
+                        throw new Error(`Invalid file format at index ${index}`);
+                    }
                 }
-                if (!isValidFileExtension(file.path, allowedExtensions)) {
-                    throw new Error(`Invalid ${field} format at index ${index}. Allowed formats: ${allowedExtensions.join(', ')}`);
+                // Kiểm tra xem field có phải là screenshots không
+                else {
+                    // Kiểm tra định dạng của file
+                    if (!isValidFileExtension(file, allowedExtensions)) {
+                        throw new Error(`Invalid ${field} format at index ${index}. Allowed formats: ${allowedExtensions.join(', ')}`);
+                    }
                 }
+                return true;
             });
-            return true;
         });
 };
 
@@ -57,40 +81,23 @@ const productValidation = [
         .isInt({ min: 0 }).withMessage('Discount must be a positive number'),
 
     // Nếu discount lớn hơn 0 thì mới kiểm tra ngày bắt đầu và kết thúc giảm giá
-    body('discountStartDate')
-        .custom((value, { req }) => {
-            if (req.body.discount > 0 && !value) {
-                throw new Error('Discount start date is required');
-            }
-
-            // Kiểm tra định dạng ngày 
-            else if (!new Date(value).toISOString()) {
-                throw new Error('Invalid date format');
-            }
-
-            // Kiểm tra ngày bắt đầu giảm giá phải lớn hơn ngày hiện tại
-            else if (value < new Date().toISOString()) {
-                throw new Error('Discount start date must be greater than current date');
-            }
-            
-            return true;
-        }),
     body('discountEndDate')
         .custom((value, { req }) => {
-            if (req.body.discount > 0 && !value) {
-                throw new Error('Discount end date is required');
-            }
+            if (req.body.discount > 0) {
+                // Kiểm tra ngày bắt đầu giảm giá có tồn tại không
+                if (!value) {
+                    throw new Error('Discount end date is required');
+                }
+                // Kiểm tra định dạng ngày
+                else if (!new Date(value).toISOString()) {
+                    throw new Error('Invalid date format');
+                }
 
-            // Kiểm tra định dạng ngày
-            else if (!new Date(value).toISOString()) {
-                throw new Error('Invalid date format');
+                // Kiểm tra ngày kết thúc giảm giá phải lớn hơn ngày hiện tại
+                else if (new Date(value) < new Date()) {
+                    throw new Error('Discount end date must be greater than current date');
+                }
             }
-
-            // Kiểm tra ngày kết thúc giảm giá phải lớn hơn ngày bắt đầu giảm giá
-            else if (value < req.body.discountStartDate) {
-                throw new Error('Discount end date must be greater than discount start date');
-            }
-
             return true;
         }),
 
@@ -116,19 +123,8 @@ const productValidation = [
         .not().isEmpty().withMessage('isActive is required')
         .isBoolean().withMessage('isActive must be a boolean'),
 
-    // Kiểm tra định dạng của ảnh [jpeg, png, jpg, gif] 
-    body('headerImage')
-        .not().isEmpty().withMessage('Image is required')
-        .custom(value => {
-            const fileExtension = path.extname(value);
-            if (!ALLOWED_IMAGE_EXTENSIONS.includes(fileExtension)) {
-                throw new Error(`Invalid image format. Allowed formats: ${ALLOWED_IMAGE_EXTENSIONS.join(', ')}`);
-            }
-            return true;
-        },),
-
     // Kiểm tra array định dạng của ảnh [jpeg, png, jpg, gif] 
-    validateFiles('images', ALLOWED_IMAGE_EXTENSIONS),
+    validateFiles('screenshots', ALLOWED_IMAGE_EXTENSIONS),
 
     // Kiểm tra array định dạng của video [mp4, avi, mkv, mov, webm]
     validateFiles('videos', ALLOWED_VIDEO_EXTENSIONS),

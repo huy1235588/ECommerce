@@ -6,6 +6,7 @@ const dotnet = require('dotenv');
 const authRoute = require('./src/routers/authRoute');
 const userRoute = require('./src/routers/userRoute');
 const productRouter = require('./src/routers/productRoute');
+const crawlRouter = require('./src/routers/crawlRoute');
 
 dotnet.config();
 
@@ -44,6 +45,7 @@ app.use(express.json()); // Phân tích dữ liệu JSON trong body của yêu c
 app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
 app.use('/api/product', productRouter);
+app.use('/api/crawl', crawlRouter);
 
 const PORT = process.env.PORT || 3002; // Cổng
 

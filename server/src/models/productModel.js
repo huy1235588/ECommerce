@@ -6,27 +6,32 @@ const productSchema = new mongoose.Schema(
         _id: {
             type: Number,
         },
+
         // Thông tin sản phẩm
         title: {
             type: String,
             required: true,
             unique: true,
         },
+
         // Loại sản phẩm
         type: {
             type: String,
             required: true,
         },
+
         // Mô tả sản phẩm
         description: {
             type: String,
         },
+
         // Giá sản phẩm
         price: {
             type: Number,
             required: true,
             min: 0,
         },
+
         // Giảm giá
         discount: {
             type: Number,
@@ -38,27 +43,31 @@ const productSchema = new mongoose.Schema(
         discountEndDate: {
             type: Date,
         },
+
         // Ngày phát hành
         releaseDate: {
             type: Date,
             default: Date.now,
         },
+
         // Nhà phát triển và phát hành
-        developer: {
+        developer: [{
             type: String,
             required: true,
-        },
+        }],
+
         // Nhà xuất bản
-        publisher: {
+        publisher: [{
             type: String,
             required: true,
-        },
+        }],
+
         // Nền tảng hỗ trợ
-        platform: {
+        platform: [{
             type: String,
-            enum: ["Windows", "Mac", "Linux"],
             required: true,
-        },
+        }],
+
         // Đánh giá sản phẩm
         rating: {
             type: Number,
@@ -76,41 +85,31 @@ const productSchema = new mongoose.Schema(
         // Hình ảnh đại diện
         headerImage: {
             type: String,
-            required: true,
         },
 
         // Danh sách hình ảnh
-        images: [
-            {
-                // Đường dẫn hình ảnh
-                path: {
-                    type: String,
-                    required: true,
-                },
-                // Mô tả hình ảnh
-                alt: {
-                    type: String,
-                }
-            },
-        ],
+        screenshots: [{
+            type: String,
+            required: true,
+        }],
 
         // Video
         videos: [
             {
-                // Đường dẫn video
-                path: {
+                // Đường dẫn video mp4
+                mp4: {
                     type: String,
                     required: true,
+                },
+                // Đường dẫn video webm
+                webm: {
+                    type: String,
                 },
                 // Hình ảnh đại diện cho video
-                poster: {
+                thumbnail: {
                     type: String,
                     required: true,
                 },
-                // Mô tả video
-                alt: {
-                    type: String,
-                }
             },
         ],
 
@@ -118,29 +117,52 @@ const productSchema = new mongoose.Schema(
         genres: [{
             type: String
         }],
+
         // Danh sách thẻ liên quan
         tags: [{
             type: String
         }],
+
         // Danh sách tính năng đặc biệt
         features: [{
             type: String
         }],
+
+        // Danh sách cấu hình yêu cầu
+        systemRequirements: {
+            win: [{
+                title: String,
+                minimum: String,
+                recommended: String
+            }],
+            mac: [{
+                title: String,
+                minimum: String,
+                recommended: String
+            }],
+            linux: [{
+                title: String,
+                minimum: String,
+                recommended: String
+            }],
+        },
 
         // Ngày tạo
         createdAt: {
             type: Date,
             default: Date.now,
         },
+
         // Ngày cập nhật
         updatedAt: {
             type: Date,
             default: Date.now,
         },
+
     }, {
-        timestamps: true,
-        _id: false  // Disable automatic _id generation
-    }
+    timestamps: true,
+    _id: false  // Disable automatic _id generation
+}
 );
 
 // Add auto-increment plugin
