@@ -1,7 +1,7 @@
 'use client'
 
 import { GenreData, PlatformData, Product, ProductVideos, TypeData } from "@/types/product";
-import { Button, Checkbox, FormControlLabel, Grid2, SelectChangeEvent } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Grid2, SelectChangeEvent } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useState } from "react";
@@ -20,6 +20,8 @@ import { useLoading } from "@/context/LoadingContext";
 import DynamicInputVideo from "@/components/admin/dynamicInputVideos";
 import SelectForm from "@/components/ui/selectForm";
 import DynamicInputRequirements from "@/components/admin/dynamicInputRequirements";
+import { useNotification } from "@/context/NotificationContext";
+import { v4 as uuidv4 } from "uuid";
 
 type ErrorForm = {
     path: string | null;
@@ -66,6 +68,7 @@ const initialFormData: Product = {
 };
 
 function ECommerceAddProductPage() {
+    const { notificationDispatch } = useNotification(); // Sử dụng context Notification
     const [errors, setErrors] = useState<ErrorForm[]>([]);
     const { setLoading } = useLoading();
     const [errorButtonDialog, setErrorButtonDialog] = useState<string>("");
@@ -93,6 +96,18 @@ function ECommerceAddProductPage() {
             const formDataErrors = validateProduct(formData);
             if (formDataErrors.length > 0) {
                 setErrors(formDataErrors);
+
+                // Hiển thị thông báo lỗi
+                notificationDispatch({
+                    type: "ADD_NOTIFICATION",
+                    payload: {
+                        id: `product-valid-${uuidv4()}`,
+                        message: "Failed to add product.",
+                        type: "error",
+                        duration: 3000,
+                    }
+                });
+
                 return;
             }
 
@@ -122,12 +137,30 @@ function ECommerceAddProductPage() {
 
             // Nếu thành công thì hiển thị thông báo
             if (headerImage.status === 200) {
-                alert('Product added successfully!');
+                const appId = response.data.id;
+
+                notificationDispatch({
+                    type: "ADD_NOTIFICATION",
+                    payload: {
+                        id: `product-add-${uuidv4()}`,
+                        message: `Product ${appId} added successfully!`,
+                        type: "success",
+                        duration: 3000,
+                    }
+                });
             }
 
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {
-                alert('Failed to add product.');
+                notificationDispatch({
+                    type: "ADD_NOTIFICATION",
+                    payload: {
+                        id: `product-add-${uuidv4()}`,
+                        message: "Failed to add product.",
+                        type: "error",
+                        duration: 3000,
+                    }
+                });
 
                 setErrors(error.response.data.errors);
             }
@@ -204,7 +237,7 @@ function ECommerceAddProductPage() {
             if (response.status === 200) {
                 //Xoá dữ liệu cũ
                 setFormData(initialFormData);
-                
+
                 // Lấy dữ liệu từ response
                 const result = response.data;
 
@@ -242,7 +275,32 @@ function ECommerceAddProductPage() {
         } finally {
             setLoading(false);
         }
-    }
+    };
+
+    // Hàm 
+    const handleAddList = async (inputValue: string) => {
+        try {
+            // Hiển thị loading
+            setLoading(true);
+
+            // Tách chuỗi thành mảng
+            const listAppId = inputValue.split(",");
+
+            // Duyệt qua từng phần tử trong mảng
+            for (let i = 0; i < listAppId.length; i++) {
+                // Gọi hàm scan data
+                await handleScanData(listAppId[i]);
+            }
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                // Hiển thị thông báo lỗi
+                setErrorButtonDialog(error.response.data.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="">
@@ -267,16 +325,41 @@ function ECommerceAddProductPage() {
                     <h1>Add Product</h1>
 
                     {/* Action */}
-                    <ButtonWithDialog
-                        buttonText="Scan data"
-                        title="Scan data"
-                        label="Enter App ID"
-                        onSubmit={handleScanData}
-                        success={successButtonDialog}
-                        setSuccess={setSuccessButtonDialog}
-                        error={errorButtonDialog}
-                        setError={setErrorButtonDialog}
-                    />
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            gap: "1rem"
+                        }}
+
+                    >
+                        <ButtonWithDialog
+                            buttonText="Scan data"
+                            title="Scan data"
+                            label="Enter App ID"
+                            type="text"
+                            onSubmit={handleScanData}
+                            success={successButtonDialog}
+                            setSuccess={setSuccessButtonDialog}
+                            error={errorButtonDialog}
+                            setError={setErrorButtonDialog}
+                        />
+
+                        <ButtonWithDialog
+                            buttonText="Add list"
+                            title="Add list"
+                            label="Enter list App ID (separate by comma)"
+                            type="text"
+                            multiple={true}
+                            onSubmit={handleAddList}
+                            success={successButtonDialog}
+                            setSuccess={setSuccessButtonDialog}
+                            error={errorButtonDialog}
+                            setError={setErrorButtonDialog}
+                        />
+                    </Box>
                 </div>
             </div>
 
