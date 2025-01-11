@@ -45,6 +45,17 @@ const crawlByURL = async (req, res) => {
             return res.status(400).json({ message: 'Invalid ID' });
         }
 
+        // Kiểm tra id có trong tệp JSON không thì trả về dữ liệu từ tệp
+        if (fs.existsSync('data.json')) {
+            const fileContent = fs.readFileSync('data.json', 'utf8');
+            const data = JSON.parse(fileContent);
+
+            const item = data.find(item => item.appId === parseInt(id));
+            if (item) {
+                return res.json(item);
+            }
+        }
+
         const url = `https://store.steampowered.com/app/${id}?cc=us`;
 
         console.log('Đang crawl dữ liệu từ:', url);
@@ -52,7 +63,6 @@ const crawlByURL = async (req, res) => {
         const browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            executablePath: '/opt/render/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome',
         });
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
@@ -90,9 +100,6 @@ const crawlByURL = async (req, res) => {
             await page.goto(currentUrl);
             console.log('URL mới sau khi thêm cc=us: ' + currentUrl);
         }
-
-        let html = await page.content();
-        // fs.writeFileSync('test.html', html, 'utf8');
 
         // Hàm lấy text từ selector
         const data = await page.evaluate((id) => {
@@ -189,7 +196,7 @@ const crawlByURL = async (req, res) => {
                 price = getText(`${discountBlock} > div.discount_prices > div.discount_original_price`);
                 discount = getText(`${discountBlock} > div.discount_pct`);
                 discountStartDate = Date.now();
-                discountEndDate = getText(`${purchaseContainer} > p.game_purchase_discount_countdown`);
+                discountEndDate = `${getText(`${purchaseContainer} > p.game_purchase_discount_countdown`)} ${new Date().getFullYear()}`;
             } else {
                 // Nếu không có giảm giá, lấy giá gốc
                 price = getText(`${purchaseContainer} > div.game_purchase_action > div.game_purchase_action_bg > div.game_purchase_price.price`);
@@ -243,13 +250,13 @@ const crawlByURL = async (req, res) => {
             };
 
             return {
-                appId: id,
+                appId: parseInt(id),
                 title: getText('#appHubAppName'),
                 type: "Game",
                 price: price,
                 discount: discount,
                 discountStartDate: discountStartDate,
-                discountEndDate: `${discountEndDate} ${new Date().getFullYear()}`,
+                discountEndDate: discountEndDate,
                 description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
                 releaseDate: getText('#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div.release_date > div.date'),
                 developer: getListText(

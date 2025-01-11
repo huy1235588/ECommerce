@@ -4,3 +4,5 @@ dist/
 northwind/
 
 */public/video/*
+server/data.json
+server/uploads/*
