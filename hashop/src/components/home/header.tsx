@@ -29,7 +29,13 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
                 <ul className="home-menu">
                     <li>
                         <a href="/shop/home" className="logo">
-                            <Image src="/logo/logo.png" width={64} height={27} alt="" />
+                            <Image
+                                src="/logo/logo.png"
+                                width={64}
+                                height={27}
+                                alt=""
+                                priority
+                            />
                         </a>
                     </li>
 

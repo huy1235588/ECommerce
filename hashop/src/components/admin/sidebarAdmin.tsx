@@ -432,6 +432,7 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                         width={isOpen ? 100 : 50}
                         height={40}
                         alt="logo"
+                        priority
                     />
                 </Link>
             </div>
