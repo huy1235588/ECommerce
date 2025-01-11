@@ -238,8 +238,6 @@ function ECommerceAddProductPage() {
         }
     }
 
-    console.log(formData);
-
     return (
         <div className="">
             {/* Page Header */}

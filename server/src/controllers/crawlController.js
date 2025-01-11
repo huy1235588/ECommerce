@@ -51,6 +51,7 @@ const crawlByURL = async (req, res) => {
 
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
         await page.goto(url);
 
         // Kiểm tra xem trang web có yêu cầu tuổi không
