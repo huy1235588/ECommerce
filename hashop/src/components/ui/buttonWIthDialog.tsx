@@ -7,6 +7,8 @@ interface ButtonWithDialogProps {
     buttonText: string;
     title: string;
     label: string;
+    type: string;
+    multiple?: boolean;
     onSubmit: (inputValue: string) => void;
     success: string;
     setSuccess: (success: string) => void;
@@ -18,6 +20,8 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
     buttonText,
     title,
     label,
+    type,
+    multiple = false,
     onSubmit,
     success,
     setSuccess,
@@ -31,11 +35,13 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
     const handleOpen = () => {
         setOpen(true);
     };
-
+    
     // Hàm đóng dialog
     const handleClose = () => {
         setOpen(false);
         setInputValue("");
+        setSuccess("");
+        setError("");
     };
 
     // Hàm xử lý thay đổi giá trị input
@@ -89,7 +95,9 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                         autoFocus
                         margin="dense"
                         label={label}
-                        type="text"
+                        type={type}
+                        multiline={multiple}
+                        rows={multiple ? 5 : 1}
                         fullWidth
                         variant="outlined"
                         value={inputValue}
