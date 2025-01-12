@@ -67,17 +67,17 @@ Author       : LeThienHuy.
     align-items: center;
 }
 
-.breadcrumb-list .breadcrumb-item a{
+.breadcrumb-list .breadcrumb-item a {
     font-size: 0.875rem;
     color: #8a9197;
     transition: all 0.3s;
 }
 
-.breadcrumb-list .breadcrumb-item a:hover{
+.breadcrumb-list .breadcrumb-item a:hover {
     color: #1b63a7;
 }
 
-.breadcrumb-list .breadcrumb-item + .breadcrumb-item{
+.breadcrumb-list .breadcrumb-item + .breadcrumb-item {
     font-size: 0.875rem;
     padding-left: 0.5rem;
 }
@@ -86,6 +86,17 @@ Author       : LeThienHuy.
     content: "/";
     padding-right: 0.5rem;
     color: #8c98a4;
+}
+
+/* Link */
+.product-link {
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.product-link:hover {
+    color: #4982b9;
 }
 /*===================================*
     02.END PRODUCTS

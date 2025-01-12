@@ -8,6 +8,7 @@ import "@/styles/pages/admin/product.css"
 import { Button, Rating } from "@mui/material";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 function ECommerceProductsPage() {
     const router = useRouter();
@@ -35,7 +36,22 @@ function ECommerceProductsPage() {
                 />
             )
         },
-        { field: 'title', headerName: 'TITLE', flex: 1, minWidth: 200 },
+        {
+            field: 'title',
+            headerName: 'TITLE',
+            flex: 1,
+            minWidth: 200,
+            renderCell: (params: GridRenderCellParams) => (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <Link
+                        href={`/admin/e-commerce/product/${params.row._id}`}
+                        className="product-link"
+                    >
+                        {params.value}
+                    </Link>
+                </div>
+            )
+        },
         { field: 'type', headerName: 'TYPE', width: 70 },
         {
             field: 'price',
@@ -113,7 +129,7 @@ function ECommerceProductsPage() {
                     rowHeight={120}
                     slotProps={{
                         cell: {
-                            style:{
+                            style: {
                                 display: 'flex',
                                 alignItems: 'center',
                                 transition: 'width 0.3s ease',
