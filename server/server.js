@@ -50,6 +50,10 @@ app.use(cors(corsOptions)); // Cấu hình CORS
 app.use(cookieParser()); // Phân tích các cookie trong yêu cầu HTTP (req.cookies)
 app.use(express.json()); // Phân tích dữ liệu JSON trong body của yêu cầu HTTP (req.body)
 
+
+// Cấu hình để phục vụ các file tĩnh từ thư mục uploads
+app.use('/uploads', express.static('uploads'));
+
 app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
 app.use('/api/product', productRouter);
