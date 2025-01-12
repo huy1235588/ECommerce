@@ -349,6 +349,8 @@ function ECommerceAddProductPage() {
         }
     };
 
+    const testCopy = "test copy";
+
     return (
         <div className="">
             {/* Page Header */}
@@ -382,6 +384,14 @@ function ECommerceAddProductPage() {
                         }}
 
                     >
+                        <Button
+                            onClick={() => {
+                                navigator.clipboard.writeText(testCopy);
+                            }}
+                        >
+                            Test Copy
+                        </Button>
+
                         <ButtonWithDialog
                             buttonText="Scan data"
                             title="Scan data"
