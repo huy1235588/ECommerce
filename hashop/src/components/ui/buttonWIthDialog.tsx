@@ -57,6 +57,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
         setSuccess("");
         setError("");
         setLoading?.("");
+        successLinks = undefined;
     };
 
     // Hàm mở dialog
@@ -136,7 +137,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                 {success && (
                     <div style={{ padding: "0 1.75rem 0.5rem", color: "#4caf50" }}>
                         <p>{success}</p>
-                        {successLinks && (
+                        {successLinks && successLinks.links.length !== 0 && (
                             <>
                                 <span
                                     style={{
@@ -147,6 +148,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                                 >
                                     {successLinks.title.text}
                                 </span>
+
                                 {successLinks.links.map((link, index) => (
                                     <a
                                         key={index}
@@ -170,7 +172,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                                     onClick={async () => {
                                         try {
                                             // Lấy danh sách các liên kết từ successLinks.links
-                                            const links = successLinks.links.map((link) => link.href).join("\n");
+                                            const links = successLinks?.links?.map((link) => link.href).join("\n") || '';
 
                                             // Sao chép vào clipboard
                                             await navigator.clipboard.writeText(links);

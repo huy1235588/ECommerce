@@ -5,9 +5,8 @@ import axios from "@/config/axios";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/product";
 import "@/styles/pages/admin/product.css"
-import { Button, Rating } from "@mui/material";
+import { Button, CardMedia, Rating } from "@mui/material";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 
 function ECommerceProductsPage() {
@@ -16,23 +15,21 @@ function ECommerceProductsPage() {
     const [rows, setRows] = useState<Product[]>([]);
 
     // Lấy dữ liệu từ API
-
     const columns: GridColDef[] = [
         {
             field: 'headerImage',
             headerName: 'IMAGE',
-            width: 220,
+            width: 270,
             align: 'center',
             renderCell: (params: GridRenderCellParams) => (
-                <Image
-                    src={`${process.env.NEXT_PUBLIC_SERVER_URL}\\${params.value}`}
-                    className="product-image"
-                    width={200}
-                    height={110}
-                    alt={params.value}
+                <CardMedia
+                    component="img"
+                    image={params.value}
+                    alt="Product image"
                     style={{
-                        padding: '0.005rem 0rem',
+                        width: '100%',
                     }}
+                    loading="lazy"
                 />
             )
         },
@@ -83,10 +80,22 @@ function ECommerceProductsPage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get<Product[]>('/api/product/all');
+                const response = await axios.post('/graphql', {
+                    query: `query {
+                        products {
+                            _id
+                            title
+                            type
+                            price
+                            discount
+                            rating
+                            headerImage
+                        }
+                    }`
+                });
 
                 if (response.status === 200) {
-                    setRows(response.data);
+                    setRows(response.data.data.products);
                 }
 
             } catch (error) {
@@ -121,12 +130,18 @@ function ECommerceProductsPage() {
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    paginationModel={{ pageSize: 5, page: 0 }}
-                    pageSizeOptions={[5]}
+                    pageSizeOptions={[5, 20, 50]}
                     checkboxSelection
                     disableRowSelectionOnClick
                     getRowId={(row) => row._id ?? ''}
                     rowHeight={120}
+                    initialState={{
+                        pagination:{
+                            paginationModel:{
+                                pageSize: 5
+                            }
+                        }
+                    }}
                     slotProps={{
                         cell: {
                             style: {

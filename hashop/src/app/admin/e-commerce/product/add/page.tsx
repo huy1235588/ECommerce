@@ -279,7 +279,7 @@ function ECommerceAddProductPage() {
                 // Hiển thị thông báo thành công
                 setButtonDialogState((prevState) => ({
                     ...prevState,
-                    success: "Scan data successfully!"
+                    success: "Scan data successfully!",
                 }));
 
                 return result;
@@ -316,22 +316,45 @@ function ECommerceAddProductPage() {
                 // Lấy dữ liệu từ response
                 const result = response.data;
 
-                // Hiển thị thông báo thành công
+                // Lấy danh sách App ID lỗi
+                const errorIds = result.errorIds;
+
+                // Lấy id của json
+                const jsonId = result.jsonId;
+
+                // Hiển thị loading
                 setButtonDialogState((prevState) => ({
                     ...prevState,
-                    success: result.message,
-                    successLinks: {
-                        title: {
-                            text: "Error IDs: ",
-                            color: "#ff4545"
-                        },
-                        links: result.errorIds.map((id: string) => ({
-                            href: `https://steamdb.info/app/${id}`,
-                            text: id,
-                            color: "#ff4545"
-                        }))
-                    }                           
+                    loading: "Adding list",
                 }));
+
+                // Gọi API thêm danh sách App ID vào database
+                const responseAddList = await axios.post('/api/product/addFromFile', {
+                    jsonId: jsonId,
+                    errorIds: errorIds
+                });
+
+                // Kiểm tra response
+                if (responseAddList.status === 200) {
+                    const resultAddList = responseAddList.data;
+
+                    // Hiển thị thông báo thành công
+                    setButtonDialogState((prevState) => ({
+                        ...prevState,
+                        success: resultAddList.message,
+                        successLinks: {
+                            title: {
+                                text: "Error IDs: ",
+                                color: "#ff4545"
+                            },
+                            links: resultAddList.errorIds.map((id: string) => ({
+                                href: `https://steamdb.info/app/${id}`,
+                                text: id,
+                                color: "#ff4545"
+                            }))
+                        }
+                    }));
+                }
 
                 return result;
             }
@@ -346,10 +369,13 @@ function ECommerceAddProductPage() {
             }
         } finally {
             setLoading(false);
+            // Xoá loading
+            setButtonDialogState((prevState) => ({
+                ...prevState,
+                loading: "",
+            }));
         }
     };
-
-    const testCopy = "test copy";
 
     return (
         <div className="">
@@ -384,14 +410,6 @@ function ECommerceAddProductPage() {
                         }}
 
                     >
-                        <Button
-                            onClick={() => {
-                                navigator.clipboard.writeText(testCopy);
-                            }}
-                        >
-                            Test Copy
-                        </Button>
-
                         <ButtonWithDialog
                             buttonText="Scan data"
                             title="Scan data"
