@@ -1,5 +1,5 @@
 const express = require('express');
-const { crawlByURL } = require('../controllers/crawlController');
+const { crawlByURL, crawlByMutipleId } = require('../controllers/crawlController');
 
 const router = express.Router();
 
@@ -210,6 +210,8 @@ const data = {
 }
 
 router.get('/', crawlByURL);
+
+router.post('/list', crawlByMutipleId);
 
 // router.get('/', (req, res) => {
 //     res.json(data);
