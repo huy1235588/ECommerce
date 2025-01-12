@@ -71,8 +71,19 @@ function ECommerceAddProductPage() {
     const { notificationDispatch } = useNotification(); // Sử dụng context Notification
     const [errors, setErrors] = useState<ErrorForm[]>([]);
     const { setLoading } = useLoading();
-    const [errorButtonDialog, setErrorButtonDialog] = useState<string>("");
-    const [successButtonDialog, setSuccessButtonDialog] = useState<string>("");
+    const [buttonDialogState, setButtonDialogState] = useState({
+        loading: "",
+        error: "",
+        success: "",
+        successLinks: {
+            title: { text: "", color: "#4caf50" },
+            links: [] as {
+                href: string;
+                text: string;
+                color?: string | "#4caf50";
+            }[]
+        }
+    });
 
     // Form data state
     const [formData, setFormData] = useState<Product>(initialFormData);
@@ -247,7 +258,9 @@ function ECommerceAddProductPage() {
                     title: result.title ? result.title : "",
                     type: result.type ? result.type : "",
                     description: result.description ? result.description : "",
-                    price: result.price ? Number(result.price.toString().replace("$", "")) : 0,
+                    // "$39.99 USD" => 39.99
+                    price: result.price ? Number(result.price.toString().replace(/[^0-9.]/g, "")) : 0,
+                    // "-10%" => 10
                     discount: result.discount ? Number(result.discount.toString().replace(/[-%]/g, "")) : 0,
                     discountEndDate: result.discountEndDate ? dayjs(result.discountEndDate) : null,
                     releaseDate: dayjs(result.releaseDate),
@@ -264,95 +277,72 @@ function ECommerceAddProductPage() {
                 }));
 
                 // Hiển thị thông báo thành công
-                setSuccessButtonDialog("Scan data successfully!");
+                setButtonDialogState((prevState) => ({
+                    ...prevState,
+                    success: "Scan data successfully!"
+                }));
+
+                return result;
             }
 
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {
                 // Hiển thị thông báo lỗi
-                setErrorButtonDialog(error.response.data.message);
+                setButtonDialogState((prevState) => ({
+                    ...prevState,
+                    error: error.response?.data.message
+                }));
             }
         } finally {
             setLoading(false);
         }
     };
 
-    // Hàm 
+    // Hàm thêm danh sách App ID
     const handleAddList = async (inputValue: string) => {
         try {
             // Hiển thị loading
             setLoading(true);
 
-            // Tách chuỗi thành mảng
-            const listAppId = inputValue.split(",");
+            // Loại bỏ dấu phẩy và khoảng trắng ở cuối
+            inputValue = inputValue.replace(/,\s*$/, "").trim();
 
-            const titleList = [];
+            // Gửi request lên server để crawl dữ liệu
+            const response = await axios.post('/api/crawl/list', {
+                listAppId: inputValue
+            });
 
-            // Duyệt qua từng phần tử trong mảng
-            for (let i = 0; i < listAppId.length; i++) {
-                // Gọi hàm scan data
-                await handleScanData(listAppId[i]);
+            if (response.status === 200) {
+                // Lấy dữ liệu từ response
+                const result = response.data;
 
-                // Nếu title null thì bỏ qua
-                if (!formData.title) {
-                    setErrorButtonDialog(`App ID ${listAppId[i]} not found!`);
-                    continue;
-                }
+                // Hiển thị thông báo thành công
+                setButtonDialogState((prevState) => ({
+                    ...prevState,
+                    success: result.message,
+                    successLinks: {
+                        title: {
+                            text: "Error IDs: ",
+                            color: "#ff4545"
+                        },
+                        links: result.errorIds.map((id: string) => ({
+                            href: `https://steamdb.info/app/${id}`,
+                            text: id,
+                            color: "#ff4545"
+                        }))
+                    }                           
+                }));
 
-                // Tạo filter
-                const filter = {
-                    title: formData.title
-                };
-
-                // Kiểm tra tile có tồn tại
-                const response = await axios.post('/graphql', {
-                    query: `query FilterProducts (
-                        $title: String!
-                    ) {
-                        filterProducts(title: $title) {
-                            _id
-                            title
-                        }
-                    }`,
-                    variables: filter
-                });
-
-                if (response.status === 200) {
-                    // Lấy dữ liệu từ response
-                    const result = await response.data.data.filterProducts;
-
-                    // Nếu title không tồn tại thì nhấn submit form
-                    if (result.length === 0) {
-                        setTimeout(() => {
-                            handleSubmit();
-                        }, 0);
-                    }
-
-                    // Nếu title tồn tại thì hiển thị thông báo
-
-                    // TODO: Ý tưởng cho phần else:
-                    // 1. Thêm title vào mảng titleList để hiển thị các title đã tồn tại
-                    // 2. Reset form data để chuẩn bị cho lần scan tiếp theo
-                    // 3. Hiển thị thông báo noti hoặc dialog với danh sách title đã tồn tại
-                    // 4. Có thể thêm option để skip hoặc override các title đã tồn tại
-
-                    // else {
-                    //     const title = result[0].title;
-                    //     titleList.push(`${listAppId[i]}: ${title} already exists!`);
-                    // }
-                }
-
-                // // Khi xong một vòng lặp thì reset form data, errors và success
-                // setFormData(initialFormData);
-                // setErrors([]);
-                // setErrorButtonDialog("");
-                // setSuccessButtonDialog("");
+                return result;
             }
 
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {
                 // Hiển thị thông báo lỗi
-                setErrorButtonDialog(error.response.data.message);
+                setButtonDialogState((prevState) => ({
+                    ...prevState,
+                    error: error.response?.data.message
+                }));
             }
         } finally {
             setLoading(false);
@@ -398,10 +388,19 @@ function ECommerceAddProductPage() {
                             label="Enter App ID"
                             type="text"
                             onSubmit={handleScanData}
-                            success={successButtonDialog}
-                            setSuccess={setSuccessButtonDialog}
-                            error={errorButtonDialog}
-                            setError={setErrorButtonDialog}
+                            success={buttonDialogState.success}
+                            successLinks={buttonDialogState.successLinks}
+                            setSuccess={(success) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, success }))
+                            }
+                            error={buttonDialogState.error}
+                            setError={(error) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, error }))
+                            }
+                            loading={buttonDialogState.loading}
+                            setLoading={(loading) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, loading }))
+                            }
                         />
 
                         <ButtonWithDialog
@@ -411,11 +410,20 @@ function ECommerceAddProductPage() {
                             type="text"
                             multiple={true}
                             onSubmit={handleAddList}
-                            success={successButtonDialog}
-                            setSuccess={setSuccessButtonDialog}
-                            error={errorButtonDialog}
-                            setError={setErrorButtonDialog}
-                        />                        
+                            success={buttonDialogState.success}
+                            successLinks={buttonDialogState.successLinks}
+                            setSuccess={(success) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, success }))
+                            }
+                            error={buttonDialogState.error}
+                            setError={(error) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, error }))
+                            }
+                            loading={buttonDialogState.loading}
+                            setLoading={(loading) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, loading }))
+                            }
+                        />
                     </Box>
                 </div>
             </div>
