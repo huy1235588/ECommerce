@@ -5,6 +5,7 @@ northwind/
 
 */public/video/*
 server/uploads/*
+server/json
 server/data.json
 */ssl/*
 

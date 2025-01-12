@@ -50,7 +50,7 @@ const crawlByURL = async (req, res) => {
             await page.click('#view_product_page_btn');
 
             // Chờ thêm thời gian để đảm bảo thao tác hoàn tất
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Lấy URL sau khi chuyển hướng
             let currentUrl = await page.url();
@@ -153,30 +153,52 @@ const crawlByURL = async (req, res) => {
                     })
             };
 
+            // Hàm chuyển thành số từ chuỗi
+            const getNumber = (price) => {
+                return Number(price.toString().replace(/[^0-9.]/g, ""));
+            }
+
             // Xác định giá và giảm giá
-            let price, discount, discountStartDate, discountEndDate;
+            let price = 0, discount = 0, discountStartDate, discountEndDate;
 
-            // Lấy container chính của thông tin mua game
-            const purchaseWrappers = document.querySelectorAll("#game_area_purchase > div.game_area_purchase_game_wrapper");
+            // Kiểm tra game có miễn phí không
+            const isFree = document.querySelector("#game_area_purchase div.game_purchase_price.price").textContent;
 
-            // Kiểm tra có ít nhất 1 phần tử
-            if (purchaseWrappers.length > 0) {
-                // Lấy phần tử đầu tiên
-                const purchaseContainer = purchaseWrappers[0];
+            if (isFree.trim() !== "Free To Play") {
+                // Lấy container chính của thông tin mua game
+                const purchaseWrappers = document.querySelector("#game_area_purchase div[data-price-final]");
 
-                // Kiểm tra trường hợp giá có giảm
-                const discountBlock = purchaseContainer.querySelector("div.game_purchase_action > div > div.discount_block.game_purchase_discount");
+                // Kiểm tra purchaseWrappers có tồn tại không
+                if (purchaseWrappers) {
+                    // Kiểm tra purchaseWrappers có class game_purchase_price price
+                    const hasPrice = purchaseWrappers.classList.contains("game_purchase_price", "price");
 
-                // Nếu có giảm giá
-                if (discountBlock) {
-                    price = getElementText(discountBlock.querySelector("div.discount_prices > div.discount_original_price"));
-                    discount = getElementText(discountBlock.querySelector("div.discount_pct"));
-                    discountStartDate = Date.now();
-                    discountEndDate = `${getElementText(purchaseContainer.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
-                } else {
+                    // Kiểm tra có class discount_block 
+                    const hasDiscount = purchaseWrappers.classList.contains("discount_block");
+
+                    // Nếu có thuộc tính data-price-final thì lấy giá từ đó
+                    if (hasDiscount) {
+                        // Kiểm tra có class no_discount
+                        const hasNoDiscount = purchaseWrappers.classList.contains("no_discount");
+
+                        // Nếu có class no_discount thì giảm giá là 0
+                        if (hasNoDiscount) {
+                            price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_final_price"));
+                        }
+
+                        // Nếu không có class no_discount thì lấy giảm giá
+                        else {
+                            price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_original_price"));
+                            discount = getElementText(purchaseWrappers.querySelector("div.discount_pct"));
+                            discountStartDate = Date.now();
+                            discountEndDate = `${getElementText(document.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
+                        }
+
+                    }
                     // Nếu không có giảm giá, lấy giá gốc
-                    priceElement = purchaseContainer.querySelector("div.game_purchase_action > div.game_purchase_action_bg > div.game_purchase_price.price");
-                    price = getElementText(priceElement);
+                    else if (hasPrice) {
+                        price = getElementText(purchaseWrappers);
+                    }
                 }
             }
 
@@ -230,8 +252,10 @@ const crawlByURL = async (req, res) => {
                 appId: parseInt(id),
                 title: getText('#appHubAppName'),
                 type: "Game",
-                price: price,
-                discount: discount,
+                // $14.99 USD => 14.99
+                price: getNumber(price),
+                // -50% => 50
+                discount: getNumber(discount),
                 discountStartDate: discountStartDate,
                 discountEndDate: discountEndDate,
                 description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
@@ -286,7 +310,7 @@ const crawlByURL = async (req, res) => {
 };
 
 // Craw dữ liệu từ nhiều ID
-const crawlByMutipleId = async (req, res) => {
+const crawlByMultipleId = async (req, res) => {
     try {
         const ids = req.body.listAppId;
         let jsonId = req.body.jsonId;
@@ -362,7 +386,7 @@ const crawlByMutipleId = async (req, res) => {
                     await page.click('#view_product_page_btn');
 
                     // Chờ thêm thời gian để đảm bảo thao tác hoàn tất
-                    await new Promise(resolve => setTimeout(resolve, 800));
+                    await new Promise(resolve => setTimeout(resolve, 1000));
 
                     // Lấy URL sau khi chuyển hướng
                     let currentUrl = await page.url();
@@ -465,31 +489,56 @@ const crawlByMutipleId = async (req, res) => {
                             })
                     };
 
+                    // Hàm chuyển thành số từ chuỗi
+                    const getNumber = (price) => {
+                        return Number(price.toString().replace(/[^0-9.]/g, ""));
+                    }
+
                     // Xác định giá và giảm giá
-                    let price, discount, discountStartDate, discountEndDate;
+                    let price = 0, discount = 0, discountStartDate, discountEndDate;
 
-                    // Lấy container chính của thông tin mua game
-                    const purchaseWrappers = document.querySelectorAll("#game_area_purchase > div.game_area_purchase_game_wrapper");
+                    // Kiểm tra game có miễn phí không
+                    const isFreeElemnt = document.querySelector("#game_area_purchase div.game_purchase_price.price");
 
-                    // Kiểm tra có ít nhất 1 phần tử
-                    if (purchaseWrappers.length > 0) {
-                        // Lấy phần tử đầu tiên
-                        const purchaseContainer = purchaseWrappers[0];
+                    if (!isFreeElemnt) {
+                        // Lấy container chính của thông tin mua game
+                        const purchaseWrappers = document.querySelector("#game_area_purchase div[data-price-final]");
 
-                        // Kiểm tra trường hợp giá có giảm
-                        const discountBlock = purchaseContainer.querySelector("div.game_purchase_action > div > div.discount_block.game_purchase_discount");
+                        // Kiểm tra purchaseWrappers có tồn tại không
+                        if (purchaseWrappers) {
+                            // Kiểm tra purchaseWrappers có class game_purchase_price price
+                            const hasPrice = purchaseWrappers.classList.contains("game_purchase_price", "price");
 
-                        // Nếu có giảm giá
-                        if (discountBlock) {
-                            price = getElementText(discountBlock.querySelector("div.discount_prices > div.discount_original_price"));
-                            discount = getElementText(discountBlock.querySelector("div.discount_pct"));
-                            discountStartDate = Date.now();
-                            discountEndDate = `${getElementText(purchaseContainer.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
-                        } else {
+                            // Kiểm tra có class discount_block 
+                            const hasDiscount = purchaseWrappers.classList.contains("discount_block");
+
+                            // Nếu có thuộc tính data-price-final thì lấy giá từ đó
+                            if (hasDiscount) {
+                                // Kiểm tra có class no_discount
+                                const hasNoDiscount = purchaseWrappers.classList.contains("no_discount");
+
+                                // Nếu có class no_discount thì giảm giá là 0
+                                if (hasNoDiscount) {
+                                    price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_final_price"));
+                                }
+
+                                // Nếu không có class no_discount thì lấy giảm giá
+                                else {
+                                    price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_original_price"));
+                                    discount = getElementText(purchaseWrappers.querySelector("div.discount_pct"));
+                                    discountStartDate = Date.now();
+                                    discountEndDate = `${getElementText(document.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
+                                }
+
+                            }
                             // Nếu không có giảm giá, lấy giá gốc
-                            priceElement = purchaseContainer.querySelector("div.game_purchase_action > div.game_purchase_action_bg > div.game_purchase_price.price");
-                            price = getElementText(priceElement);
+                            else if (hasPrice) {
+                                price = getElementText(purchaseWrappers);
+                            }
                         }
+                    }
+                    else if (isFreeElemnt.textContent.trim() === "Free To Play") {
+                        price = "Free To Play";
                     }
 
                     // Lấy thông tin hệ thống yêu cầu
@@ -542,8 +591,10 @@ const crawlByMutipleId = async (req, res) => {
                         appId: parseInt(id),
                         title: getText('#appHubAppName'),
                         type: "Game",
-                        price: price,
-                        discount: discount,
+                        // $14.99 USD => 14.99
+                        price: getNumber(price),
+                        // -50% => 50
+                        discount: getNumber(discount),
                         discountStartDate: discountStartDate,
                         discountEndDate: discountEndDate,
                         description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
@@ -616,5 +667,5 @@ const crawlByMutipleId = async (req, res) => {
 
 module.exports = {
     crawlByURL,
-    crawlByMutipleId
+    crawlByMultipleId
 }

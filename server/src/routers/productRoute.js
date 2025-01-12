@@ -1,5 +1,5 @@
 const express = require('express');
-const { addProduct, getProducts, uploadProductHeaderImage, getCountByColumn } = require('../controllers/productController');
+const { addProduct, getProducts, uploadProductHeaderImage, getCountByColumn, addProductFromFile } = require('../controllers/productController');
 const { productValidation } = require('../utils/validator');
 const multer = require('multer');
 const path = require('path');
@@ -8,6 +8,7 @@ const Product = require('../models/productModel');
 
 const router = express.Router();
 
+// Cấu hình multer để upload ảnh sản phẩm
 const upload = multer({
     dest: 'uploads/',
     limits: {
@@ -54,6 +55,9 @@ router.post('/uploadImage',
     upload.single('headerImage'),
     uploadProductHeaderImage
 );
+
+// Router thêm sản phẩm từ file JSON
+router.post('/addFromFile', addProductFromFile);
 
 // Router lấy tất cả sản phẩm
 router.get('/all', getProducts);

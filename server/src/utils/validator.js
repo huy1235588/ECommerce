@@ -3,7 +3,6 @@ const { body, validationResult } = require('express-validator');
 const Product = require('../models/productModel');
 
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif'];
-const ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.avi', '.mkv', '.mov', '.webm'];
 
 // Hàm kiểm tra định dạng file
 const isValidFileExtension = (fileUrl, allowedExtensions) => {
@@ -22,30 +21,9 @@ const validateFiles = (field, allowedExtensions) => {
         .isArray({ min: 1 }).withMessage(`${capitalize(field)} is required`)
         .custom(files => {
             return files.every((file, index) => {
-                // Kiểm tra xem field có phải là videos không
-                if (field === 'videos') {
-                    const { mp4, webm, thumbnail } = file;
-
-                    // Kiểm tra xem mp4, webm, thumbnail có tồn tại không
-                    if (!mp4 || !webm || !thumbnail) {
-                        throw new Error(`${field} at index ${index} must have mp4, webm, and thumbnail`);
-                    }
-
-                    // Kiểm tra định dạng của mp4, webm, thumbnail
-                    if (
-                        !isValidFileExtension(mp4, ['.mp4']) ||
-                        !isValidFileExtension(webm, ['.webm']) ||
-                        !isValidFileExtension(thumbnail, ALLOWED_IMAGE_EXTENSIONS)
-                    ) {
-                        throw new Error(`Invalid file format at index ${index}`);
-                    }
-                }
-                // Kiểm tra xem field có phải là screenshots không
-                else {
-                    // Kiểm tra định dạng của file
-                    if (!isValidFileExtension(file, allowedExtensions)) {
-                        throw new Error(`Invalid ${field} format at index ${index}. Allowed formats: ${allowedExtensions.join(', ')}`);
-                    }
+                // Kiểm tra định dạng của file
+                if (!isValidFileExtension(file, allowedExtensions)) {
+                    throw new Error(`Invalid ${field} format at index ${index}. Allowed formats: ${allowedExtensions.join(', ')}`);
                 }
                 return true;
             });
@@ -127,7 +105,28 @@ const productValidation = [
     validateFiles('screenshots', ALLOWED_IMAGE_EXTENSIONS),
 
     // Kiểm tra array định dạng của video [mp4, avi, mkv, mov, webm]
-    validateFiles('videos', ALLOWED_VIDEO_EXTENSIONS),
+    body('videos')
+        .custom(files => {
+            return files.every((file, index) => {
+                // Kiểm tra xem field có phải là videos không
+                const { mp4, webm, thumbnail } = file;
+
+                // Kiểm tra xem mp4, webm, thumbnail có tồn tại không
+                if (!mp4 || !webm || !thumbnail) {
+                    throw new Error(`${field} at index ${index} must have mp4, webm, and thumbnail`);
+                }
+
+                // Kiểm tra định dạng của mp4, webm, thumbnail
+                if (
+                    !isValidFileExtension(mp4, ['.mp4']) ||
+                    !isValidFileExtension(webm, ['.webm']) ||
+                    !isValidFileExtension(thumbnail, ALLOWED_IMAGE_EXTENSIONS)
+                ) {
+                    throw new Error(`Invalid file format at index ${index}`);
+                }
+                return true;
+            });
+        }),
 
     // Kiểm tra xem genres có ít nhất 1 phần tử không
     body('genres')

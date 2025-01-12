@@ -1,4 +1,17 @@
+const { default: mongoose } = require("mongoose");
 const Product = require("../models/productModel");
+const { readDataFromJson } = require("../utils/interactJson");
+const AutoIncrementModel = mongoose.connection.collection('counters'); // Bảng của mongoose-sequence
+
+// Hàm lấy id tiếp theo
+async function getNextId() {
+    const result = await AutoIncrementModel.findOneAndUpdate(
+        { id: 'product_seq' },
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+    );
+    return result.seq;
+}
 
 // Thêm sản phẩm
 const addProduct = async (req, res) => {
@@ -48,6 +61,51 @@ const uploadProductHeaderImage = async (req, res) => {
     }
 }
 
+// Thêm sản phẩm từ file JSON
+const addProductFromFile = async (req, res) => {
+    try {
+        const {
+            jsonId,
+            errorIds
+        } = req.body;
+
+        // Kiểm tra xem người dùng đã nhập đúng các trường cần thiết chưa
+        if (!jsonId || !errorIds) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Đọc dữ liệu từ tệp JSON
+        const data = readDataFromJson(`json/data-${jsonId}.json`);
+
+        // Xoá các sản phẩm có title null
+        const products = data.filter(product => product.title !== null);
+
+        // Thêm id cho sản phẩm
+        const productsWithId = await Promise.all(
+            products.map(async product => {
+                const id = await getNextId();
+                return { ...product, _id: id };
+            })
+        );
+
+        // Thêm sản phẩm vào Database
+        await Product.insertMany(productsWithId);
+
+        res.status(201).json({
+            message: "Products added successfully",
+            errorIds,
+        });
+    }
+    catch (error) {
+        if (error.name === "ValidationError") {
+            console.log(error.errors);
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Lấy tất cả sản phẩm
 const getProducts = async (req, res) => {
     try {
@@ -78,6 +136,7 @@ const getCountByColumn = async (req, res) => {
 
 module.exports = {
     addProduct,
+    addProductFromFile,
     getProducts,
     uploadProductHeaderImage,
     getCountByColumn,

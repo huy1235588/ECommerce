@@ -99,7 +99,6 @@ const productSchema = new mongoose.Schema(
                 // Đường dẫn video mp4
                 mp4: {
                     type: String,
-                    required: true,
                 },
                 // Đường dẫn video webm
                 webm: {
@@ -108,7 +107,6 @@ const productSchema = new mongoose.Schema(
                 // Hình ảnh đại diện cho video
                 thumbnail: {
                     type: String,
-                    required: true,
                 },
             },
         ],
@@ -160,16 +158,16 @@ const productSchema = new mongoose.Schema(
         },
 
     }, {
+    _id: false, // Tắt tự động tạo _id
     timestamps: true,
-    _id: false  // Disable automatic _id generation
 }
 );
 
 // Add auto-increment plugin
 productSchema.plugin(AutoIncrement, {
-    id: 'product_seq',
-    inc_field: '_id',
-    start_seq: 1
+    id: 'product_seq', // Tên bộ đếm
+    inc_field: '_id', // Tên trường chứa giá trị tự tăng
+    start_seq: 1 // Giá trị bắt đầu
 });
 
 const Product = mongoose.model('Product', productSchema);
