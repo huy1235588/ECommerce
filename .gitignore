@@ -6,3 +6,7 @@ northwind/
 */public/video/*
 server/uploads/*
 server/data.json
+*/ssl/*
+
+python/*.html
+python/*.txt

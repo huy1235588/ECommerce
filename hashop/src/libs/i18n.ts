@@ -9,7 +9,7 @@ const loadTranslations = async (lng: string) => {
 
     if (isServer) {
         // Khi chạy trên server, sử dụng URL tuyệt đối
-        const absolutePath = `http://localhost:3000/locales/${lng}/translation.json`;
+        const absolutePath = `${process.env.NEXT_PUBLIC_SERVER_HOSTNAME}/locales/${lng}/translation.json`;
         response = await fetch(absolutePath);
     } else {
         // Khi chạy trên client, sử dụng URL tương đối
