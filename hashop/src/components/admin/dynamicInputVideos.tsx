@@ -18,7 +18,7 @@ const DynamicInputVideo: React.FC<DynamicInputVideoProps> = ({
     values,
     onChange,
 }) => {
-    const [inputs, setInputs] = useState<ProductVideos[]>([{
+    const [inputs, setInputs] = useState<ProductVideos[]>(values || [{
         thumbnail: "",
         mp4: "",
         webm: "",
