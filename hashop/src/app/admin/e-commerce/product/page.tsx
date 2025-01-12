@@ -1,12 +1,13 @@
 'use client';
 
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import axios from "@/config/axios";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/product";
 import "@/styles/pages/admin/product.css"
-import { Button } from "@mui/material";
+import { Button, Rating } from "@mui/material";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 function ECommerceProductsPage() {
     const router = useRouter();
@@ -14,14 +15,53 @@ function ECommerceProductsPage() {
     const [rows, setRows] = useState<Product[]>([]);
 
     // Lấy dữ liệu từ API
-    const columns = [
-        { field: '_id', headerName: 'ID', width: 50 },
-        { field: 'title', headerName: 'TITLE', width: 100 },
-        { field: 'type', headerName: 'TYPE', width: 80 },
-        { field: 'price', headerName: 'PRICE', width: 150 },
-        { field: 'developer', headerName: 'DEVELOPER', width: 150 },
-        { field: 'publisher', headerName: 'PUBLISHER', width: 150 },
-        { field: 'rating', headerName: 'RATING', width: 150 },
+
+    const columns: GridColDef[] = [
+        {
+            field: 'headerImage',
+            headerName: 'IMAGE',
+            width: 220,
+            align: 'center',
+            renderCell: (params: GridRenderCellParams) => (
+                <Image
+                    src={`${process.env.NEXT_PUBLIC_SERVER_URL}\\${params.value}`}
+                    className="product-image"
+                    width={200}
+                    height={110}
+                    alt={params.value}
+                    style={{
+                        padding: '0.005rem 0rem',
+                    }}
+                />
+            )
+        },
+        { field: 'title', headerName: 'TITLE', flex: 1, minWidth: 200 },
+        { field: 'type', headerName: 'TYPE', width: 70 },
+        {
+            field: 'price',
+            headerName: 'PRICE',
+            width: 70,
+            renderCell: (params: GridRenderCellParams) => (
+                <span>${params.value}</span>
+            )
+        },
+        {
+            field: 'discount',
+            headerName: 'DISCOUNT',
+            width: 90,
+            align: 'center',
+            renderCell: (params: GridRenderCellParams) => (
+                <span>{params.value}%</span>
+            )
+        },
+        {
+            field: 'rating',
+            headerName: 'RATING',
+            width: 140,
+            renderCell: (params: GridRenderCellParams) => (
+                <Rating readOnly value={params.value} />
+            )
+        },
     ];
 
     useEffect(() => {
@@ -70,6 +110,18 @@ function ECommerceProductsPage() {
                     checkboxSelection
                     disableRowSelectionOnClick
                     getRowId={(row) => row._id ?? ''}
+                    rowHeight={120}
+                    slotProps={{
+                        cell: {
+                            style:{
+                                display: 'flex',
+                                alignItems: 'center',
+                                transition: 'width 0.3s ease',
+                                textWrap: 'wrap',
+                                lineHeight: '1.5',
+                            }
+                        }
+                    }}
                 />
             </div>
         </div>
