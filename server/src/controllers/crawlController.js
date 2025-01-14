@@ -161,10 +161,9 @@ const crawlByURL = async (req, res) => {
             // Xác định giá và giảm giá
             let price = 0, discount = 0, discountStartDate, discountEndDate;
 
-            // Kiểm tra game có miễn phí không
-            const isFree = document.querySelector("#game_area_purchase div.game_purchase_price.price").textContent;
-
-            if (isFree.trim() !== "Free To Play") {
+            // Kiểm tra miễn phí
+            const isFree = document.querySelector('#freeGameBtn');
+            if (!isFree) {
                 // Lấy container chính của thông tin mua game
                 const purchaseWrappers = document.querySelector("#game_area_purchase div[data-price-final]");
 
@@ -497,10 +496,9 @@ const crawlByMultipleId = async (req, res) => {
                     // Xác định giá và giảm giá
                     let price = 0, discount = 0, discountStartDate, discountEndDate;
 
-                    // Kiểm tra game có miễn phí không
-                    const isFreeElemnt = document.querySelector("#game_area_purchase div.game_purchase_price.price");
-
-                    if (!isFreeElemnt) {
+                    // Kiểm tra miễn phí
+                    const isFree = document.querySelector('#freeGameBtn');
+                    if (!isFree) {
                         // Lấy container chính của thông tin mua game
                         const purchaseWrappers = document.querySelector("#game_area_purchase div[data-price-final]");
 
@@ -536,9 +534,6 @@ const crawlByMultipleId = async (req, res) => {
                                 price = getElementText(purchaseWrappers);
                             }
                         }
-                    }
-                    else if (isFreeElemnt.textContent.trim() === "Free To Play") {
-                        price = "Free To Play";
                     }
 
                     // Lấy thông tin hệ thống yêu cầu

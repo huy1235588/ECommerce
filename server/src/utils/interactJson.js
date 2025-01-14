@@ -28,7 +28,7 @@ function addDataToJson(filePath, newData) {
 
         // Ghi lại dữ liệu cập nhật vào tệp JSON
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-        console.log('Đã thêm dữ liệu mới vào tệp JSON!');
+        console.log(`Đã thêm dữ liệu mới vào tệp ${filePath} thành công!`);
     } catch (error) {
         console.error('Đã xảy ra lỗi:', error);
     }
