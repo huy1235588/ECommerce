@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { readDataFromJson, addDataToJson } = require('../utils/interactJson');
+const { get } = require('http');
 
 // Craw dữ liệu từ URL
 const crawlByURL = async (req, res) => {
@@ -332,7 +333,7 @@ const crawlByMultipleId = async (req, res) => {
             fileJSONName = `data-${jsonId}.json`;
         }
         else {
-            // Tạo id cho file json
+            // Tạo id cho file json cách 3 tiếng
             const date = new Date();
             const timestamp = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
             jsonId = timestamp;
@@ -525,7 +526,8 @@ const crawlByMultipleId = async (req, res) => {
                                     price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_original_price"));
                                     discount = getElementText(purchaseWrappers.querySelector("div.discount_pct"));
                                     discountStartDate = Date.now();
-                                    discountEndDate = `${getElementText(document.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
+                                    const discountEndDateText = `${getElementText(document.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
+                                    discountEndDate = new Date(discountEndDateText).toISOString();
                                 }
 
                             }
@@ -582,6 +584,11 @@ const crawlByMultipleId = async (req, res) => {
                         return requirements;
                     };
 
+                    let release_date = getText('#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div.release_date > div.date');
+                    if (release_date === "To be announced" || release_date === "Coming soon") {
+                        release_date = null;
+                    }
+
                     return {
                         appId: parseInt(id),
                         title: getText('#appHubAppName'),
@@ -593,7 +600,7 @@ const crawlByMultipleId = async (req, res) => {
                         discountStartDate: discountStartDate,
                         discountEndDate: discountEndDate,
                         description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
-                        releaseDate: getText('#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div.release_date > div.date'),
+                        releaseDate: release_date,
                         developer: getListText(
                             '#developers_list',
                             'a'

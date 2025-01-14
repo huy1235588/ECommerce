@@ -7,7 +7,7 @@ with open('python/test.html', 'r', encoding='utf-8') as f:
     soup = BeautifulSoup(f, 'html.parser')
 
 # Mở file để ghi kết quả
-with open('python/app_ids.txt', 'w', encoding='utf-8') as out_file:
+with open('python/ids/app_ids6.txt', 'w', encoding='utf-8') as out_file:
     # Tìm tất cả thẻ <a> trong HTML
     for a_tag in soup.find_all('a'):
         # Chỉ xử lý thẻ <a> có nội dung text
