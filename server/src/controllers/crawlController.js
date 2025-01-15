@@ -366,6 +366,8 @@ const crawlByMultipleId = async (req, res) => {
         // Đường dẫn đến thư mục chứa trình duyệt
         let browserExecutablePath;
 
+        console.log(puppeteer.executablePath());
+
         // Kiểm tra hệ điều hành để chọn đúng đường dẫn trình duyệt
         if (process.platform === "win32") {
             browserExecutablePath = `${__dirname}/../../chrome/win64-132.0.6834.83/chrome-win64/chrome.exe`;
@@ -376,12 +378,13 @@ const crawlByMultipleId = async (req, res) => {
         // Khởi tạo trình duyệt
         const browser = await puppeteer.launch({
             headless: true,
-            executablePath: browserExecutablePath,
+            executablePath: puppeteer.executablePath() ,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox'
             ],
         });
+
 
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
