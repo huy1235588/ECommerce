@@ -1,5 +1,5 @@
 const express = require('express');
-const { addProduct, getProducts, uploadProductHeaderImage, getCountByColumn, addProductFromFile } = require('../controllers/productController');
+const { addProduct, addProductDetailFromFile, getProducts, uploadProductHeaderImage, getCountByColumn, addProductFromFile } = require('../controllers/productController');
 const { productValidation } = require('../utils/validator');
 const multer = require('multer');
 const path = require('path');
@@ -49,6 +49,9 @@ router.post('/add',
     productValidation,
     addProduct
 );
+
+// Router thêm chi tiết sản phẩm từ file JSON
+router.post('/add/detail', addProductDetailFromFile);
 
 // Router upload ảnh sản phẩm
 router.post('/uploadImage',

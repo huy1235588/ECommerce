@@ -25,6 +25,11 @@ const productSchema = new mongoose.Schema(
             type: String,
         },
 
+        // Mô tả chi tiết sản phẩm
+        detail: {
+            type: String,
+        },
+
         // Giá sản phẩm
         price: {
             type: Number,
@@ -75,6 +80,14 @@ const productSchema = new mongoose.Schema(
             min: 0,
             max: 5,
         },
+
+        // User review
+        /**
+         * 
+         * TODO: Thêm user review
+         * 
+         * 
+         */
 
         // Trạng thái sản phẩm
         isActive: {

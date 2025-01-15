@@ -377,6 +377,74 @@ function ECommerceAddProductPage() {
         }
     };
 
+    // Hàm thêm mô tả sản phẩm
+    const handleAddAboutProduct = async (inputValue: string) => {
+        try {
+            // Hiển thị loading
+            setLoading(true);
+
+            // Loại bỏ dấu phẩy và khoảng trắng ở cuối
+            inputValue = inputValue.replace(/,\s*$/, "").trim();
+
+            // Gửi request lên server để crawl dữ liệu
+            const response = await axios.post('/api/crawl/detail', {
+                listAppId: inputValue
+            });
+
+            if (response.status === 200) {
+                // Lấy dữ liệu từ response
+                const result = response.data;
+
+                // Lấy danh sách App ID lỗi
+                const errorIds = result.errorIds;
+
+                // Lấy id của json
+                const jsonId = result.jsonId;
+
+                // Hiển thị loading
+                setButtonDialogState((prevState) => ({
+                    ...prevState,
+                    loading: "Adding list",
+                }));
+
+                // Gọi API thêm detail của danh sách App ID vào database
+                const responseAddList = await axios.post('/api/product/add/detail', {
+                    jsonId: jsonId,
+                    errorIds: errorIds
+                });
+
+                // Kiểm tra response
+                if (responseAddList.status === 200) {
+                    const resultAddList = responseAddList.data;
+
+                    // Hiển thị thông báo thành công
+                    setButtonDialogState((prevState) => ({
+                        ...prevState,
+                        success: resultAddList.message,
+                    }));
+                }
+
+                return result;
+            }
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                // Hiển thị thông báo lỗi
+                setButtonDialogState((prevState) => ({
+                    ...prevState,
+                    error: error.response?.data.message
+                }));
+            }
+        } finally {
+            setLoading(false);
+            // Xoá loading
+            setButtonDialogState((prevState) => ({
+                ...prevState,
+                loading: "",
+            }));
+        }
+    };
+
     return (
         <div className="">
             {/* Page Header */}
@@ -438,6 +506,29 @@ function ECommerceAddProductPage() {
                             type="text"
                             multiple={true}
                             onSubmit={handleAddList}
+                            success={buttonDialogState.success}
+                            successLinks={buttonDialogState.successLinks}
+                            setSuccess={(success) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, success }))
+                            }
+                            error={buttonDialogState.error}
+                            setError={(error) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, error }))
+                            }
+                            loading={buttonDialogState.loading}
+                            setLoading={(loading) =>
+                                setButtonDialogState((prevState) => ({ ...prevState, loading }))
+                            }
+                        />
+
+                        {/* Thêm mô tả sản phẩm */}
+                        <ButtonWithDialog
+                            buttonText="Add about product"
+                            title="Add about product"
+                            label="Enter list App ID (separate by comma)"
+                            type="text"
+                            multiple={true}
+                            onSubmit={handleAddAboutProduct}
                             success={buttonDialogState.success}
                             successLinks={buttonDialogState.successLinks}
                             setSuccess={(success) =>

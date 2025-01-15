@@ -494,6 +494,14 @@ const crawlByMultipleId = async (req, res) => {
                         return Number(price.toString().replace(/[^0-9.]/g, ""));
                     }
 
+                    // Hàm lấy toàn bộ nội dung của element
+                    const getInnerHTML = (selector) => {
+                        const element = document.querySelector(selector);
+                        return element
+                            ? element.innerHTML
+                            : null;
+                    };
+
                     // Xác định giá và giảm giá
                     let price = 0, discount = 0, discountStartDate, discountEndDate;
 
@@ -600,6 +608,7 @@ const crawlByMultipleId = async (req, res) => {
                         discountStartDate: discountStartDate,
                         discountEndDate: discountEndDate,
                         description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
+                        detail: getInnerHTML('#game_area_description'),
                         releaseDate: release_date,
                         developer: getListText(
                             '#developers_list',
@@ -667,7 +676,158 @@ const crawlByMultipleId = async (req, res) => {
     }
 }
 
+// Crawl dữ liệu html từ nhiều ID
+const crawlHtmlByMultipleId = async (req, res) => {
+    try {
+        const ids = req.body.listAppId;
+        let jsonId = req.body.jsonId;
+
+        // Kiểm tra xem ids có tồn tại không
+        if (!ids) {
+            return res.status(400).json({ message: 'Invalid IDs' });
+        }
+
+        // Chuyển ids từ chuỗi thành mảng và xoá newline
+        const idList = ids.split(',').map(id => id.replace(/\n/g, ''));
+
+        /**
+         *   Nếu có jsonId thì sẽ lấy dữ liệu từ file json
+         *   Nếu không có jsonId thì sẽ tạo file json mới
+         */
+        let fileJSONName;
+        if (jsonId) {
+            jsonId = jsonId.replace(/\n/g, '');
+            fileJSONName = `data-detail-${jsonId}.json`;
+        }
+        else {
+            // Tạo id cho file json cách 3 tiếng
+            const date = new Date();
+            const timestamp = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+            jsonId = timestamp;
+
+            // Tạo tên file json
+            fileJSONName = `data-detail-${jsonId}.json`;
+
+            // Kiểm tra xem file json đã tồn tại chưa
+            if (!fs.existsSync(`json/${fileJSONName}`)) {
+                fs.writeFileSync(`json/${fileJSONName}`, '[]', 'utf8');
+            }
+        }
+
+        // Lấy dữ liệu từ tệp JSON
+        const data = readDataFromJson(`json/${fileJSONName}`);
+
+        // Lọc dữ liệu từ mảng ids không có trong tệp JSON
+        const idsNotInData = idList.filter(id => !data.some(item => item.appId === parseInt(id)));
+
+        // Khởi tạo trình duyệt
+        const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
+        const page = await browser.newPage();
+        await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
+
+        // Duyệt qua mảng ids không có trong tệp JSON
+        for (const id of idsNotInData) {
+            const url = `https://store.steampowered.com/app/${id}?cc=en`;
+
+            console.log('Đang crawl dữ liệu từ:', url);
+
+            try {
+                // Truy cập vào trang web
+                await page.goto(url);
+
+                // Xử lý nếu có cổng yêu cầu xác nhận tuổi
+                const isAgeGate = await page.$('#ageYear');
+
+                if (isAgeGate) {
+                    console.log('Xác định cổng xác nhận tuổi.');
+
+                    // Chọn năm sinh trong thẻ select có id 'ageYear'
+                    // Chọn ngẫu nhiên một năm từ 1980 đến 2003
+                    const ageYear = Math.floor(Math.random() * (2003 - 1980 + 1)) + 1980;
+                    await page.select('#ageYear', ageYear.toString());
+
+                    // Nhấn nút xác nhận trong thẻ a có id 'view_product_page_btn'
+                    await page.click('#view_product_page_btn');
+
+                    // Chờ thêm thời gian để đảm bảo thao tác hoàn tất
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Lấy URL sau khi chuyển hướng
+                    let currentUrl = await page.url();
+                    console.log('URL sau khi chuyển hướng: ' + currentUrl);
+
+                    // Thêm tham số ?cc=en vào URL nếu chưa có
+                    if (!currentUrl.includes('?')) {
+                        currentUrl += '?cc=en';
+                    } else {
+                        currentUrl += '&cc=en';
+                    }
+
+                    // Điều hướng đến URL mới với tham số cc=en
+                    await page.goto(currentUrl);
+                    console.log('URL mới sau khi thêm cc=en: ' + currentUrl);
+                }
+
+                // Hàm lấy text từ selector
+                const data = await page.evaluate((id) => {
+                    // Hàm lấy text từ selector
+                    const getText = (selector) => {
+                        const element = document.querySelector(selector);
+                        return element
+                            ? element.innerText
+                            : null;
+                    };
+
+                    // Hàm lấy toàn bộ nội dung của element
+                    const getInnerHTML = (selector) => {
+                        const element = document.querySelector(selector);
+                        return element
+                            ? element.innerHTML
+                            : null;
+                    };
+
+                    return {
+                        appId: parseInt(id),
+                        title: getText('#appHubAppName'),
+                        detail: getInnerHTML('#game_area_description'),
+                    };
+                }, id);
+
+                // Ghi vào file mảng json
+                addDataToJson(`json/${fileJSONName}`, data);
+
+            } catch (error) {
+                console.error(`Lỗi khi crawl dữ liệu từ ID ${id}:`, error);
+            }
+        };
+
+        // Đóng trình duyệt
+        await browser.close();
+
+        // Đọc dữ liệu từ tệp JSON đã cập nhật
+        const dataUpdated = readDataFromJson(`json/${fileJSONName}`);
+
+        // Lấy ra các id có title null trong file json
+        const errorIds = dataUpdated.filter(item => item.title === null).map(item => item.appId);
+
+        res.json({
+            message: 'Crawl data successfully!',
+            errorIds: errorIds,
+            jsonId: jsonId
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
 module.exports = {
     crawlByURL,
-    crawlByMultipleId
+    crawlByMultipleId,
+    crawlHtmlByMultipleId,
 }

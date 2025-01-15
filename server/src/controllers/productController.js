@@ -106,6 +106,42 @@ const addProductFromFile = async (req, res) => {
     }
 };
 
+// Thêm chi tiết sản phẩm từ file JSON vào Database
+const addProductDetailFromFile = async (req, res) => {
+    try {
+        const { jsonId, errorIds } = req.body;
+
+        if (!jsonId || !errorIds) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const data = readDataFromJson(`json/data-detail-${jsonId}.json`);
+
+        const products = data;
+
+        products.forEach(async product => {
+            const result = await Product.updateOne(
+                { title: product.title },
+                { $set: { detail: product.detail } }
+            );
+
+            console.log(`Updated ${result.matchedCount} product(s) with title ${product.title}`);
+        });
+
+        res.status(201).json({
+            message: "Products updated successfully",
+            errorIds,
+        });
+    } catch (error) {
+        if (error.name === "ValidationError") {
+            console.log(error.errors);
+            return res.status(400).json({ error: error.message });
+        }
+
+        res.status(500).json({ error: error.message });
+    }
+};
+
 // Lấy tất cả sản phẩm
 const getProducts = async (req, res) => {
     try {
@@ -137,6 +173,7 @@ const getCountByColumn = async (req, res) => {
 module.exports = {
     addProduct,
     addProductFromFile,
+    addProductDetailFromFile,
     getProducts,
     uploadProductHeaderImage,
     getCountByColumn,
