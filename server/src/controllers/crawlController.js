@@ -378,310 +378,309 @@ const crawlByMultipleId = async (req, res) => {
         // Khởi tạo trình duyệt
         const browser = await puppeteer.launch({
             headless: true,
-            executablePath: puppeteer.executablePath() ,
+            executablePath: puppeteer.executablePath(),
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox'
             ],
         });
 
-
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
 
         // Duyệt qua mảng ids không có trong tệp JSON
-        // for (const id of idsNotInData) {
-        //     const url = `https://store.steampowered.com/app/${id}?cc=en`;
+        for (const id of idsNotInData) {
+            const url = `https://store.steampowered.com/app/${id}?cc=en`;
 
-        //     console.log('Đang crawl dữ liệu từ:', url);
+            console.log('Đang crawl dữ liệu từ:', url);
 
-        //     try {
-        //         // Truy cập vào trang web
-        //         await page.goto(url);
+            try {
+                // Truy cập vào trang web
+                await page.goto(url);
 
-        //         // Xử lý nếu có cổng yêu cầu xác nhận tuổi
-        //         const isAgeGate = await page.$('#ageYear');
+                // Xử lý nếu có cổng yêu cầu xác nhận tuổi
+                const isAgeGate = await page.$('#ageYear');
 
-        //         if (isAgeGate) {
-        //             console.log('Xác định cổng xác nhận tuổi.');
+                if (isAgeGate) {
+                    console.log('Xác định cổng xác nhận tuổi.');
 
-        //             // Chọn năm sinh trong thẻ select có id 'ageYear'
-        //             // Chọn ngẫu nhiên một năm từ 1980 đến 2003
-        //             const ageYear = Math.floor(Math.random() * (2003 - 1980 + 1)) + 1980;
-        //             await page.select('#ageYear', ageYear.toString());
+                    // Chọn năm sinh trong thẻ select có id 'ageYear'
+                    // Chọn ngẫu nhiên một năm từ 1980 đến 2003
+                    const ageYear = Math.floor(Math.random() * (2003 - 1980 + 1)) + 1980;
+                    await page.select('#ageYear', ageYear.toString());
 
-        //             // Nhấn nút xác nhận trong thẻ a có id 'view_product_page_btn'
-        //             await page.click('#view_product_page_btn');
+                    // Nhấn nút xác nhận trong thẻ a có id 'view_product_page_btn'
+                    await page.click('#view_product_page_btn');
 
-        //             // Chờ thêm thời gian để đảm bảo thao tác hoàn tất
-        //             await new Promise(resolve => setTimeout(resolve, 1000));
+                    // Chờ thêm thời gian để đảm bảo thao tác hoàn tất
+                    await new Promise(resolve => setTimeout(resolve, 1000));
 
-        //             // Lấy URL sau khi chuyển hướng
-        //             let currentUrl = await page.url();
-        //             console.log('URL sau khi chuyển hướng: ' + currentUrl);
+                    // Lấy URL sau khi chuyển hướng
+                    let currentUrl = await page.url();
+                    console.log('URL sau khi chuyển hướng: ' + currentUrl);
 
-        //             // Thêm tham số ?cc=en vào URL nếu chưa có
-        //             if (!currentUrl.includes('?')) {
-        //                 currentUrl += '?cc=en';
-        //             } else {
-        //                 currentUrl += '&cc=en';
-        //             }
+                    // Thêm tham số ?cc=en vào URL nếu chưa có
+                    if (!currentUrl.includes('?')) {
+                        currentUrl += '?cc=en';
+                    } else {
+                        currentUrl += '&cc=en';
+                    }
 
-        //             // Điều hướng đến URL mới với tham số cc=en
-        //             await page.goto(currentUrl);
-        //             console.log('URL mới sau khi thêm cc=en: ' + currentUrl);
-        //         }
+                    // Điều hướng đến URL mới với tham số cc=en
+                    await page.goto(currentUrl);
+                    console.log('URL mới sau khi thêm cc=en: ' + currentUrl);
+                }
 
-        //         // Hàm lấy text từ selector
-        //         const data = await page.evaluate((id) => {
-        //             // Hàm làm sạch văn bản (loại bỏ khoảng trắng, dấu xuống dòng, tab)
-        //             const cleanText = (text) => {
-        //                 return text
-        //                     ? text.trim().replace(/\n/g, '').replace(/\t/g, '')
-        //                     : null;
-        //             };
+                // Hàm lấy text từ selector
+                const data = await page.evaluate((id) => {
+                    // Hàm làm sạch văn bản (loại bỏ khoảng trắng, dấu xuống dòng, tab)
+                    const cleanText = (text) => {
+                        return text
+                            ? text.trim().replace(/\n/g, '').replace(/\t/g, '')
+                            : null;
+                    };
 
-        //             // Hàm lấy text từ selector
-        //             const getText = (selector) => {
-        //                 const element = document.querySelector(selector);
-        //                 return element
-        //                     ? cleanText(element.innerText)
-        //                     : null;
-        //             };
+                    // Hàm lấy text từ selector
+                    const getText = (selector) => {
+                        const element = document.querySelector(selector);
+                        return element
+                            ? cleanText(element.innerText)
+                            : null;
+                    };
 
-        //             // Hàm lấy text từ element
-        //             const getElementText = (element) => {
-        //                 return element
-        //                     ? cleanText(element.innerText)
-        //                     : null;
-        //             }
+                    // Hàm lấy text từ element
+                    const getElementText = (element) => {
+                        return element
+                            ? cleanText(element.innerText)
+                            : null;
+                    }
 
-        //             // Hàm lấy danh sách từ selector
-        //             const getListText = (selector, childSelector) => {
-        //                 const container = document.querySelector(selector);
-        //                 if (!container) return [];
+                    // Hàm lấy danh sách từ selector
+                    const getListText = (selector, childSelector) => {
+                        const container = document.querySelector(selector);
+                        if (!container) return [];
 
-        //                 return Array.from(container.querySelectorAll(childSelector))
-        //                     .map(link =>
-        //                         cleanText(link.innerText)
-        //                     );
-        //             };
+                        return Array.from(container.querySelectorAll(childSelector))
+                            .map(link =>
+                                cleanText(link.innerText)
+                            );
+                    };
 
-        //             // Hàm lấy src từ selector
-        //             const getSrc = (selector) => {
-        //                 const element = document.querySelector(selector);
-        //                 return element
-        //                     ? element.src
-        //                     : null;
-        //             };
+                    // Hàm lấy src từ selector
+                    const getSrc = (selector) => {
+                        const element = document.querySelector(selector);
+                        return element
+                            ? element.src
+                            : null;
+                    };
 
-        //             // Hàm lấy danh sách src từ selector
-        //             const getListSrc = (
-        //                 selector,
-        //                 childSelector,
-        //                 Attribute
-        //             ) => {
-        //                 const container = document.querySelector(selector);
-        //                 if (!container) return [];
+                    // Hàm lấy danh sách src từ selector
+                    const getListSrc = (
+                        selector,
+                        childSelector,
+                        Attribute
+                    ) => {
+                        const container = document.querySelector(selector);
+                        if (!container) return [];
 
-        //                 return Array.from(container.querySelectorAll(childSelector))
-        //                     .map(link => {
-        //                         if (Attribute === "src") {
-        //                             return link.src;
-        //                         }
-        //                         else if (Attribute === "href") {
-        //                             return link.href;
-        //                         }
-        //                     });
-        //             };
+                        return Array.from(container.querySelectorAll(childSelector))
+                            .map(link => {
+                                if (Attribute === "src") {
+                                    return link.src;
+                                }
+                                else if (Attribute === "href") {
+                                    return link.href;
+                                }
+                            });
+                    };
 
-        //             // Hàm lấy video từ selector
-        //             const getVideo = (
-        //                 videoSelector,
-        //                 videoChildSelector,
-        //             ) => {
-        //                 const videoContainer = document.querySelector(videoSelector);
-        //                 if (!videoContainer) return [];
+                    // Hàm lấy video từ selector
+                    const getVideo = (
+                        videoSelector,
+                        videoChildSelector,
+                    ) => {
+                        const videoContainer = document.querySelector(videoSelector);
+                        if (!videoContainer) return [];
 
-        //                 return Array.from(videoContainer.querySelectorAll(videoChildSelector))
-        //                     .map(video => {
-        //                         const { dataset } = video;
+                        return Array.from(videoContainer.querySelectorAll(videoChildSelector))
+                            .map(video => {
+                                const { dataset } = video;
 
-        //                         console.log(dataset);
+                                console.log(dataset);
 
-        //                         return {
-        //                             thumbnail: dataset.poster || null,
-        //                             mp4: dataset.mp4Source || null,
-        //                             webm: dataset.webmSource || null,
-        //                         };
-        //                     })
-        //             };
+                                return {
+                                    thumbnail: dataset.poster || null,
+                                    mp4: dataset.mp4Source || null,
+                                    webm: dataset.webmSource || null,
+                                };
+                            })
+                    };
 
-        //             // Hàm chuyển thành số từ chuỗi
-        //             const getNumber = (price) => {
-        //                 return Number(price.toString().replace(/[^0-9.]/g, ""));
-        //             }
+                    // Hàm chuyển thành số từ chuỗi
+                    const getNumber = (price) => {
+                        return Number(price.toString().replace(/[^0-9.]/g, ""));
+                    }
 
-        //             // Hàm lấy toàn bộ nội dung của element
-        //             const getInnerHTML = (selector) => {
-        //                 const element = document.querySelector(selector);
-        //                 return element
-        //                     ? element.innerHTML
-        //                     : null;
-        //             };
+                    // Hàm lấy toàn bộ nội dung của element
+                    const getInnerHTML = (selector) => {
+                        const element = document.querySelector(selector);
+                        return element
+                            ? element.innerHTML
+                            : null;
+                    };
 
-        //             // Xác định giá và giảm giá
-        //             let price = 0, discount = 0, discountStartDate, discountEndDate;
+                    // Xác định giá và giảm giá
+                    let price = 0, discount = 0, discountStartDate, discountEndDate;
 
-        //             // Kiểm tra miễn phí
-        //             const isFree = document.querySelector('#freeGameBtn');
-        //             if (!isFree) {
-        //                 // Lấy container chính của thông tin mua game
-        //                 const purchaseWrappers = document.querySelector("#game_area_purchase div[data-price-final]");
+                    // Kiểm tra miễn phí
+                    const isFree = document.querySelector('#freeGameBtn');
+                    if (!isFree) {
+                        // Lấy container chính của thông tin mua game
+                        const purchaseWrappers = document.querySelector("#game_area_purchase div[data-price-final]");
 
-        //                 // Kiểm tra purchaseWrappers có tồn tại không
-        //                 if (purchaseWrappers) {
-        //                     // Kiểm tra purchaseWrappers có class game_purchase_price price
-        //                     const hasPrice = purchaseWrappers.classList.contains("game_purchase_price", "price");
+                        // Kiểm tra purchaseWrappers có tồn tại không
+                        if (purchaseWrappers) {
+                            // Kiểm tra purchaseWrappers có class game_purchase_price price
+                            const hasPrice = purchaseWrappers.classList.contains("game_purchase_price", "price");
 
-        //                     // Kiểm tra có class discount_block 
-        //                     const hasDiscount = purchaseWrappers.classList.contains("discount_block");
+                            // Kiểm tra có class discount_block 
+                            const hasDiscount = purchaseWrappers.classList.contains("discount_block");
 
-        //                     // Nếu có thuộc tính data-price-final thì lấy giá từ đó
-        //                     if (hasDiscount) {
-        //                         // Kiểm tra có class no_discount
-        //                         const hasNoDiscount = purchaseWrappers.classList.contains("no_discount");
+                            // Nếu có thuộc tính data-price-final thì lấy giá từ đó
+                            if (hasDiscount) {
+                                // Kiểm tra có class no_discount
+                                const hasNoDiscount = purchaseWrappers.classList.contains("no_discount");
 
-        //                         // Nếu có class no_discount thì giảm giá là 0
-        //                         if (hasNoDiscount) {
-        //                             price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_final_price"));
-        //                         }
+                                // Nếu có class no_discount thì giảm giá là 0
+                                if (hasNoDiscount) {
+                                    price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_final_price"));
+                                }
 
-        //                         // Nếu không có class no_discount thì lấy giảm giá
-        //                         else {
-        //                             price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_original_price"));
-        //                             discount = getElementText(purchaseWrappers.querySelector("div.discount_pct"));
-        //                             discountStartDate = Date.now();
-        //                             const discountEndDateText = `${getElementText(document.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
-        //                             discountEndDate = new Date(discountEndDateText).toISOString();
-        //                         }
+                                // Nếu không có class no_discount thì lấy giảm giá
+                                else {
+                                    price = getElementText(purchaseWrappers.querySelector("div.discount_prices > div.discount_original_price"));
+                                    discount = getElementText(purchaseWrappers.querySelector("div.discount_pct"));
+                                    discountStartDate = Date.now();
+                                    const discountEndDateText = `${getElementText(document.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
+                                    discountEndDate = new Date(discountEndDateText).toISOString();
+                                }
 
-        //                     }
-        //                     // Nếu không có giảm giá, lấy giá gốc
-        //                     else if (hasPrice) {
-        //                         price = getElementText(purchaseWrappers);
-        //                     }
-        //                 }
-        //             }
+                            }
+                            // Nếu không có giảm giá, lấy giá gốc
+                            else if (hasPrice) {
+                                price = getElementText(purchaseWrappers);
+                            }
+                        }
+                    }
 
-        //             // Lấy thông tin hệ thống yêu cầu
-        //             const getSystemRequirements = () => {
-        //                 const requirements = {};
-        //                 const sysReqSections = document.querySelectorAll('.game_area_sys_req');
+                    // Lấy thông tin hệ thống yêu cầu
+                    const getSystemRequirements = () => {
+                        const requirements = {};
+                        const sysReqSections = document.querySelectorAll('.game_area_sys_req');
 
-        //                 sysReqSections.forEach(section => {
-        //                     const os = section.getAttribute('data-os');
-        //                     if (os) {
-        //                         requirements[os] = parseRequirements(section);
-        //                     } else {
-        //                         // Nếu không có sysreq_tabs, giả định là chỉ có Windows
-        //                         requirements['windows'] = parseRequirements(section);
-        //                     }
-        //                 });
+                        sysReqSections.forEach(section => {
+                            const os = section.getAttribute('data-os');
+                            if (os) {
+                                requirements[os] = parseRequirements(section);
+                            } else {
+                                // Nếu không có sysreq_tabs, giả định là chỉ có Windows
+                                requirements['windows'] = parseRequirements(section);
+                            }
+                        });
 
-        //                 return requirements;
-        //             };
+                        return requirements;
+                    };
 
-        //             // Hàm phân tích yêu cầu hệ thống
-        //             const parseRequirements = (section) => {
-        //                 const requirements = [];
+                    // Hàm phân tích yêu cầu hệ thống
+                    const parseRequirements = (section) => {
+                        const requirements = [];
 
-        //                 // Lấy danh sách các mục trong phần tối thiểu và đề xuất
-        //                 const minimumItems = Array.from(section.querySelectorAll('.game_area_sys_req_leftCol ul.bb_ul li'));
-        //                 const recommendedItems = Array.from(section.querySelectorAll('.game_area_sys_req_rightCol ul.bb_ul li'));
+                        // Lấy danh sách các mục trong phần tối thiểu và đề xuất
+                        const minimumItems = Array.from(section.querySelectorAll('.game_area_sys_req_leftCol ul.bb_ul li'));
+                        const recommendedItems = Array.from(section.querySelectorAll('.game_area_sys_req_rightCol ul.bb_ul li'));
 
-        //                 // Danh sách các tiêu đề cần lấy
-        //                 const titles = ['OS', 'Processor', 'Memory', 'Graphics', 'DirectX', 'Network', 'Storage', 'Additional Notes'];
+                        // Danh sách các tiêu đề cần lấy
+                        const titles = ['OS', 'Processor', 'Memory', 'Graphics', 'DirectX', 'Network', 'Storage', 'Additional Notes'];
 
-        //                 titles.forEach((title) => {
-        //                     // Tìm mục tương ứng trong danh sách tối thiểu và đề xuất
-        //                     const minimum = minimumItems.find(item => item.textContent.startsWith(`${title}:`))
-        //                         ?.textContent.replace(/.*:\s*/, '').trim() || '';
-        //                     const recommended = recommendedItems.find(item => item.textContent.startsWith(`${title}:`))
-        //                         ?.textContent.replace(/.*:\s*/, '').trim() || '';
+                        titles.forEach((title) => {
+                            // Tìm mục tương ứng trong danh sách tối thiểu và đề xuất
+                            const minimum = minimumItems.find(item => item.textContent.startsWith(`${title}:`))
+                                ?.textContent.replace(/.*:\s*/, '').trim() || '';
+                            const recommended = recommendedItems.find(item => item.textContent.startsWith(`${title}:`))
+                                ?.textContent.replace(/.*:\s*/, '').trim() || '';
 
-        //                     requirements.push({
-        //                         title,
-        //                         minimum,
-        //                         recommended
-        //                     });
-        //                 });
+                            requirements.push({
+                                title,
+                                minimum,
+                                recommended
+                            });
+                        });
 
-        //                 return requirements;
-        //             };
+                        return requirements;
+                    };
 
-        //             let release_date = getText('#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div.release_date > div.date');
-        //             if (release_date === "To be announced" || release_date === "Coming soon") {
-        //                 release_date = null;
-        //             }
+                    let release_date = getText('#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div.release_date > div.date');
+                    if (release_date === "To be announced" || release_date === "Coming soon") {
+                        release_date = null;
+                    }
 
-        //             return {
-        //                 appId: parseInt(id),
-        //                 title: getText('#appHubAppName'),
-        //                 type: "Game",
-        //                 // $14.99 USD => 14.99
-        //                 price: getNumber(price),
-        //                 // -50% => 50
-        //                 discount: getNumber(discount),
-        //                 discountStartDate: discountStartDate,
-        //                 discountEndDate: discountEndDate,
-        //                 description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
-        //                 detail: getInnerHTML('#game_area_description'),
-        //                 releaseDate: release_date,
-        //                 developer: getListText(
-        //                     '#developers_list',
-        //                     'a'
-        //                 ),
-        //                 publisher: getListText(
-        //                     '#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div:nth-child(4) > div.summary.column',
-        //                     'a'
-        //                 ),
-        //                 platform: [
-        //                     "Windows",
-        //                 ],
-        //                 tags: getListText(
-        //                     '#glanceCtnResponsiveRight > div.glance_tags_ctn.popular_tags_ctn > div.glance_tags.popular_tags',
-        //                     'a'
-        //                 ),
-        //                 genres: getListText(
-        //                     '#genresAndManufacturer > span',
-        //                     'a'
-        //                 ),
-        //                 features: getListText(
-        //                     '#category_block > div.game_area_features_list_ctn',
-        //                     'a > div.label'
-        //                 ),
-        //                 headerImage: getSrc('#gameHeaderImageCtn > img'),
-        //                 screenshots: getListSrc(
-        //                     '#highlight_player_area',
-        //                     '.highlight_player_item.highlight_screenshot > div.screenshot_holder > .highlight_screenshot_link',
-        //                     "href"
-        //                 ),
-        //                 videos: getVideo(
-        //                     "#highlight_player_area",
-        //                     "div.highlight_player_item.highlight_movie",
-        //                 ),
-        //                 systemRequirements: getSystemRequirements(),
-        //             };
-        //         }, id);
+                    return {
+                        appId: parseInt(id),
+                        title: getText('#appHubAppName'),
+                        type: "Game",
+                        // $14.99 USD => 14.99
+                        price: getNumber(price),
+                        // -50% => 50
+                        discount: getNumber(discount),
+                        discountStartDate: discountStartDate,
+                        discountEndDate: discountEndDate,
+                        description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
+                        detail: getInnerHTML('#game_area_description'),
+                        releaseDate: release_date,
+                        developer: getListText(
+                            '#developers_list',
+                            'a'
+                        ),
+                        publisher: getListText(
+                            '#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div:nth-child(4) > div.summary.column',
+                            'a'
+                        ),
+                        platform: [
+                            "Windows",
+                        ],
+                        tags: getListText(
+                            '#glanceCtnResponsiveRight > div.glance_tags_ctn.popular_tags_ctn > div.glance_tags.popular_tags',
+                            'a'
+                        ),
+                        genres: getListText(
+                            '#genresAndManufacturer > span',
+                            'a'
+                        ),
+                        features: getListText(
+                            '#category_block > div.game_area_features_list_ctn',
+                            'a > div.label'
+                        ),
+                        headerImage: getSrc('#gameHeaderImageCtn > img'),
+                        screenshots: getListSrc(
+                            '#highlight_player_area',
+                            '.highlight_player_item.highlight_screenshot > div.screenshot_holder > .highlight_screenshot_link',
+                            "href"
+                        ),
+                        videos: getVideo(
+                            "#highlight_player_area",
+                            "div.highlight_player_item.highlight_movie",
+                        ),
+                        systemRequirements: getSystemRequirements(),
+                    };
+                }, id);
 
-        //         // Ghi vào file mảng json
-        //         addDataToJson(`json/${fileJSONName}`, data);
+                // Ghi vào file mảng json
+                addDataToJson(`json/${fileJSONName}`, data);
 
-        //     } catch (error) {
-        //         console.error(`Lỗi khi crawl dữ liệu từ ID ${id}:`, error);
-        //     }
-        // };
+            } catch (error) {
+                console.error(`Lỗi khi crawl dữ liệu từ ID ${id}:`, error);
+            }
+        };
 
         // Đóng trình duyệt
         await browser.close();
