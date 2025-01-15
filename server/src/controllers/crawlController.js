@@ -366,6 +366,7 @@ const crawlByMultipleId = async (req, res) => {
         // Khởi tạo trình duyệt
         const browser = await puppeteer.launch({
             headless: true,
+            executablePath: ' /opt/render/project/src/server/chrome/linux-132.0.6834.83/chrome-linux64/chrome',
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox'
