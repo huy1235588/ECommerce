@@ -346,14 +346,14 @@ const crawlByMultipleId = async (req, res) => {
                 // Tạo thư mục 'json' nếu chưa tồn tại
                 fs.mkdirSync('json');
 
-                console.log('Tạo thư mục "json" thành công!');
+                console.log('Create folder json successfully!');
             }
 
             // Kiểm tra xem file json đã tồn tại chưa
             if (!fs.existsSync(`json/${fileJSONName}`)) {
                 fs.writeFileSync(`json/${fileJSONName}`, '[]', 'utf8');
                 // In ra thông báo tạo file json mới
-                console.log(`Tạo file ${fileJSONName} thành công!`);
+                console.log(`Create file ${fileJSONName} successfully!`);
             }
         }
 
@@ -366,6 +366,7 @@ const crawlByMultipleId = async (req, res) => {
         // Khởi tạo trình duyệt
         const browser = await puppeteer.launch({
             headless: true,
+            executablePath: '/opt/render/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome',
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox'
