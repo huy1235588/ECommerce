@@ -341,9 +341,19 @@ const crawlByMultipleId = async (req, res) => {
             // Tạo tên file json
             fileJSONName = `data-${jsonId}.json`;
 
+            // Kiểm tra xem thư mục 'json' đã tồn tại chưa
+            if (!fs.existsSync('json')) {
+                // Tạo thư mục 'json' nếu chưa tồn tại
+                fs.mkdirSync('json');
+
+                console.log('Tạo thư mục "json" thành công!');
+            }
+
             // Kiểm tra xem file json đã tồn tại chưa
             if (!fs.existsSync(`json/${fileJSONName}`)) {
                 fs.writeFileSync(`json/${fileJSONName}`, '[]', 'utf8');
+                // In ra thông báo tạo file json mới
+                console.log(`Tạo file ${fileJSONName} thành công!`);
             }
         }
 
@@ -356,7 +366,10 @@ const crawlByMultipleId = async (req, res) => {
         // Khởi tạo trình duyệt
         const browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox'
+            ],
         });
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
