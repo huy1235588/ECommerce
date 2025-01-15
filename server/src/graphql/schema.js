@@ -24,6 +24,7 @@ const typeDefs = gql`
     title: String!
     type: String!
     description: String
+    detail: String
     price: Float!
     discount: Float
     discountStartDate: String
