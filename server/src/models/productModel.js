@@ -81,14 +81,6 @@ const productSchema = new mongoose.Schema(
             max: 5,
         },
 
-        // User review
-        /**
-         * 
-         * TODO: Thêm user review
-         * 
-         * 
-         */
-
         // Trạng thái sản phẩm
         isActive: {
             type: Boolean,
@@ -155,6 +147,19 @@ const productSchema = new mongoose.Schema(
                 title: String,
                 minimum: String,
                 recommended: String
+            }],
+        },
+
+        // Ngôn ngữ hỗ trợ
+        languages: {
+            interface: [{
+                type: String,
+            }],
+            fullAudio: [{
+                type: String,
+            }],
+            subtitles: [{
+                type: String,
             }],
         },
 

@@ -32,7 +32,7 @@ const crawlByURL = async (req, res) => {
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
         });
-        const page = await browser.newPage();
+        let page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
         await page.goto(url);
 
@@ -50,11 +50,16 @@ const crawlByURL = async (req, res) => {
             // Nhấn nút xác nhận trong thẻ a có id 'view_product_page_btn'
             await page.click('#view_product_page_btn');
 
+            // // Kiểm tra xem có nút xem trang sản phẩm không
+            // if (await page.$('#view_product_page_btn')) {
+            //     await page.click('#view_product_page_btn');
+            // }
+
             // Chờ thêm thời gian để đảm bảo thao tác hoàn tất
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 1500));
 
             // Lấy URL sau khi chuyển hướng
-            let currentUrl = await page.url();
+            let currentUrl = page.url();
             console.log('URL sau khi chuyển hướng: ' + currentUrl);
 
             // Thêm tham số ?cc=en vào URL nếu chưa có
@@ -65,6 +70,7 @@ const crawlByURL = async (req, res) => {
             }
 
             // Điều hướng đến URL mới với tham số cc=en
+            // page = await browser.newPage();
             await page.goto(currentUrl);
             console.log('URL mới sau khi thêm cc=en: ' + currentUrl);
         }
@@ -75,6 +81,15 @@ const crawlByURL = async (req, res) => {
             const cleanText = (text) => {
                 return text
                     ? text.trim().replace(/\n/g, '').replace(/\t/g, '')
+                    : null;
+            };
+
+            // Hàm lấy toàn bộ nội dung của element
+            const getInnerHTML = (selector) => {
+                const element = document.querySelector(selector);
+                return element
+                    // Xóa \n và \t trong chuỗi
+                    ? element.innerHTML.replace(/\n/g, '').replace(/\t/g, '')
                     : null;
             };
 
@@ -248,7 +263,29 @@ const crawlByURL = async (req, res) => {
                 return requirements;
             };
 
-            return {
+            // Hàm lấy ngôn ngữ từ selector
+            const getLanguage = (selector) => {
+                const rows = document.querySelectorAll(`${selector} tr`);
+
+                // Bỏ dòng đầu tiên vì là tiêu đề
+                return Array.from(rows).slice(1).map(row => {
+                    const columns = row.querySelectorAll('td');
+                    const language = columns[0].textContent.trim();
+                    const interface = columns[1].textContent.includes('✔');
+                    const fullAudio = columns[2].textContent.includes('✔');
+                    const subtitles = columns[3].textContent.includes('✔');
+
+                    return {
+                        language,
+                        interface,
+                        fullAudio,
+                        subtitles,
+                    };
+                });
+            };
+
+            // Lấy thông tin của sản phẩm
+            const product = {
                 appId: parseInt(id),
                 title: getText('#appHubAppName'),
                 type: "Game",
@@ -259,6 +296,7 @@ const crawlByURL = async (req, res) => {
                 discountStartDate: discountStartDate,
                 discountEndDate: discountEndDate,
                 description: getText('#game_highlights > div.rightcol > div > div.game_description_snippet'),
+                detail: getInnerHTML('#game_area_description'),
                 releaseDate: getText('#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div.release_date > div.date'),
                 developer: getListText(
                     '#developers_list',
@@ -295,14 +333,94 @@ const crawlByURL = async (req, res) => {
                 ),
                 systemRequirements: getSystemRequirements(),
             };
+
+            // Thông tin ngôn ngữ của sản phẩm
+            const language = {
+                appId: parseInt(id),
+                title: getText('#appHubAppName'),
+                languages: getLanguage('#languageTable > table.game_language_options'),
+            };
+
+            return {
+                product,
+                language,
+            }
         }, id);
 
+        // // Đường dẫn đến trang thành tựu
+        // const achievementUrl = `https://steamcommunity.com/stats/${id}/achievements?cc=en`;
+        // // Chuyển đến trang thành tựu
+        // await page.goto(achievementUrl);
+
+        const achievementLink = '#achievement_block a';
+        // Nhấn vào link thành tựu
+        await page.click(achievementLink);
+
+        // Lấy url hiện tại
+        const achievementCurrentUrl = page.url();
+        console.log(`URL hiện tại: ${achievementCurrentUrl}`);
+
+        // Đợi cho đến khi selector hiện ra
+        await page.waitForSelector('#mainContents > div.achieveRow .achieveTxt h5:last-child');
+
+        // Lấy số lượng thành tựu
+        const dataAchievement = await page.evaluate((id) => {
+            // Hàm làm sạch văn bản (loại bỏ khoảng trắng, dấu xuống dòng, tab)
+            const cleanText = (text) => {
+                return text
+                    ? text.trim().replace(/\n/g, '').replace(/\t/g, '')
+                    : null;
+            };
+
+            // Hàm lấy text từ selector
+            const getText = (selector) => {
+                const element = document.querySelector(selector);
+
+                return element
+                    ? cleanText(element.innerText)
+                    : null;
+            };       
+
+            // Lấy số lượng thành tựu
+            const rows = document.querySelectorAll(`#mainContents > div.achieveRow`);
+
+            const achievement = Array.from(rows).map(row => {
+                const image = row.querySelector('.achieveImgHolder img').src;
+
+                const txt = row.querySelector('.achieveTxtHolder');
+                const title = txt.querySelector('.achieveTxt h3').textContent;
+                const description = txt.querySelector('.achieveTxt h5').textContent;
+                // 72.4% => 70.4
+                const percent = parseFloat(txt.querySelector('.achievePercent').textContent);
+
+                return {
+                    title,
+                    description,
+                    percent,
+                    image,
+                };
+            });
+
+            return {
+                appId: parseInt(id),
+                title: getText('#responsive_page_template_content > div > div.profile_small_header_bg > div > div:nth-child(1) > h1'),
+                achievement,
+            };
+        }, id);
+
+        // Đóng trình duyệt
         await browser.close();
 
         // Ghi vào file mảng json
-        addDataToJson('data.json', data);
+        addDataToJson('data.json', data.product);
 
-        res.json(data);
+        // Ghi ngôn ngữ vào json 
+        addDataToJson('language.json', data.language);
+
+        // Ghi thành tựu vào json
+        addDataToJson('achievement.json', dataAchievement);
+
+        res.json(data.product);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error.message });
@@ -851,7 +969,6 @@ const crawlHtmlByMultipleId = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
-
 
 module.exports = {
     crawlByURL,

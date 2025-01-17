@@ -1,6 +1,8 @@
 const { default: mongoose } = require("mongoose");
 const Product = require("../models/productModel");
 const { readDataFromJson } = require("../utils/interactJson");
+const Achievement = require("../models/achievementModel");
+const Language = require("../models/languageModel");
 const AutoIncrementModel = mongoose.connection.collection('counters'); // Bảng của mongoose-sequence
 
 // Hàm lấy id tiếp theo
@@ -64,36 +66,58 @@ const uploadProductHeaderImage = async (req, res) => {
 // Thêm sản phẩm từ file JSON
 const addProductFromFile = async (req, res) => {
     try {
-        const {
-            jsonId,
-            errorIds
-        } = req.body;
+        // const {
+        //     jsonId,
+        //     errorIds
+        // } = req.body;
 
-        // Kiểm tra xem người dùng đã nhập đúng các trường cần thiết chưa
-        if (!jsonId || !errorIds) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
+        // // Kiểm tra xem người dùng đã nhập đúng các trường cần thiết chưa
+        // if (!jsonId || !errorIds) {
+        //     return res.status(400).json({ error: 'Missing required fields' });
+        // }
 
         // Đọc dữ liệu từ tệp JSON
-        const data = readDataFromJson(`json/data-${jsonId}.json`);
+        // const data = readDataFromJson(`json/data-${jsonId}.json`);
+
+        const productData = readDataFromJson(`data.json`);
+        const achievementData = readDataFromJson(`achievement.json`);
+        const languageData = readDataFromJson(`language.json`);
 
         // Xoá các sản phẩm có title null
-        const products = data.filter(product => product.title !== null);
+        // const products = data.filter(product => product.title !== null);
 
         // Thêm id cho sản phẩm
         const productsWithId = await Promise.all(
-            products.map(async product => {
+            productData.map(async product => {
                 const id = await getNextId();
                 return { ...product, _id: id };
             })
         );
 
-        // Thêm sản phẩm vào Database
-        await Product.insertMany(productsWithId);
+        for (let i = 0; i < productsWithId.length; i++) {
+            const product = productsWithId[i];
+            const productModel = new Product(product);
+            await productModel.save();
+
+            // Thêm thành tựu cho sản phẩm
+            const achievement = achievementData[i];
+            const achievementModel = new Achievement({
+                productId: productModel._id,
+                achievements: achievement.achievement
+            });
+            await achievementModel.save();
+
+            // Thêm ngôn ngữ cho sản phẩm
+            const language = languageData[i];
+            const languageModel = new Language({
+                productId: productModel._id,
+                languages: language.languages
+            });
+            await languageModel.save();
+        }
 
         res.status(201).json({
             message: "Products added successfully",
-            errorIds,
         });
     }
     catch (error) {
