@@ -7,10 +7,10 @@ const authRoute = require('./src/routers/authRoute');
 const userRoute = require('./src/routers/userRoute');
 const productRouter = require('./src/routers/productRoute');
 const crawlRouter = require('./src/routers/crawlRoute');
-const resolvers = require('./src/graphql/resolvers');
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const typeDefs = require('./src/graphql/schema');
+const resolvers = require('./src/graphql/resolvers');
 
 // Đọc các biến môi trường từ file .env
 dotnet.config();

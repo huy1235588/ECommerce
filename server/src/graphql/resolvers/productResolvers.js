@@ -14,7 +14,12 @@ const productResolver = {
 
         // Hàm này trả về một danh sách sản phẩm dựa vào các điều kiện lọc
         filterProducts: async (_, args) => {
-            return await Product.find(args);
+            const { limit, ...filters } = args;
+            let query = Product.find(filters);
+            if (limit) {
+                query = query.limit(limit);
+            }
+            return await query;
         },
     },
     Mutation: {
