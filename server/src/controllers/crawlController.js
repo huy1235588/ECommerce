@@ -1,7 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { readDataFromJson, addDataToJson } = require('../utils/interactJson');
-const { get } = require('http');
 
 // Craw dữ liệu từ URL
 const crawlByURL = async (req, res) => {
@@ -347,13 +346,8 @@ const crawlByURL = async (req, res) => {
             }
         }, id);
 
-        // // Đường dẫn đến trang thành tựu
-        // const achievementUrl = `https://steamcommunity.com/stats/${id}/achievements?cc=en`;
-        // // Chuyển đến trang thành tựu
-        // await page.goto(achievementUrl);
-
-        const achievementLink = '#achievement_block a';
         // Nhấn vào link thành tựu
+        const achievementLink = '#achievement_block a';
         await page.click(achievementLink);
 
         // Lấy url hiện tại
@@ -379,7 +373,7 @@ const crawlByURL = async (req, res) => {
                 return element
                     ? cleanText(element.innerText)
                     : null;
-            };       
+            };
 
             // Lấy số lượng thành tựu
             const rows = document.querySelectorAll(`#mainContents > div.achieveRow`);
@@ -448,7 +442,7 @@ const crawlByMultipleId = async (req, res) => {
         let fileJSONName;
         if (jsonId) {
             jsonId = jsonId.replace(/\n/g, '');
-            fileJSONName = `data-${jsonId}.json`;
+            fileJSONName = `data-${jsonId}`;
         }
         else {
             // Tạo id cho file json cách 3 tiếng
@@ -456,8 +450,8 @@ const crawlByMultipleId = async (req, res) => {
             const timestamp = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
             jsonId = timestamp;
 
-            // Tạo tên file json
-            fileJSONName = `data-${jsonId}.json`;
+            // Tạo tên folder json
+            fileJSONName = `data-${jsonId}`;
 
             // Kiểm tra xem thư mục 'json' đã tồn tại chưa
             if (!fs.existsSync('json')) {
@@ -467,31 +461,40 @@ const crawlByMultipleId = async (req, res) => {
                 console.log('Create folder json successfully!');
             }
 
-            // Kiểm tra xem file json đã tồn tại chưa
+            // Kiểm tra xem thư mục 'json/${fileJSONName}' đã tồn tại chưa
             if (!fs.existsSync(`json/${fileJSONName}`)) {
-                fs.writeFileSync(`json/${fileJSONName}`, '[]', 'utf8');
+                // Tạo thư mục 'json/${fileJSONName}' nếu chưa tồn tại
+                fs.mkdirSync(`json/${fileJSONName}`);
+
+                console.log(`Create folder json/${fileJSONName} successfully!`);
+            }
+
+            // Kiểm tra xem file json đã tồn tại chưa
+            if (!fs.existsSync(`json/${fileJSONName}/data.json`)) {
+                fs.writeFileSync(`json/${fileJSONName}/data.json`, '[]', 'utf8');
                 // In ra thông báo tạo file json mới
-                console.log(`Create file ${fileJSONName} successfully!`);
+                console.log(`Create file ${fileJSONName}/data.json successfully!`);
+            }
+
+            // Kiểm tra xem file json thành tựu đã tồn tại chưa
+            if (!fs.existsSync(`json/${fileJSONName}/achievement.json`)) {
+                fs.writeFileSync(`json/${fileJSONName}/achievement.json`, '[]', 'utf8');
+                // In ra thông báo tạo file json mới
+                console.log(`Create file ${fileJSONName}/achievement.json successfully!`);
             }
         }
 
         // Lấy dữ liệu từ tệp JSON
-        const data = readDataFromJson(`json/${fileJSONName}`);
+        const data = readDataFromJson(`json/${fileJSONName}/data.json`);
 
         // Lọc dữ liệu từ mảng ids không có trong tệp JSON
         const idsNotInData = idList.filter(id => !data.some(item => item.appId === parseInt(id)));
 
-        // Đường dẫn đến thư mục chứa trình duyệt
-        let browserExecutablePath;
+        // Lấy dữ liệu từ tệp JSON thành tựu
+        const dataAchievement = readDataFromJson(`json/${fileJSONName}/achievement.json`);
 
-        console.log(puppeteer.executablePath());
-
-        // Kiểm tra hệ điều hành để chọn đúng đường dẫn trình duyệt
-        if (process.platform === "win32") {
-            browserExecutablePath = `${__dirname}/../../chrome/win64-132.0.6834.83/chrome-win64/chrome.exe`;
-        } else if (process.platform === "linux") {
-            browserExecutablePath = `${__dirname}/../../chrome/linux-132.0.6834.83/chrome-linux64/chrome.exe`;
-        }
+        // Lọc dữ liệu từ mảng ids không có trong tệp JSON
+        const idsNotInAchievement = idList.filter(id => !dataAchievement.some(item => item.appId === parseInt(id)));
 
         // Khởi tạo trình duyệt
         const browser = await puppeteer.launch({
@@ -643,7 +646,8 @@ const crawlByMultipleId = async (req, res) => {
                     const getInnerHTML = (selector) => {
                         const element = document.querySelector(selector);
                         return element
-                            ? element.innerHTML
+                            // Xóa \n và \t trong chuỗi
+                            ? element.innerHTML.replace(/\n/g, '').replace(/\t/g, '')
                             : null;
                     };
 
@@ -680,7 +684,15 @@ const crawlByMultipleId = async (req, res) => {
                                     discount = getElementText(purchaseWrappers.querySelector("div.discount_pct"));
                                     discountStartDate = Date.now();
                                     const discountEndDateText = `${getElementText(document.querySelector("p.game_purchase_discount_countdown"))} ${new Date().getFullYear()}`;
-                                    discountEndDate = new Date(discountEndDateText).toISOString();
+                                    // Biểu thức chính quy để kiểm tra định dạng ngày tháng
+                                    const dateRegex = /^(January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}$/;
+
+                                    if (dateRegex.test(discountEndDateText)) {
+                                        // Nếu đúng định dạng, chuyển đổi sang kiểu Date
+                                        discountEndDate = new Date(discountEndDateText).toISOString();
+                                    } else {
+                                        discountEndDate = null;
+                                    }
                                 }
 
                             }
@@ -737,12 +749,48 @@ const crawlByMultipleId = async (req, res) => {
                         return requirements;
                     };
 
+                    // Nếu không có release_date thì gán null
                     let release_date = getText('#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div.release_date > div.date');
                     if (release_date === "To be announced" || release_date === "Coming soon") {
                         release_date = null;
                     }
 
-                    return {
+                    // Hàm lấy ngôn ngữ từ selector
+                    const getLanguage = (selector) => {
+                        const rows = document.querySelectorAll(`${selector} tr`);
+
+                        // Bỏ dòng đầu tiên vì là tiêu đề
+                        return Array.from(rows).slice(1).map(row => {
+                            const columns = row.querySelectorAll('td');
+
+                            const language = columns[0].textContent.trim();
+
+                            // Kiểm tra có interface, fullAudio, subtitles không
+                            if (columns.length === 4) {
+                                const interface = columns[1].textContent.includes('✔');
+                                const fullAudio = columns[2].textContent.includes('✔');
+                                const subtitles = columns[3].textContent.includes('✔');
+
+                                return {
+                                    language,
+                                    interface,
+                                    fullAudio,
+                                    subtitles,
+                                };
+                            }
+                            else {
+                                return {
+                                    language,
+                                    interface: false,
+                                    fullAudio: false,
+                                    subtitles: false,
+                                };
+                            }
+                        });
+                    };
+
+                    // Lấy thông tin của sản phẩm
+                    const product = {
                         appId: parseInt(id),
                         title: getText('#appHubAppName'),
                         type: "Game",
@@ -790,29 +838,130 @@ const crawlByMultipleId = async (req, res) => {
                         ),
                         systemRequirements: getSystemRequirements(),
                     };
+
+                    // Thông tin ngôn ngữ của sản phẩm
+                    const language = {
+                        appId: parseInt(id),
+                        title: getText('#appHubAppName'),
+                        languages: getLanguage('#languageTable > table.game_language_options'),
+                    };
+
+                    return {
+                        product,
+                        language,
+                    }
                 }, id);
 
                 // Ghi vào file mảng json
-                addDataToJson(`json/${fileJSONName}`, data);
+                addDataToJson(`json/${fileJSONName}/data.json`, data.product);
+
+                // Ghi ngôn ngữ vào json
+                addDataToJson(`json/${fileJSONName}/language.json`, data.language);
 
             } catch (error) {
                 console.error(`Lỗi khi crawl dữ liệu từ ID ${id}:`, error);
             }
         };
 
+        // Duyêt qua mảng ids để lấy dữ liệu thành tựu
+        for (const id of idsNotInAchievement) {
+            const url = `https://steamcommunity.com/stats/${id}/achievements/?l=english`;
+
+            console.log('Đang dữ liệu thành tựu từ:', url);
+
+            try {
+                // Truy cập vào trang web
+                await page.goto(url);
+
+                // Lấy số lượng thành tựu
+                const dataAchievement = await page.evaluate((id) => {
+                    // Hàm làm sạch văn bản (loại bỏ khoảng trắng, dấu xuống dòng, tab)
+                    const cleanText = (text) => {
+                        return text
+                            ? text.trim().replace(/\n/g, '').replace(/\t/g, '')
+                            : null;
+                    };
+
+                    // Hàm lấy text từ selector
+                    const getText = (selector) => {
+                        const element = document.querySelector(selector);
+
+                        return element
+                            ? cleanText(element.innerText)
+                            : null;
+                    };
+
+                    const titleApp = getText('#responsive_page_template_content > div > div.profile_small_header_bg > div > div:nth-child(1) > h1');
+
+                    // Lấy số lượng thành tựu
+                    const rows = document.querySelectorAll(`#mainContents > div.achieveRow`);
+
+                    const achievement = Array.from(rows).map(row => {
+                        let image, title, description, percent;
+
+                        // Nếu không có titleApp thì gán null
+                        if (titleApp === null) {
+                            image = null;
+                            title = null;
+                            description = null;
+                            percent = null;
+                        }
+                        else {
+                            image = row.querySelector('.achieveImgHolder img').src;
+
+                            const txt = row.querySelector('.achieveTxtHolder');
+                            title = txt.querySelector('.achieveTxt h3').textContent;
+                            description = txt.querySelector('.achieveTxt h5').textContent;
+                            // 72.4% => 70.4
+                            percent = parseFloat(txt.querySelector('.achievePercent').textContent);
+                        }                      
+
+                        return {
+                            title,
+                            description,
+                            percent,
+                            image,
+                        };
+                    });
+
+                    return {
+                        appId: parseInt(id),
+                        title: titleApp,
+                        achievement,
+                    };
+                }, id);
+
+                // Ghi vào file mảng json
+                addDataToJson(`json/${fileJSONName}/achievement.json`, dataAchievement);
+
+            } catch (error) {
+                console.error(`Lỗi khi crawl dữ liệu thành tựu từ ID ${id}:`, error);
+            }
+
+        }
+
         // Đóng trình duyệt
         await browser.close();
 
         // Đọc dữ liệu từ tệp JSON đã cập nhật
-        const dataUpdated = readDataFromJson(`json/${fileJSONName}`);
-
+        const dataUpdated = readDataFromJson(`json/${fileJSONName}/data.json`);
         // Lấy ra các id có title null trong file json
         const errorIds = dataUpdated.filter(item => item.title === null).map(item => item.appId);
 
+        // Đọc dữ liệu từ tệp JSON thành tựu đã cập nhật
+        const dataAchievementUpdated = readDataFromJson(`json/${fileJSONName}/achievement.json`);
+        // Lấy ra các id có title null trong file json
+        const errorIdsAchievement = dataAchievementUpdated.filter(item => item.title === null).map(item => item.appId);
+
+        // In ra thông báo crawl dữ liệu thành công
+        console.log('Crawl dữ liệu thành công!');
+
+        // Trả về kết quả
         res.json({
             message: 'Crawl data successfully!',
+            jsonId: jsonId,
             errorIds: errorIds,
-            jsonId: jsonId
+            errorIdsAchievement: errorIdsAchievement,
         });
 
     } catch (error) {

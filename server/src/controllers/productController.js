@@ -66,56 +66,69 @@ const uploadProductHeaderImage = async (req, res) => {
 // Thêm sản phẩm từ file JSON
 const addProductFromFile = async (req, res) => {
     try {
-        // const {
-        //     jsonId,
-        //     errorIds
-        // } = req.body;
+        const {
+            jsonId,
+            errorIds,
+            errorIdsAchievement
+        } = req.body;
 
-        // // Kiểm tra xem người dùng đã nhập đúng các trường cần thiết chưa
-        // if (!jsonId || !errorIds) {
-        //     return res.status(400).json({ error: 'Missing required fields' });
-        // }
+        // Kiểm tra xem người dùng đã nhập đúng các trường cần thiết chưa
+        if (!jsonId || !errorIds || !errorIdsAchievement) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
 
         // Đọc dữ liệu từ tệp JSON
-        // const data = readDataFromJson(`json/data-${jsonId}.json`);
+        const folder = `json/data-${jsonId}`;
 
-        const productData = readDataFromJson(`data.json`);
-        const achievementData = readDataFromJson(`achievement.json`);
-        const languageData = readDataFromJson(`language.json`);
+        const productData = readDataFromJson(`${folder}/data.json`);
+        const achievementData = readDataFromJson(`${folder}/achievement.json`);
+        const languageData = readDataFromJson(`${folder}/language.json`);
 
-        // Xoá các sản phẩm có title null
-        // const products = data.filter(product => product.title !== null);
+        // Lọc ra các sản phẩm hợp lệ
+        const validProducts = productData.filter(product => product.title !== null);
+
+        // Cập nhật achievementData từ validProducts
+        errorIdsAchievement.forEach(errorId => {
+            const productAchievement = validProducts.find(item => item.id === errorId);
+            const achievement = achievementData.find(item => item.id === errorId);
+
+            if (productAchievement && productAchievement.title && achievement) {
+                achievement.title = productAchievement.title;
+            }
+        });
 
         // Thêm id cho sản phẩm
         const productsWithId = await Promise.all(
-            productData.map(async product => {
-                const id = await getNextId();
-                return { ...product, _id: id };
+            validProducts.map(async product => ({
+                ...product,
+                _id: await getNextId(),
+            }))
+        );
+
+        // Thêm sản phẩm vào Database
+        const productModels = productsWithId.map(product => new Product(product));
+        const achievementModels = productModels.map((product, i) =>
+            new Achievement({
+                productId: product._id,
+                achievements: achievementData[i]?.achievement || [],
+            })
+        );
+        const languageModels = productModels.map((product, i) =>
+            new Language({
+                productId: product._id,
+                languages: languageData[i]?.languages || [],
             })
         );
 
-        for (let i = 0; i < productsWithId.length; i++) {
-            const product = productsWithId[i];
-            const productModel = new Product(product);
-            await productModel.save();
+        // Batch insert
+        await Product.bulkWrite(productModels.map(doc => ({ insertOne: { document: doc } })));
+        await Achievement.bulkWrite(achievementModels.map(doc => ({ insertOne: { document: doc } })));
+        await Language.bulkWrite(languageModels.map(doc => ({ insertOne: { document: doc } })));
 
-            // Thêm thành tựu cho sản phẩm
-            const achievement = achievementData[i];
-            const achievementModel = new Achievement({
-                productId: productModel._id,
-                achievements: achievement.achievement
-            });
-            await achievementModel.save();
+        // Thông báo thành công
+        console.log(`Products added successfully: ${productsWithId.length} products`);
 
-            // Thêm ngôn ngữ cho sản phẩm
-            const language = languageData[i];
-            const languageModel = new Language({
-                productId: productModel._id,
-                languages: language.languages
-            });
-            await languageModel.save();
-        }
-
+        // Trả về kết quả
         res.status(201).json({
             message: "Products added successfully",
         });

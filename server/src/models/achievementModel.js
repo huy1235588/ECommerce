@@ -13,22 +13,22 @@ const achievementSchema = new mongoose.Schema({
         // Tên thành tựu
         title: {
             type: String,
-            required: true
+            default: null
         },
         // Mô tả
         description: {
             type: String,
-            required: true
+            default: null
         },
         // Phần trăm người chơi đạt được
         percent: {
             type: Number,
-            required: true
+            default: 0
         },
         // Ảnh
         image: {
             type: String,
-            required: true
+            default: null
         }
     }],
 });

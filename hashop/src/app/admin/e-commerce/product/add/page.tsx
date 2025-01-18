@@ -316,11 +316,12 @@ function ECommerceAddProductPage() {
                 // Lấy dữ liệu từ response
                 const result = response.data;
 
-                // Lấy danh sách App ID lỗi
-                const errorIds = result.errorIds;
-
                 // Lấy id của json
                 const jsonId = result.jsonId;
+                // Lấy danh sách App ID lỗi
+                const errorIds = result.errorIds;
+                // Lấy danh sách errorIdsAchievement
+                const errorIdsAchievement = result.errorIdsAchievement;
 
                 // Hiển thị loading
                 setButtonDialogState((prevState) => ({
@@ -331,7 +332,8 @@ function ECommerceAddProductPage() {
                 // Gọi API thêm danh sách App ID vào database
                 const responseAddList = await axios.post('/api/product/addFromFile', {
                     jsonId: jsonId,
-                    errorIds: errorIds
+                    errorIds: errorIds,
+                    errorIdsAchievement: errorIdsAchievement
                 });
 
                 // Kiểm tra response
