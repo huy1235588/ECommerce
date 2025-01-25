@@ -113,4 +113,4 @@ type Mutation {
 }
 `;
 
-export default productSchema;
+module.exports = productSchema;

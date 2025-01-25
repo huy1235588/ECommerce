@@ -1,7 +1,7 @@
 const { gql } = require('graphql-tag');
-const { default: productSchema } = require('./schema/productSchema');
 const achievementSchema = require('./schema/achievementSchema');
 const languageSchema = require('./schema/languageSchema');
+const productSchema = require('./schema/productSchema');
 
 const typeDefs = gql`
     ${productSchema}

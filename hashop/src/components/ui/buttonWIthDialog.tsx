@@ -223,7 +223,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                 )}
 
                 {loading !== "" && (
-                    <p
+                    <div
                         style={{
                             padding: "0 1.75rem 0.5rem",
                             color: "#2196f3",
@@ -238,7 +238,7 @@ const ButtonWithDialog: React.FC<ButtonWithDialogProps> = ({
                             color="#2196f3"
                             size="0.5rem"
                         />
-                    </p>
+                    </div>
                 )}
 
                 <DialogActions>
