@@ -2,6 +2,18 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { readDataFromJson, addDataToJson } = require('../utils/interactJson');
 
+// Hàm lấy id từ file txt
+const getIdFromFile = (fileName) => {
+    // Đọc dữ liệu từ file txt
+    const data = fs.readFileSync(fileName, 'utf8');
+
+    // 3,\n 4, => [3, 4]
+    const ids = data.split(',').map(id => id.replace(/\n/g, ''));
+
+    // Trả về mảng id
+    return ids;
+};
+
 // Craw dữ liệu từ URL
 const crawlByURL = async (req, res) => {
     try {
@@ -470,31 +482,67 @@ const crawlByMultipleId = async (req, res) => {
             }
 
             // Kiểm tra xem file json đã tồn tại chưa
-            if (!fs.existsSync(`json/${fileJSONName}/data.json`)) {
-                fs.writeFileSync(`json/${fileJSONName}/data.json`, '[]', 'utf8');
+            if (!fs.existsSync(`json/${fileJSONName}/data0.json`)) {
+                fs.writeFileSync(`json/${fileJSONName}/data0.json`, '[]', 'utf8');
                 // In ra thông báo tạo file json mới
-                console.log(`Create file ${fileJSONName}/data.json successfully!`);
+                console.log(`Create file ${fileJSONName}/data0.json successfully!`);
             }
 
             // Kiểm tra xem file json thành tựu đã tồn tại chưa
-            if (!fs.existsSync(`json/${fileJSONName}/achievement.json`)) {
-                fs.writeFileSync(`json/${fileJSONName}/achievement.json`, '[]', 'utf8');
+            if (!fs.existsSync(`json/${fileJSONName}/achievement0.json`)) {
+                fs.writeFileSync(`json/${fileJSONName}/achievement0.json`, '[]', 'utf8');
                 // In ra thông báo tạo file json mới
-                console.log(`Create file ${fileJSONName}/achievement.json successfully!`);
+                console.log(`Create file ${fileJSONName}/achievement0.json successfully!`);
+            }
+
+            // Kiểm tra xem file txt đã tồn tại chưa
+            if (!fs.existsSync(`json/${fileJSONName}/logs`)) {
+                fs.mkdirSync(`json/${fileJSONName}/logs`);
+                // In ra thông báo tạo file txt mới
+                console.log(`Create folder ${fileJSONName}/logs successfully!`);
+            }
+
+            // Kiểm tra xem file txt đã tồn tại chưa
+            if (!fs.existsSync(`json/${fileJSONName}/logs/success.txt`)) {
+                fs.writeFileSync(`json/${fileJSONName}/logs/success.txt`, '', 'utf8');
+                // In ra thông báo tạo file txt mới
+                console.log(`Create file ${fileJSONName}/logs/success.txt successfully!`);
+            }
+
+            // Kiểm tra xem file txt đã tồn tại chưa
+            if (!fs.existsSync(`json/${fileJSONName}/logs/successAchievement.txt`)) {
+                fs.writeFileSync(`json/${fileJSONName}/logs/successAchievement.txt`, '', 'utf8');
+                // In ra thông báo tạo file txt mới
+                console.log(`Create file ${fileJSONName}/logs/successAchievement.txt successfully!`);
             }
         }
 
-        // Lấy dữ liệu từ tệp JSON
-        const data = readDataFromJson(`json/${fileJSONName}/data.json`);
+        // Lấy dữ liệu từ tệp TXT
+        const idSucces = getIdFromFile(`json/${fileJSONName}/logs/success.txt`);
+        const idAchievementSucces = getIdFromFile(`json/${fileJSONName}/logs/successAchievement.txt`);
+        // Lọc dữ liệu từ mảng ids không có trong tệp txt
+        const idsNotInData = idList.filter(id => !idSucces.includes(id));
+        const idsNotInAchievement = idList.filter(id => !idAchievementSucces.includes(id));
+        
+        let index;
+        // Nếu chưa có dữ liệu thì gán index = 1
+        if (idSucces.length === 0) {
+            index = 0;
+        }
+        // Nếu có dữ liệu thì gán index = length + 1
+        else {
+            index = idSucces.length + 1;
+        }
 
-        // Lọc dữ liệu từ mảng ids không có trong tệp JSON
-        const idsNotInData = idList.filter(id => !data.some(item => item.appId === parseInt(id)));
-
-        // Lấy dữ liệu từ tệp JSON thành tựu
-        const dataAchievement = readDataFromJson(`json/${fileJSONName}/achievement.json`);
-
-        // Lọc dữ liệu từ mảng ids không có trong tệp JSON
-        const idsNotInAchievement = idList.filter(id => !dataAchievement.some(item => item.appId === parseInt(id)));
+        let indexAchievement;
+        // Nếu chưa có dữ liệu thành tựu thì gán index = 1
+        if (idAchievementSucces.length === 0) {
+            indexAchievement = 0;
+        }
+        // Nếu có dữ liệu thành tựu thì gán index = length + 1
+        else {
+            indexAchievement = idAchievementSucces.length + 1;
+        }
 
         // Khởi tạo trình duyệt
         const browser = await puppeteer.launch({
@@ -506,6 +554,7 @@ const crawlByMultipleId = async (req, res) => {
             ],
         });
 
+        // Mở trang mới
         const page = await browser.newPage();
         await page.setUserAgent('Mozilla/5.0 (x11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.67778.204 Safari/537.36');
 
@@ -513,7 +562,7 @@ const crawlByMultipleId = async (req, res) => {
         for (const id of idsNotInData) {
             const url = `https://store.steampowered.com/app/${id}?cc=en`;
 
-            console.log('Đang crawl dữ liệu từ:', url);
+            console.log(`Đang crawl dữ liệu thứ ${index} từ:`, url);
 
             try {
                 // Truy cập vào trang web
@@ -553,7 +602,7 @@ const crawlByMultipleId = async (req, res) => {
                 }
 
                 // Hàm lấy text từ selector
-                const data = await page.evaluate((id) => {
+                const data = await page.evaluate((id, index) => {
                     // Hàm làm sạch văn bản (loại bỏ khoảng trắng, dấu xuống dòng, tab)
                     const cleanText = (text) => {
                         return text
@@ -791,6 +840,7 @@ const crawlByMultipleId = async (req, res) => {
 
                     // Lấy thông tin của sản phẩm
                     const product = {
+                        index: index, // Thêm index để xác định vị trí của sản phẩm trong mảng
                         appId: parseInt(id),
                         title: getText('#appHubAppName'),
                         type: "Game",
@@ -850,16 +900,49 @@ const crawlByMultipleId = async (req, res) => {
                         product,
                         language,
                     }
-                }, id);
+                }, id, index);
 
-                // Ghi vào file mảng json
-                addDataToJson(`json/${fileJSONName}/data.json`, data.product);
+                index += 1;
 
-                // Ghi ngôn ngữ vào json
-                addDataToJson(`json/${fileJSONName}/language.json`, data.language);
+                if (index < 1000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/data0.json`, data.product);
+                    // Ghi ngôn ngữ vào json
+                    addDataToJson(`json/${fileJSONName}/language0.json`, data.language);
+                }
+                else if (index < 2000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/data1.json`, data.product);
+                    // Ghi ngôn ngữ vào json
+                    addDataToJson(`json/${fileJSONName}/language1.json`, data.language);
+                }
+                else if (index < 3000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/data2.json`, data.product);
+                    // Ghi ngôn ngữ vào json
+                    addDataToJson(`json/${fileJSONName}/language2.json`, data.language);
+                }
+                else if (index < 4000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/data3.json`, data.product);
+                    // Ghi ngôn ngữ vào json
+                    addDataToJson(`json/${fileJSONName}/language3.json`, data.language);
+                }
+                else if (index < 5000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/data4.json`, data.product);
+                    // Ghi ngôn ngữ vào json
+                    addDataToJson(`json/${fileJSONName}/language4.json`, data.language);
+                }
+
+                // Ghi các id thành công vào file txt
+                fs.appendFileSync(`json/${fileJSONName}/logs/success.txt`, `${id},\n`, 'utf8');
 
             } catch (error) {
                 console.error(`Lỗi khi crawl dữ liệu từ ID ${id}:`, error);
+
+                // Ghi các id lỗi vào file txt
+                fs.appendFileSync(`json/${fileJSONName}/logs/error.txt`, `${id},\n`, 'utf8');
             }
         };
 
@@ -867,14 +950,14 @@ const crawlByMultipleId = async (req, res) => {
         for (const id of idsNotInAchievement) {
             const url = `https://steamcommunity.com/stats/${id}/achievements/?l=english`;
 
-            console.log('Đang dữ liệu thành tựu từ:', url);
+            console.log(`Đang dữ liệu thành tựu thứ ${indexAchievement} từ:`, url);
 
             try {
                 // Truy cập vào trang web
                 await page.goto(url);
 
                 // Lấy số lượng thành tựu
-                const dataAchievement = await page.evaluate((id) => {
+                const dataAchievement = await page.evaluate((id, indexAchievement) => {
                     // Hàm làm sạch văn bản (loại bỏ khoảng trắng, dấu xuống dòng, tab)
                     const cleanText = (text) => {
                         return text
@@ -914,7 +997,7 @@ const crawlByMultipleId = async (req, res) => {
                             description = txt.querySelector('.achieveTxt h5').textContent;
                             // 72.4% => 70.4
                             percent = parseFloat(txt.querySelector('.achievePercent').textContent);
-                        }                      
+                        }
 
                         return {
                             title,
@@ -925,17 +1008,44 @@ const crawlByMultipleId = async (req, res) => {
                     });
 
                     return {
+                        index: indexAchievement, // Thêm index để xác định vị trí của sản phẩm trong mảng
                         appId: parseInt(id),
                         title: titleApp,
                         achievement,
                     };
-                }, id);
+                }, id, indexAchievement);
 
-                // Ghi vào file mảng json
-                addDataToJson(`json/${fileJSONName}/achievement.json`, dataAchievement);
+                indexAchievement += 1;
+
+                if (indexAchievement < 1000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/achievement0.json`, dataAchievement);
+                }
+                else if (indexAchievement < 2000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/achievement1.json`, dataAchievement);
+                }
+                else if (indexAchievement < 3000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/achievement2.json`, dataAchievement);
+                }
+                else if (indexAchievement < 4000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/achievement3.json`, dataAchievement);
+                }
+                else if (indexAchievement < 5000) {
+                    // Ghi vào file mảng json
+                    addDataToJson(`json/${fileJSONName}/achievement4.json`, dataAchievement);
+                }
+
+                // Ghi các id thành công vào file txt
+                fs.appendFileSync(`json/${fileJSONName}/logs/successAchievement.txt`, `${id},\n`, 'utf8');
 
             } catch (error) {
                 console.error(`Lỗi khi crawl dữ liệu thành tựu từ ID ${id}:`, error);
+
+                // Ghi các id lỗi vào file txt
+                fs.appendFileSync(`json/${fileJSONName}/logs/errorAchievement.txt`, `${id},\n`, 'utf8');
             }
 
         }
@@ -944,12 +1054,12 @@ const crawlByMultipleId = async (req, res) => {
         await browser.close();
 
         // Đọc dữ liệu từ tệp JSON đã cập nhật
-        const dataUpdated = readDataFromJson(`json/${fileJSONName}/data.json`);
+        const dataUpdated = readDataFromJson(`json/${fileJSONName}/data0.json`);
         // Lấy ra các id có title null trong file json
         const errorIds = dataUpdated.filter(item => item.title === null).map(item => item.appId);
 
         // Đọc dữ liệu từ tệp JSON thành tựu đã cập nhật
-        const dataAchievementUpdated = readDataFromJson(`json/${fileJSONName}/achievement.json`);
+        const dataAchievementUpdated = readDataFromJson(`json/${fileJSONName}/achievement0.json`);
         // Lấy ra các id có title null trong file json
         const errorIdsAchievement = dataAchievementUpdated.filter(item => item.title === null).map(item => item.appId);
 

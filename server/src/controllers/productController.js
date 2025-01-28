@@ -80,53 +80,58 @@ const addProductFromFile = async (req, res) => {
         // Đọc dữ liệu từ tệp JSON
         const folder = `json/data-${jsonId}`;
 
-        const productData = readDataFromJson(`${folder}/data.json`);
-        const achievementData = readDataFromJson(`${folder}/achievement.json`);
-        const languageData = readDataFromJson(`${folder}/language.json`);
+        const counterData = 3;
 
-        // Lọc ra các sản phẩm hợp lệ
-        const validProducts = productData.filter(product => product.title !== null);
+        for (let i = 0; i <= counterData; i++) {
+            // Đọc dữ liệu từ tệp JSON
+            const productData = readDataFromJson(`${folder}/data${i}.json`);
+            const achievementData = readDataFromJson(`${folder}/achievement${i}.json`);
+            const languageData = readDataFromJson(`${folder}/language${i}.json`);
 
-        // Cập nhật achievementData từ validProducts
-        errorIdsAchievement.forEach(errorId => {
-            const productAchievement = validProducts.find(item => item.id === errorId);
-            const achievement = achievementData.find(item => item.id === errorId);
+            // Lọc ra các sản phẩm hợp lệ
+            const validProducts = productData.filter(product => product.title !== null);
 
-            if (productAchievement && productAchievement.title && achievement) {
-                achievement.title = productAchievement.title;
-            }
-        });
+            // Cập nhật achievementData từ validProducts
+            errorIdsAchievement.forEach(errorId => {
+                const productAchievement = validProducts.find(item => item.id === errorId);
+                const achievement = achievementData.find(item => item.id === errorId);
 
-        // Thêm id cho sản phẩm
-        const productsWithId = await Promise.all(
-            validProducts.map(async product => ({
-                ...product,
-                _id: await getNextId(),
-            }))
-        );
+                if (productAchievement && productAchievement.title && achievement) {
+                    achievement.title = productAchievement.title;
+                }
+            });
 
-        // Thêm sản phẩm vào Database
-        const productModels = productsWithId.map(product => new Product(product));
-        const achievementModels = productModels.map((product, i) =>
-            new Achievement({
-                productId: product._id,
-                achievements: achievementData[i]?.achievement || [],
-            })
-        );
-        const languageModels = productModels.map((product, i) =>
-            new Language({
-                productId: product._id,
-                languages: languageData[i]?.languages || [],
-            })
-        );
+            // Thêm id cho sản phẩm
+            const productsWithId = await Promise.all(
+                validProducts.map(async product => ({
+                    ...product,
+                    _id: await getNextId(),
+                }))
+            );
 
-        // Batch insert
-        await Product.bulkWrite(productModels.map(doc => ({ insertOne: { document: doc } })));
-        await Achievement.bulkWrite(achievementModels.map(doc => ({ insertOne: { document: doc } })));
-        await Language.bulkWrite(languageModels.map(doc => ({ insertOne: { document: doc } })));
+            // Thêm sản phẩm vào Database
+            const productModels = productsWithId.map(product => new Product(product));
+            const achievementModels = productModels.map((product, i) =>
+                new Achievement({
+                    productId: product._id,
+                    achievements: achievementData[i]?.achievement || [],
+                })
+            );
+            const languageModels = productModels.map((product, i) =>
+                new Language({
+                    productId: product._id,
+                    languages: languageData[i]?.languages || [],
+                })
+            );
 
-        // Thông báo thành công
-        console.log(`Products added successfully: ${productsWithId.length} products`);
+            // Batch insert
+            await Product.bulkWrite(productModels.map(doc => ({ insertOne: { document: doc } })));
+            await Achievement.bulkWrite(achievementModels.map(doc => ({ insertOne: { document: doc } })));
+            await Language.bulkWrite(languageModels.map(doc => ({ insertOne: { document: doc } })));
+
+            // Thông báo thành công
+            console.log(`Products added successfully: ${productsWithId.length} products`);
+        }
 
         // Trả về kết quả
         res.status(201).json({

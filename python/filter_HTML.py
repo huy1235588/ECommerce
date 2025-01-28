@@ -14,8 +14,14 @@ with open('python/ids/app_ids6.txt', 'w', encoding='utf-8') as out_file:
         if a_tag.text.strip():
             href = a_tag.get('href')
             if href:
-                # Tìm và trích xuất ID từ href dạng /app/{id}/charts/
-                match = re.search(r'/app/(\d+)/charts/', href)
+                # Tìm và trích xuất ID từ href dạng /app/{id}/
+                match = re.search(r'/app/(\d+)/', href)
                 if match:
                     # Ghi ID vào file, thêm dấu phẩy ở cuối
                     out_file.write(match.group(1) + ',\n')
+                    
+                # Tìm và trích xuất ID từ href dạng /app/{id}/charts/
+                # match = re.search(r'/app/(\d+)/charts/', href)
+                # if match:
+                #     # Ghi ID vào file, thêm dấu phẩy ở cuối
+                #     out_file.write(match.group(1) + ',\n')

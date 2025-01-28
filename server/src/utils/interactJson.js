@@ -44,7 +44,7 @@ function readDataFromJson(filePath) {
             const data = JSON.parse(fileContent); // Chuyển đổi từ chuỗi JSON sang đối tượng
             return data;
         } else {
-            console.error('Tệp không tồn tại!');
+            console.error(`Tệp ${filePath} không tồn tại!`);
             return [];
         }
     } catch (error) {
