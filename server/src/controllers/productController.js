@@ -78,7 +78,7 @@ const addProductFromFile = async (req, res) => {
         }
 
         // Đọc dữ liệu từ tệp JSON
-        const folder = `json/data-${jsonId}`;
+        const folder = `json/sorted/data-${jsonId}`;
 
         const counterData = 3;
 
