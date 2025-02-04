@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const achievementSchema = new mongoose.Schema({
-   // productId Tham chiếu đến product
+   // Tham chiếu đến product
     productId: {
-         type: Number,
-         ref: 'Product',
-         required: true
+        type: Number,
+        ref: 'Product',
+        required: true
     },
 
     // Mảng các thành tựu

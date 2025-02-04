@@ -1,10 +1,10 @@
 const express = require('express');
-const { addProduct, addProductDetailFromFile, getProducts, uploadProductHeaderImage, getCountByColumn, addProductFromFile } = require('../controllers/productController');
 const { productValidation } = require('../utils/validator');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const Product = require('../models/productModel');
+const productController = require('../controllers/productController');
 
 const router = express.Router();
 
@@ -47,25 +47,25 @@ const upload = multer({
 // Router thêm sản phẩm vào Database
 router.post('/add',
     productValidation,
-    addProduct
+    productController.addProduct
 );
-
-// Router thêm chi tiết sản phẩm từ file JSON
-router.post('/add/detail', addProductDetailFromFile);
 
 // Router upload ảnh sản phẩm
 router.post('/uploadImage',
-    upload.single('headerImage'),
-    uploadProductHeaderImage
+    upload.single('image'),
+    productController.uploadImage
 );
 
 // Router thêm sản phẩm từ file JSON
-router.post('/addFromFile', addProductFromFile);
+router.post('/addFromFile', productController.addProductFromFile);
 
 // Router lấy tất cả sản phẩm
-router.get('/all', getProducts);
+router.get('/all', productController.getProducts);
+
+// Router lấy sản phẩm theo id
+router.get('/:id', productController.getProductById);
 
 // Router kiểm tra sản phẩm đã tồn tại chưa
-router.get('/item/count', getCountByColumn);
+router.get('/item/count', productController.getCountByColumn);
 
 module.exports = router;

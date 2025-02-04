@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // Hàm thêm dữ liệu vào tệp JSON
-function addDataToJson(filePath, newData) {
+function addDataToJson(filePath, newData, key = null) {
     try {
         // Đọc nội dung của tệp JSON
         let data = [];
@@ -25,6 +25,13 @@ function addDataToJson(filePath, newData) {
 
         // Thêm đối tượng mới vào mảng
         data.push(newData);
+
+        // Sắp xếp mảng theo key
+        if (key) {
+            data.sort((a, b) => {
+                return a[key] - b[key];
+            });
+        }
 
         // Ghi lại dữ liệu cập nhật vào tệp JSON
         fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
@@ -53,7 +60,27 @@ function readDataFromJson(filePath) {
     }
 }
 
+// Hàm lấy dữ liệu theo key từ tệp JSON
+function getDataByKey(filePath, key, value) {
+    try {
+        // Đọc nội dung của tệp JSON
+        if (fs.existsSync(filePath)) {
+            const fileContent = fs.readFileSync(filePath, 'utf8');
+            const data = JSON.parse(fileContent); // Chuyển đổi từ chuỗi JSON sang đối tượng
+
+            // Lấy dữ liệu theo key
+            const result = data.find(item => item[key] === value);
+            return result;
+        }
+    }
+    catch (error) {
+        console.error('Đã xảy ra lỗi:', error);
+        return [];
+    }
+}
+
 module.exports = {
     addDataToJson,
     readDataFromJson,
+    getDataByKey,
 };

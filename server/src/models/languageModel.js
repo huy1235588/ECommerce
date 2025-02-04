@@ -1,12 +1,12 @@
 const mongoose = require('mongoose');
+const productService = require('../services/productService');
 
 const languageSchema = new mongoose.Schema({
     productId: {
         type: Number,
         ref: 'Product',
-        required: true
     },
-    languages:[{
+    languages: [{
         language: {
             type: String,
             required: true

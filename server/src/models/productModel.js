@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
-const AutoIncrement = require('mongoose-sequence')(mongoose);
+const getNextSequenceValue = require('../utils/autoIncrement');
 
 const productSchema = new mongoose.Schema(
     {
-        _id: {
+        productId: {
             type: Number,
+            unique: true,
         },
 
         // Thông tin sản phẩm
@@ -150,19 +151,6 @@ const productSchema = new mongoose.Schema(
             }],
         },
 
-        // Ngôn ngữ hỗ trợ
-        languages: {
-            interface: [{
-                type: String,
-            }],
-            fullAudio: [{
-                type: String,
-            }],
-            subtitles: [{
-                type: String,
-            }],
-        },
-
         // Ngày tạo
         createdAt: {
             type: Date,
@@ -176,18 +164,26 @@ const productSchema = new mongoose.Schema(
         },
 
     }, {
-    _id: false, // Tắt tự động tạo _id
     timestamps: true,
-}
-);
+});
 
-// Add auto-increment plugin
-productSchema.plugin(AutoIncrement, {
-    id: 'product_seq', // Tên bộ đếm
-    inc_field: '_id', // Tên trường chứa giá trị tự tăng
-    start_seq: 1 // Giá trị bắt đầu
+// Tạo productId tự tăng
+productSchema.pre('insertMany', async function (next, docs) {
+    try {
+        // Duyệt qua từng sản phẩm
+        for (let doc of docs) {
+            if (!doc.productId) {
+                // Tạo productId tự tăng
+                doc.productId = await getNextSequenceValue('productId');
+            }
+        }
+
+    } catch (error) {
+        return next(error);
+    }
+
+    next();
 });
 
 const Product = mongoose.model('Product', productSchema);
-
 module.exports = Product;
