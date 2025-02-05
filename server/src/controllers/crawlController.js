@@ -907,8 +907,14 @@ const crawlByMultipleId = async (req, res) => {
                 // Truy cập vào trang web
                 await page.goto(url);
 
+                const title = getDataByKey(
+                    `json/${fileJSONName}/data.json`,
+                    'appId',
+                    Number(id)
+                ).title;
+
                 // Lấy số lượng thành tựu
-                const dataAchievement = await page.evaluate((id) => {
+                const dataAchievement = await page.evaluate((id, title) => {
                     // Hàm làm sạch văn bản (loại bỏ khoảng trắng, dấu xuống dòng, tab)
                     const cleanText = (text) => {
                         return text
@@ -932,8 +938,6 @@ const crawlByMultipleId = async (req, res) => {
 
                     // Nếu không có titleApp thì trả về null
                     if (!titleApp) {
-                        const title = getDataByKey('data.json', 'appId', id).title;
-
                         return {
                             appId: parseInt(id),
                             title: title,
@@ -968,7 +972,7 @@ const crawlByMultipleId = async (req, res) => {
                         title: titleApp,
                         achievements,
                     };
-                }, id);
+                }, id, title);
 
                 // Ghi vào file mảng json
                 addDataToJson(`json/${fileJSONName}/achievement.json`, dataAchievement, dataAchievement.appId);

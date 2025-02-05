@@ -61,15 +61,15 @@ function readDataFromJson(filePath) {
 }
 
 // Hàm lấy dữ liệu theo key từ tệp JSON
-function getDataByKey(filePath, key, value) {
+const getDataByKey = (filePath, key, value) => {
     try {
         // Đọc nội dung của tệp JSON
         if (fs.existsSync(filePath)) {
             const fileContent = fs.readFileSync(filePath, 'utf8');
             const data = JSON.parse(fileContent); // Chuyển đổi từ chuỗi JSON sang đối tượng
 
-            // Lấy dữ liệu theo key
-            const result = data.find(item => item[key] === value);
+            // Lấy 1 đối tượng dựa trên key và value
+            const result = data.find(item => item.appId === value);
             return result;
         }
     }
