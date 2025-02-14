@@ -18,7 +18,7 @@ type Requirements {
 }
 
 type Product {
-    _id: Int!
+    productId: Int!
     title: String!
     type: String!
     description: String
@@ -48,7 +48,7 @@ type Query {
     products: [Product]
     product(id: Int!): Product
     filterProducts(
-        _id: Int
+        productId: Int
         title: String
         discountStartDate: String
         discountEndDate: String
