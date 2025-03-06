@@ -63,7 +63,7 @@ type Query {
         features: [String]
         limit: Int
     ): [Product]
-    paginatedProducts(page: Int!, limit: Int!): PaginatedProducts  # Phân trang sản phẩm
+    paginatedProducts(page: Int!, limit: Int!, sortColumn: String, sortOrder: String): PaginatedProducts  # Phân trang sản phẩm
 }
 
 # Kết quả phân trang

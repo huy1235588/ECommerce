@@ -23,7 +23,7 @@ const productResolver = {
         },
 
         // Hàm này dùng để phân trang
-        paginatedProducts: async (_, { page, limit }) => {
+        paginatedProducts: async (_, { page, limit, sortColumn, sortOrder }) => {
             const startIndex = (page - 1) * limit;
             const endIndex = page * limit;
             const results = {};
@@ -44,7 +44,12 @@ const productResolver = {
                 };
             }
 
-            results.products = await Product.find().limit(limit).skip(startIndex);
+            results.products = await Product
+                .find()
+                .limit(limit)
+                .skip(startIndex)
+                .sort({ [sortColumn]: sortOrder })
+                .exec();
             results.totalProducts = await Product.countDocuments().exec();
             return results;
         },
