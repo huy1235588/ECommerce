@@ -44,7 +44,7 @@ const productResolver = {
                 };
             }
 
-            results.results = await Product.find().limit(limit).skip(startIndex);
+            results.products = await Product.find().limit(limit).skip(startIndex);
             return results;
         },
     },

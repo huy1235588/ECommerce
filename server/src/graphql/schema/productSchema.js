@@ -68,7 +68,7 @@ type Query {
 
 # Kết quả phân trang
 type PaginatedProducts {
-    results: [Product]
+    products: [Product]
     previous: Page
     next: Page
 }
