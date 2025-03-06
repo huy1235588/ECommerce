@@ -1,11 +1,10 @@
 'use client';
 
-// import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import axios from "@/config/axios";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/product";
 import "@/styles/pages/admin/product.css"
-import { Button, CardMedia, Rating } from "@mui/material";
+import { Button, CardMedia } from "@mui/material";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -23,82 +22,24 @@ interface Column {
 
 function ECommerceProductsPage() {
     const router = useRouter();
-    // const [rows, setRows] = useState<Product[]>([]);
 
-    const [data, setData] = useState<Product[]>([]);
-    const [total, setTotal] = useState<number>(0);
-    const [page, setPage] = useState<number>(1);
-    const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+    const [data, setData] = useState<Product[]>([]);            // Dữ liệu bảng
+    const [total, setTotal] = useState<number>(0);              // Tổng số dòng
+    const [page, setPage] = useState<number>(1);                // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState<number>(5);  // Số dòng mỗi trang
+    const [totalLoaded, setTotalLoaded] = useState<number>(0);          // Số bản ghi đã tải
+    const [loading, setLoading] = useState(false);              // Trạng thái đang tải
 
-    // Lấy dữ liệu từ API
-    // const columns: GridColDef[] = [
-    //     {
-    //         field: 'headerImage',
-    //         headerName: 'IMAGE',
-    //         width: 270,
-    //         align: 'center',
-    //         renderCell: (params: GridRenderCellParams) => (
-    //             <CardMedia
-    //                 component="img"
-    //                 image={params.value}
-    //                 alt="Product image"
-    //                 style={{
-    //                     width: '100%',
-    //                 }}
-    //                 loading="lazy"
-    //             />
-    //         )
-    //     },
-    //     {
-    //         field: 'title',
-    //         headerName: 'TITLE',
-    //         flex: 1,
-    //         minWidth: 200,
-    //         renderCell: (params: GridRenderCellParams) => (
-    //             <div style={{ display: 'flex', flexDirection: 'column' }}>
-    //                 <Link
-    //                     href={`/admin/e-commerce/product/${params.row._id}`}
-    //                     className="product-link"
-    //                 >
-    //                     {params.value}
-    //                 </Link>
-    //             </div>
-    //         )
-    //     },
-    //     { field: 'type', headerName: 'TYPE', width: 70 },
-    //     {
-    //         field: 'price',
-    //         headerName: 'PRICE',
-    //         width: 70,
-    //         renderCell: (params: GridRenderCellParams) => (
-    //             <span>${params.value}</span>
-    //         )
-    //     },
-    //     {
-    //         field: 'discount',
-    //         headerName: 'DISCOUNT',
-    //         width: 90,
-    //         align: 'center',
-    //         renderCell: (params: GridRenderCellParams) => (
-    //             <span>{params.value}%</span>
-    //         )
-    //     },
-    //     {
-    //         field: 'rating',
-    //         headerName: 'RATING',
-    //         width: 140,
-    //         renderCell: (params: GridRenderCellParams) => (
-    //             <Rating readOnly value={params.value} />
-    //         )
-    //     },
-    // ];
-
+    // Các cột của bảng
     const columns: Column[] = [
         {
             key: 'headerImage',
             label: 'IMAGE',
             width: 270,
-
+            style: {
+                textAlign: 'center',
+                padding: 0
+            },
             renderCell: (value: string) => (
                 <CardMedia
                     component="img"
@@ -113,12 +54,42 @@ function ECommerceProductsPage() {
         },
         { key: 'title', label: 'TITLE', width: 200 },
         { key: 'type', label: 'TYPE', width: 70 },
-        { key: 'price', label: 'PRICE', width: 70 },
-        { key: 'discount', label: 'DISCOUNT', width: 90 },
+        {
+            key: 'price',
+            label: 'PRICE',
+            width: 70,
+            style: {
+                textAlign: 'center'
+            },
+            renderCell: (value: number) => {
+                // Nếu = 0 thì hiển thị FREE
+                if (value === 0) {
+                    return 'FREE';
+                } else {
+                    return `$${value}`;
+                }
+            }
+        },
+        {
+            key: 'discount',
+            label: 'DISCOUNT',
+            width: 90,
+            style: {
+                textAlign: 'center'
+            },
+        },
     ];
 
     // Hàm lấy dữ liệu từ API
-    const fetchData = async (page: number, rowsPerPage: number, sortColumn?: string, sortDirection?: 'asc' | 'desc') => {
+    const fetchData = async (
+        page: number,
+        rowsPerPage: number,
+        sortColumn?: string,
+        sortDirection?: 'asc' | 'desc'
+    ) => {
+        if (loading) return;
+        setLoading(true);
+
         try {
             const response = await axios.post('/graphql', {
                 query: `query {
@@ -131,25 +102,44 @@ function ECommerceProductsPage() {
                             discount
                             headerImage
                         }
+                        totalProducts
                     }
                     
                 }`
             });
 
             if (response.status === 200) {
-                // setRows(response.data.data.products);
 
-                setData(response.data.data.paginatedProducts.products);
+                const results = response.data.data.paginatedProducts;
+                const data = results.products;
+                const total = results.totalProducts;
+
+                setData((prev) => [...prev, ...data]);
+                setTotalLoaded((prev) => prev + data.length);
+                setTotal(total);
             }
 
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false);
         }
     };
 
+    // Hàm tải dữ liệu
     useEffect(() => {
-        fetchData(page, rowsPerPage);
-    }, [page, rowsPerPage]);
+        fetchData(1, rowsPerPage * 5);
+    }, []);
+
+    // Xử lý khi chuyển trang
+    const handlePageChange = (newPage: number) => {
+        const totalPagesLoaded = Math.ceil(totalLoaded / rowsPerPage); // Số trang đã tải
+        if (newPage === totalPagesLoaded && totalLoaded < total) {
+            // Tải thêm dữ liệu khi đến trang cuối của dữ liệu đã tải
+            fetchData(totalLoaded, rowsPerPage * 5);
+        }
+        setPage(newPage);
+    };
 
     return (
         <div>
@@ -172,42 +162,17 @@ function ECommerceProductsPage() {
 
             {/* List product */}
             <div>
-                {/* <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSizeOptions={[5, 20, 50]}
-                    checkboxSelection
-                    disableRowSelectionOnClick
-                    getRowId={(row) => row._id ?? ''}
-                    rowHeight={120}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5
-                            }
-                        }
-                    }}
-                    slotProps={{
-                        cell: {
-                            style: {
-                                display: 'flex',
-                                alignItems: 'center',
-                                transition: 'width 0.3s ease',
-                                textWrap: 'wrap',
-                                lineHeight: '1.5',
-                            }
-                        }
-                    }}
-                /> */}
-
                 <DataGrid
                     data={data}
                     columns={columns}
                     total={total}
                     page={page}
                     rowsPerPage={rowsPerPage}
-                    onPageChange={(page) => setPage(page)}
-                    onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
+                    onPageChange={handlePageChange}
+                    onRowsPerPageChange={(newRowsPerPage) => {
+                        setRowsPerPage(newRowsPerPage);
+                        setPage(1);
+                    }}
                     onSort={(sortColumn, sortDirection) =>
                         fetchData(page, rowsPerPage, sortColumn, sortDirection)
                     }

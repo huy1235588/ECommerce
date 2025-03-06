@@ -45,6 +45,7 @@ const productResolver = {
             }
 
             results.products = await Product.find().limit(limit).skip(startIndex);
+            results.totalProducts = await Product.countDocuments().exec();
             return results;
         },
     },

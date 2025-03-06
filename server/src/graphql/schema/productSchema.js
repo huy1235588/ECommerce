@@ -69,6 +69,7 @@ type Query {
 # Kết quả phân trang
 type PaginatedProducts {
     products: [Product]
+    totalProducts: Int
     previous: Page
     next: Page
 }

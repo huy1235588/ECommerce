@@ -25,6 +25,7 @@ interface DataGridProps {
     onPageChange: (newPage: number) => void;
     onRowsPerPageChange: (newRowsPerPage: number) => void;
     onSort: (column: string, direction: 'asc' | 'desc') => void;
+    isLoading?: boolean;
     options?: DataGridOptions;
 }
 
@@ -37,6 +38,7 @@ const DataGrid: React.FC<DataGridProps> = ({
     onPageChange,
     onRowsPerPageChange,
     onSort,
+    isLoading = false,
     options = {},
 }) => {
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -262,6 +264,11 @@ const DataGrid: React.FC<DataGridProps> = ({
         <div className="data-grid-container">
             {renderSearch()}
             <div id="data-grid-table-container" className="data-grid-table-container">
+                {isLoading && (
+                    <div className="data-grid-loading">
+                        <div className="loading-spinner"></div>
+                    </div>
+                )}
                 {renderTable()}
                 <div className="data-grid-footer">
                     {renderRowsPerPage()}
