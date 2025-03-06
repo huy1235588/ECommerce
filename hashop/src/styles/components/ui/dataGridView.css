@@ -47,7 +47,7 @@
 }
 
 .data-grid-pagination button:disabled {
-    background-color: #ccc;
+    background-color: #9c9c9c;
     cursor: not-allowed;
 }
 
@@ -208,12 +208,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem;
-    /* background-color: #f4f4f4; */
     border-top: 1px solid #ccc;
 }
 
 #rowsPerPage {
     padding: 8px;
+    margin-left: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
     cursor: pointer;

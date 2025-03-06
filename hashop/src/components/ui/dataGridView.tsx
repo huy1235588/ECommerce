@@ -11,11 +11,6 @@ interface Column {
     width?: number;
     renderCell?: (value: Product[keyof Product], row: Product) => React.ReactNode;
 }
-
-interface DataGridOptions {
-    onRowClick?: (id: number) => void;
-}
-
 interface DataGridProps {
     columns: Column[];
     data: Product[];
@@ -26,8 +21,8 @@ interface DataGridProps {
     onRowsPerPageChange: (newRowsPerPage: number) => void;
     onSort: (column: string, direction: 'asc' | 'desc') => void;
     onSearch: (query: string) => void;
+    onRowClick?: (id: number) => void;
     isLoading?: boolean;
-    options?: DataGridOptions;
 }
 
 const DataGrid: React.FC<DataGridProps> = ({
@@ -40,14 +35,12 @@ const DataGrid: React.FC<DataGridProps> = ({
     onRowsPerPageChange,
     onSort,
     onSearch,
+    onRowClick,
     isLoading = false,
-    options = {},
 }) => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [orderBy, setOrderBy] = useState<string>(columns[0].key);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-    const onRowClick = options.onRowClick || ((id: number) => { });
 
     // Handler cho tìm kiếm với debounce
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -90,6 +83,13 @@ const DataGrid: React.FC<DataGridProps> = ({
     const handleRowsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newRowsPerPage = parseInt(e.target.value);
         onRowsPerPageChange(newRowsPerPage); // Thông báo cho component cha
+    };
+
+    // Handler cho click vào row
+    const handleClickRow = (id: number) => {
+        if (onRowClick) {
+            onRowClick(id);
+        }
     };
 
     // Render search input
@@ -227,7 +227,7 @@ const DataGrid: React.FC<DataGridProps> = ({
                             key={row.productId}
                             className="data-grid-row"
                             data-id={row.productId}
-                            onClick={() => onRowClick(row.productId)}
+                            onClick={() => handleClickRow(row.productId)}
                         >
                             {renderTd(row)}
                         </tr>

@@ -6,7 +6,6 @@ import { Product } from "@/types/product";
 import "@/styles/pages/admin/product.css"
 import { Button, CardMedia } from "@mui/material";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import DataGrid from '@/components/ui/dataGridView';
 
@@ -121,7 +120,6 @@ function ECommerceProductsPage() {
             // Nếu có query thì thêm vào
             if (query) {
                 queryStr += `, query: "${query}"`;
-                console.log(queryStr);
             }
 
             // Gọi API
@@ -174,6 +172,11 @@ function ECommerceProductsPage() {
             fetchData(totalLoaded, rowsPerPage * 5);
         }
         setPage(newPage);
+    };
+
+    // Hàm xử lý khi click vào dòng
+    const handleRowClick = (id: number) => {
+        router.push(`/admin/e-commerce/product/details?id=${id}`);
     };
 
     return (
@@ -267,6 +270,7 @@ function ECommerceProductsPage() {
                         setTotalLoaded(0);
                         fetchData(1, rowsPerPage * 5, sortColumn, sortDirection, queryString);
                     }}
+                    onRowClick={handleRowClick}
                     isLoading={loading}
                 />
 
