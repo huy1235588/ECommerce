@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
-import { ClickAwayListener, Collapse, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Typography } from '@mui/material';
+import React, { useEffect, useRef, useState } from 'react';
+import { ClickAwayListener, Collapse, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, MenuItem, MenuList, Paper, Popper, Typography } from '@mui/material';
 import Image from 'next/image';
 import { BiCircle, BiHome } from 'react-icons/bi';
 import { MdExpandLess, MdExpandMore } from 'react-icons/md';
@@ -44,10 +44,24 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
     // Trạng thái của các mục menu được mở rộng
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [selectedPath, setSelectedPath] = useState<string[]>([]);
-    const [menuState, setMenuState] = useState<{ isMenuOpen: boolean; anchorEl: HTMLElement | null }>({
+    const [menuState, setMenuState] = useState<{
+        isMenuOpen: boolean;
+        anchorEl: HTMLElement | null
+    }>({
         isMenuOpen: false,
         anchorEl: null
     });
+    // State để quản lý menu khi hover (dùng cho sidebar đóng)
+    const [hoveredMenu, setHoveredMenu] = useState<{
+        menuItem: MenuItem | null;
+        anchorEl: HTMLElement | null;
+    }>({
+        menuItem: null,
+        anchorEl: null
+    });
+
+    // Ref cho timeout khi hover menu
+    const submenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Đóng tất cả các mục menu khi Sidebar được đóng
     useEffect(() => {
@@ -56,11 +70,9 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
         }
     }, [isOpen]);
 
-    // Lấy route hiện tại
+    // Cập nhật selectedPath và expandedSections dựa trên route
     useEffect(() => {
         const path = findPathToRoute(menuItems, currentRoute);
-
-        console.log('path', path);
 
         if (path) {
             setSelectedPath(path);
@@ -240,8 +252,8 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
         }));
     };
 
-    // Hàm render các mục menu đệ quy
-    const renderMenuItems = (items: MenuItem[], parentPath: string, depth: number) => (
+    // Render submenu khi hover
+    const renderHoverMenuItems = (items: MenuItem[], parentPath: string, depth: number) => (
         items.map((item) => {
             const currentPath = parentPath ? `${parentPath}/${item.id}` : item.id;
             const isExpanded = expandedSections.has(currentPath);
@@ -294,16 +306,136 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                             )}
                         </ListItemIcon>
 
+                        <ListItemText primary={item.label} />
+                        {item.children && (isExpanded ? <MdExpandLess /> : <MdExpandMore />)}
+                    </ListItemButton>
+
+                    {/* Hiển thị submenu nếu mục menu có children */}
+                    {item.children && (
+                        <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                            <List disablePadding>
+                                {renderHoverMenuItems(item.children, currentPath, depth + 1)}
+                            </List>
+                        </Collapse>
+                    )}
+                </React.Fragment>
+            );
+        })
+    );
+
+    // Hàm render các mục menu đệ quy
+    const renderMenuItems = (items: MenuItem[], parentPath: string, depth: number) => (
+        items.map((item) => {
+            const currentPath = parentPath ? `${parentPath}/${item.id}` : item.id;
+            const isExpanded = expandedSections.has(currentPath);
+
+            const handleToggle = () => {
+                setExpandedSections((prev) => {
+                    const newSet = new Set(prev);
+                    if (isExpanded) {
+                        newSet.delete(currentPath);
+                    } else {
+                        // Đóng tất cả các mục menu cùng cấp
+                        items.forEach((i) => {
+                            const siblingPath = parentPath ? `${parentPath}/${i.id}` : i.id;
+                            if (newSet.has(siblingPath)) {
+                                newSet.delete(siblingPath);
+                            }
+                        });
+                        // Mở mục menu được chọn
+                        newSet.add(currentPath);
+                    }
+                    return newSet;
+                });
+            };
+
+            return (
+                <React.Fragment key={currentPath}>
+                    <ListItemButton
+                        sx={{ pl: depth * 2 }}
+                        onClick={() => {
+                            if (isOpen && item.children) {
+                                handleToggle();
+                            } else if (item.route) {
+                                handleSelectRoute(item.route);
+                            }
+                        }}
+                        // Khi sidebar đóng, xử lý sự kiện hover để hiện submenu
+                        onMouseEnter={(e) => {
+                            if (!isOpen && item.children) {
+                                if (submenuTimeoutRef.current) {
+                                    clearTimeout(submenuTimeoutRef.current);
+                                }
+                                setHoveredMenu({ menuItem: item, anchorEl: e.currentTarget });
+                            }
+                        }}
+                        onMouseLeave={() => {
+                            if (!isOpen && item.children) {
+                                // Đóng submenu khi chuột rời khỏi mục menu
+                                submenuTimeoutRef.current = setTimeout(() => {
+                                    setHoveredMenu({ menuItem: null, anchorEl: null });
+                                }, 300);
+                            }
+                        }}
+                        selected={selectedPath.includes(currentPath)}
+                        style={{
+                            minHeight: 52,
+                        }}
+                    >
+                        <ListItemIcon>
+                            {item.icon ? (
+                                item.icon
+                            ) : item.children ? (
+                                <FaCircle size={8} />
+                            ) : selectedPath.includes(currentPath) ? (
+                                <FaCircle size={8} />
+                            ) : (
+                                <BiCircle size={8} />
+                            )}
+                        </ListItemIcon>
+
                         {isOpen && <ListItemText primary={item.label} />}
                         {isOpen && item.children && (isExpanded ? <MdExpandLess /> : <MdExpandMore />)}
                     </ListItemButton>
 
+                    {/* Hiển thị submenu nếu mục menu có children */}
                     {isOpen && item.children && (
                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                             <List disablePadding>
                                 {renderMenuItems(item.children, currentPath, depth + 1)}
                             </List>
                         </Collapse>
+                    )}
+
+                    {/* Nếu sidebar đóng và mục menu có submenu, hiển thị submenu khi hover */}
+                    {!isOpen && item.children && (
+                        <Popper
+                            open={Boolean(hoveredMenu.menuItem && hoveredMenu.menuItem.id === item.id)}
+                            anchorEl={hoveredMenu.anchorEl}
+                            placement="right-start"
+                            style={{ zIndex: 1300 }}
+                        >
+                            <Paper
+                                elevation={3}
+                                onMouseEnter={() => {
+                                    if (submenuTimeoutRef.current) clearTimeout(submenuTimeoutRef.current);
+                                }}
+                                onMouseLeave={() => {
+                                    submenuTimeoutRef.current = setTimeout(() => {
+                                        setHoveredMenu({ menuItem: null, anchorEl: null });
+                                    }, 300);
+                                }}
+                            >
+                                <List disablePadding
+                                    style={{
+                                        width: 300,
+                                        backgroundColor: '#000',
+                                    }}
+                                >
+                                    {renderHoverMenuItems(item.children, currentPath, depth + 1)}
+                                </List>
+                            </Paper>
+                        </Popper>
                     )}
                 </React.Fragment>
             );
@@ -333,7 +465,11 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
             </div>
 
             {/* Menu */}
-            <List className="sidebar">
+            <List className="sidebar"
+                sx={{
+                    position: 'unset'
+                }}
+            >
                 {renderMenuItems(menuItems, '', 2)}
             </List>
 
@@ -361,9 +497,14 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                     </IconButton>
 
                     {/* Menu for Langue */}
-                    {menuState.isMenuOpen && (
+                    <Popper
+                        open={menuState.isMenuOpen}
+                        anchorEl={menuState.anchorEl}
+                        placement="bottom-start"
+                        style={{ zIndex: 1300 }}
+                    >
                         <ClickAwayListener onClickAway={() => setMenuState({ isMenuOpen: false, anchorEl: null })}>
-                            <Paper className="lang-menu" elevation={4} style={{ position: 'absolute', top: 'calc(100% - 120px)' }}>
+                            <Paper className="lang-menu" elevation={4}>
                                 <MenuList>
                                     {languages.map((language) => (
                                         <MenuItem
@@ -388,7 +529,7 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                                 </MenuList>
                             </Paper>
                         </ClickAwayListener>
-                    )}
+                    </Popper>
                 </div>
             )}
         </Drawer >
