@@ -23,16 +23,42 @@ const productResolver = {
         },
 
         // Hàm này dùng để phân trang
-        paginatedProducts: async (_, { page, limit, sortColumn, sortOrder }) => {
+        paginatedProducts: async (_,
+            {
+                page,
+                limit,
+                sortColumn = 'productId',
+                sortOrder = 'asc',
+                query = '{}'
+            }
+        ) => {
+            const filters = query ? JSON.parse(query) : {};
             const startIndex = (page - 1) * limit;
             const endIndex = page * limit;
-            const results = {};
 
-            // Kiểm tra xem có trang kế tiếp hay không
-            if (endIndex < (await Product.countDocuments().exec())) {
+            // Tạo một object chứa kết quả phân trang
+            const [totalProducts, products] = await Promise.all([
+                Product.countDocuments(filters),
+                Product.find(filters)
+                    .sort({ [sortColumn]: sortOrder })
+                    .skip(startIndex)
+                    .limit(limit)
+                    .exec()
+            ]);
+
+            // Kết quả phân trang
+            const results = {
+                totalProducts,
+                products,
+                previous: null,
+                next: null
+            };
+
+            // Kiểm tra xem có trang tiếp theo hay không
+            if (endIndex < totalProducts) {
                 results.next = {
                     page: page + 1,
-                    limit: limit,
+                    limit
                 };
             }
 
@@ -44,13 +70,6 @@ const productResolver = {
                 };
             }
 
-            results.products = await Product
-                .find()
-                .limit(limit)
-                .skip(startIndex)
-                .sort({ [sortColumn]: sortOrder })
-                .exec();
-            results.totalProducts = await Product.countDocuments().exec();
             return results;
         },
     },
