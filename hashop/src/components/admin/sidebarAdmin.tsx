@@ -49,6 +49,13 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
         anchorEl: null
     });
 
+    // Đóng tất cả các mục menu khi Sidebar được đóng
+    useEffect(() => {
+        if (!isOpen) {
+            setExpandedSections(new Set());
+        }
+    }, [isOpen]);
+
     // Lấy route hiện tại
     useEffect(() => {
         const path = findPathToRoute(menuItems, currentRoute);
@@ -64,6 +71,7 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
             setSelectedPath([]);
             setExpandedSections(new Set());
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentRoute]);
 
     // Cấu trúc menu Sidebar
@@ -270,6 +278,9 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                             }
                         }}
                         selected={selectedPath.includes(currentPath)}
+                        style={{
+                            minHeight: 52,
+                        }}
                     >
                         <ListItemIcon>
                             {item.icon ? (
@@ -283,11 +294,11 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                             )}
                         </ListItemIcon>
 
-                        <ListItemText primary={item.label} />
-                        {item.children && (isExpanded ? <MdExpandLess /> : <MdExpandMore />)}
+                        {isOpen && <ListItemText primary={item.label} />}
+                        {isOpen && item.children && (isExpanded ? <MdExpandLess /> : <MdExpandMore />)}
                     </ListItemButton>
 
-                    {item.children && (
+                    {isOpen && item.children && (
                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                             <List disablePadding>
                                 {renderMenuItems(item.children, currentPath, depth + 1)}
@@ -323,7 +334,7 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
 
             {/* Menu */}
             <List className="sidebar">
-                {renderMenuItems(menuItems, '', 1)}
+                {renderMenuItems(menuItems, '', 2)}
             </List>
 
             {/* Footer */}

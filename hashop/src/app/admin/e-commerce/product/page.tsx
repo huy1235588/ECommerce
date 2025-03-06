@@ -165,6 +165,7 @@ function ECommerceProductsPage() {
     useEffect(() => {
         fetchData(1, rowsPerPage * 5, 'productId', 'asc');
         setCurrentRoute('e-commerce/product');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Xử lý khi chuyển trang
