@@ -21,6 +21,32 @@ const productResolver = {
             }
             return await query;
         },
+
+        // Hàm này dùng để phân trang
+        paginatedProducts: async (_, { page, limit }) => {
+            const startIndex = (page - 1) * limit;
+            const endIndex = page * limit;
+            const results = {};
+
+            // Kiểm tra xem có trang kế tiếp hay không
+            if (endIndex < (await Product.countDocuments().exec())) {
+                results.next = {
+                    page: page + 1,
+                    limit: limit,
+                };
+            }
+
+            // Kiểm tra xem có trang trước đó hay không
+            if (startIndex > 0) {
+                results.previous = {
+                    page: page - 1,
+                    limit: limit,
+                };
+            }
+
+            results.results = await Product.find().limit(limit).skip(startIndex);
+            return results;
+        },
     },
     Mutation: {
         createProduct: async (_, { input }) => {

@@ -45,9 +45,9 @@ type Product {
 }
 
 type Query {
-    products: [Product]
-    product(id: Int!): Product
-    filterProducts(
+    products: [Product]         # Lấy tất cả sản phẩm
+    product(id: Int!): Product  # Lấy sản phẩm theo ID
+    filterProducts(             # Lọc sản phẩm theo nhiều tiêu chí
         productId: Int
         title: String
         discountStartDate: String
@@ -63,27 +63,42 @@ type Query {
         features: [String]
         limit: Int
     ): [Product]
+    paginatedProducts(page: Int!, limit: Int!): PaginatedProducts  # Phân trang sản phẩm
 }
 
-  input VideoInput {
+# Kết quả phân trang
+type PaginatedProducts {
+    results: [Product]
+    previous: Page
+    next: Page
+}
+
+# Thông tin phân trang
+type Page {
+    page: Int
+    limit: Int
+}
+
+# Input cho mutation
+input VideoInput {
     mp4: String!
     webm: String
     thumbnail: String!
 }
 
-  input SystemRequirementInput {
+input SystemRequirementInput {
     title: String
     minimum: String
     recommended: String
 }
 
-  input RequirementsInput {
+input RequirementsInput {
     win: [SystemRequirementInput]
     mac: [SystemRequirementInput]
     linux: [SystemRequirementInput]
 }
 
-  input ProductInput {
+input ProductInput {
     title: String!
     type: String!
     description: String
