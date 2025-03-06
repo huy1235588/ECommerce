@@ -1,5 +1,5 @@
 import { Product } from '@/types/product';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import '@/styles/components/ui/dataGridView.css';
 import dayjs from 'dayjs';
 
@@ -25,6 +25,7 @@ interface DataGridProps {
     onPageChange: (newPage: number) => void;
     onRowsPerPageChange: (newRowsPerPage: number) => void;
     onSort: (column: string, direction: 'asc' | 'desc') => void;
+    onSearch: (query: string) => void;
     isLoading?: boolean;
     options?: DataGridOptions;
 }
@@ -38,6 +39,7 @@ const DataGrid: React.FC<DataGridProps> = ({
     onPageChange,
     onRowsPerPageChange,
     onSort,
+    onSearch,
     isLoading = false,
     options = {},
 }) => {
@@ -47,26 +49,31 @@ const DataGrid: React.FC<DataGridProps> = ({
 
     const onRowClick = options.onRowClick || ((id: number) => { });
 
-    // Hàm debounce cho tìm kiếm (nếu cần)
-    const debounce = (func: Function, timeout = 300) => {
-        let timer: any;
-        return (...args: any[]) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                func(...args);
-            }, timeout);
-        };
-    };
+    // Handler cho tìm kiếm với debounce
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Handler cho tìm kiếm (nếu cần tìm kiếm cục bộ)
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const debouncedHandleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
         setSearchQuery(query);
-        // Nếu cần lọc dữ liệu cục bộ, có thể thêm logic tại đây
-        // Hoặc gọi callback ra component cha nếu tìm kiếm do cha xử lý
-    };
 
-    const debouncedHandleSearch = useCallback(debounce(handleSearch, 500), []);
+        // Implement debounce logic directly
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => {
+            onSearch(query);
+        }, 500);
+    }, [onSearch, setSearchQuery]);
+
+    // Clean up timeout when component unmounts
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, []);
 
     // Handler cho sắp xếp
     const handleSort = (column: string) => {
@@ -264,12 +271,15 @@ const DataGrid: React.FC<DataGridProps> = ({
         <div className="data-grid-container">
             {renderSearch()}
             <div id="data-grid-table-container" className="data-grid-table-container">
+                {renderTable()}
                 {isLoading && (
                     <div className="data-grid-loading">
                         <div className="loading-spinner"></div>
                     </div>
                 )}
-                {renderTable()}
+                {total === 0 &&
+                    <div className="data-grid-no-data">No data</div>
+                }
                 <div className="data-grid-footer">
                     {renderRowsPerPage()}
                     {renderPagination()}

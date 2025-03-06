@@ -71,6 +71,16 @@
     height: 100%;
 }
 
+/* data-grid-no-data */
+.data-grid-no-data {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    font-size: 1.5rem;
+    color: #ccc;
+}
+
 /* Sort icon */
 .sort-icon {
     display: inline-block;
@@ -127,7 +137,7 @@
     letter-spacing: 0.00938em;
     padding-right: 0.5rem;
     padding-left: 1rem;
-    color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
     box-sizing: border-box;
     position: relative;
     cursor: text;
@@ -159,7 +169,7 @@
 }
 
 .search-input-container .data-grid-search::placeholder {
-    color: #0000008f;
+    color: #8181818f;
 }
 
 .button-clear {
@@ -185,9 +195,10 @@
 
 .data-grid-container .search-icon {
     position: absolute;
+    top: 0.0125rem;
     left: -1rem;
-    color: #000;
-    fill: #000;
+    color: #ffffff;
+    fill: #ffffff;
     padding: 0.5rem;
 }
 

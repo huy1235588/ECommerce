@@ -28,9 +28,10 @@ function ECommerceProductsPage() {
     const [page, setPage] = useState<number>(1);                                // Trang hiện tại
     const [rowsPerPage, setRowsPerPage] = useState<number>(5);                  // Số dòng mỗi trang
     const [totalLoaded, setTotalLoaded] = useState<number>(0);                  // Số bản ghi đã tải
-    const [loading, setLoading] = useState(false);                              // Trạng thái đang tải
+    const [loading, setLoading] = useState<boolean>(false);                     // Trạng thái đang tải
     const [sortColumn, setSortColumn] = useState<string>('productId');          // Cột sắp xếp
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');  // Hướng sắp xếp
+    const [queryString, setQueryString] = useState<string>('');                 // Từ khóa tìm kiếm
 
     // Các cột của bảng
     const columns: Column[] = [
@@ -107,15 +108,26 @@ function ECommerceProductsPage() {
         page: number,
         rowsPerPage: number,
         sortColumn?: string,
-        sortDirection?: 'asc' | 'desc'
+        sortDirection?: 'asc' | 'desc',
+        query?: string
     ) => {
         if (loading) return;
         setLoading(true);
 
         try {
+            // Tạo tham số truy vấn
+            let queryStr = `page: ${page}, limit: ${rowsPerPage}, sortColumn: "${sortColumn}", sortOrder: "${sortDirection}"`;
+
+            // Nếu có query thì thêm vào
+            if (query) {
+                queryStr += `, query: "${query}"`;
+                console.log(queryStr);
+            }
+
+            // Gọi API
             const response = await axios.post('/graphql', {
                 query: `query {
-                    paginatedProducts(page: ${page}, limit: ${rowsPerPage}, sortColumn: "${sortColumn}", sortOrder: "${sortDirection}") {
+                    paginatedProducts(${queryStr}) {
                         products {
                             productId
                             title
@@ -130,6 +142,7 @@ function ECommerceProductsPage() {
                 }`
             });
 
+            // Xử lý kết quả
             if (response.status === 200) {
 
                 const results = response.data.data.paginatedProducts;
@@ -203,8 +216,58 @@ function ECommerceProductsPage() {
                         setTotalLoaded(0);
                         setSortColumn(sortColumn);
                         setSortDirection(sortDirection);
-                        fetchData(page, rowsPerPage, sortColumn, sortDirection)
+                        fetchData(page, rowsPerPage, sortColumn, sortDirection, queryString);
                     }}
+                    onSearch={(searchText) => {
+                        // Nếu searchText rỗng thì tải lại dữ liệu
+                        if (!searchText || searchText.trim() === '') {
+                            setData([]);
+                            setTotalLoaded(0);
+                            setQueryString('');
+                            fetchData(1, rowsPerPage * 5, sortColumn, sortDirection);
+                            return;
+                        }
+
+                        // Tạo query
+                        const query = {
+                            $or: [
+                                { title: { $regex: searchText, $options: "i" } },
+                                { type: { $regex: searchText, $options: "i" } },
+                                {
+                                    $expr: {
+                                        $regexMatch: {
+                                            input: { $toString: "$price" },
+                                            regex: searchText,
+                                            options: "i"
+                                        },
+                                    }
+                                },
+                                {
+                                    $expr: {
+                                        $regexMatch: {
+                                            input: { $toString: "$discount" },
+                                            regex: searchText,
+                                            options: "i"
+                                        },
+                                    }
+                                }
+                            ]
+                        }
+
+                        // Chuyển query sang chuỗi
+                        const queryStr = JSON.stringify(query)
+                            .replace(/"/g, '\\"') // Thay " thành \"
+                            .replace(/\//g, '\\/'); // Thay / thành \/
+
+                        // Lưu query
+                        setQueryString(queryStr);
+
+                        // Gọi API
+                        setData([]);
+                        setTotalLoaded(0);
+                        fetchData(1, rowsPerPage * 5, sortColumn, sortDirection, queryString);
+                    }}
+                    isLoading={loading}
                 />
 
             </div>
