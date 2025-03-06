@@ -165,7 +165,7 @@ function ECommerceProductsPage() {
     useEffect(() => {
         fetchData(1, rowsPerPage * 5, 'productId', 'asc');
         setCurrentRoute('e-commerce/product');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Xử lý khi chuyển trang
@@ -240,24 +240,8 @@ function ECommerceProductsPage() {
                             $or: [
                                 { title: { $regex: searchText, $options: "i" } },
                                 { type: { $regex: searchText, $options: "i" } },
-                                {
-                                    $expr: {
-                                        $regexMatch: {
-                                            input: { $toString: "$price" },
-                                            regex: searchText,
-                                            options: "i"
-                                        },
-                                    }
-                                },
-                                {
-                                    $expr: {
-                                        $regexMatch: {
-                                            input: { $toString: "$discount" },
-                                            regex: searchText,
-                                            options: "i"
-                                        },
-                                    }
-                                }
+                                { price: { $eq: parseFloat(searchText) } },
+                                { discount: { $eq: parseFloat(searchText) } }
                             ]
                         }
 

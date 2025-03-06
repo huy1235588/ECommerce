@@ -56,7 +56,7 @@ const DataGrid: React.FC<DataGridProps> = ({
 
         timeoutRef.current = setTimeout(() => {
             onSearch(query);
-        }, 500);
+        }, 300);
     }, [onSearch, setSearchQuery]);
 
     // Clean up timeout when component unmounts
