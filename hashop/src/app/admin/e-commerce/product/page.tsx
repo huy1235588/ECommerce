@@ -11,6 +11,16 @@ import Link from "next/link";
 
 import DataGrid from '@/components/ui/dataGridView';
 
+interface Column {
+    key: keyof Product;
+    label?: string;
+    sortAble?: boolean;
+    style?: React.CSSProperties;
+    width?: number;
+    renderCell?: (value: any, row: any) => React.ReactNode;
+}
+
+
 function ECommerceProductsPage() {
     const router = useRouter();
     // const [rows, setRows] = useState<Product[]>([]);
@@ -83,11 +93,12 @@ function ECommerceProductsPage() {
     //     },
     // ];
 
-    const columns = [
+    const columns: Column[] = [
         {
             key: 'headerImage',
             label: 'IMAGE',
             width: 270,
+
             renderCell: (value: string) => (
                 <CardMedia
                     component="img"
@@ -104,7 +115,6 @@ function ECommerceProductsPage() {
         { key: 'type', label: 'TYPE', width: 70 },
         { key: 'price', label: 'PRICE', width: 70 },
         { key: 'discount', label: 'DISCOUNT', width: 90 },
-        { key: 'rating', label: 'RATING', width: 140 }
     ];
 
     // Hàm lấy dữ liệu từ API
@@ -119,7 +129,6 @@ function ECommerceProductsPage() {
                             type
                             price
                             discount
-                            rating
                             headerImage
                         }
                     }
@@ -199,6 +208,9 @@ function ECommerceProductsPage() {
                     rowsPerPage={rowsPerPage}
                     onPageChange={(page) => setPage(page)}
                     onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
+                    onSort={(sortColumn, sortDirection) =>
+                        fetchData(page, rowsPerPage, sortColumn, sortDirection)
+                    }
                 />
 
             </div>

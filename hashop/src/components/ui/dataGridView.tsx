@@ -1,13 +1,14 @@
 import { Product } from '@/types/product';
 import React, { useState, useCallback } from 'react';
 import '@/styles/components/ui/dataGridView.css';
+import dayjs from 'dayjs';
 
 interface Column {
-    key: string;
+    key: keyof Product;
     label?: string;
     sortAble?: boolean;
     style?: React.CSSProperties;
-    width?: string;
+    width?: number;
     renderCell?: (value: any, row: any) => React.ReactNode;
 }
 
@@ -42,7 +43,7 @@ const DataGrid: React.FC<DataGridProps> = ({
     const [orderBy, setOrderBy] = useState<string>(columns[0].key);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-    const onRowClick = options.onRowClick || ((id: number) => {});
+    const onRowClick = options.onRowClick || ((id: number) => { });
 
     // Hàm debounce cho tìm kiếm (nếu cần)
     const debounce = (func: Function, timeout = 300) => {
@@ -152,18 +153,50 @@ const DataGrid: React.FC<DataGridProps> = ({
     );
 
     // Hàm render cell của table
-    const renderTd = (row: any) => (
+    const renderTd = (row: Product) => (
         <>
-            {columns.map((col) => (
-                <td
-                    key={col.key}
-                    style={{ width: col.width, ...col.style }}
-                >
-                    <div className="data-grid-cell" style={col.style}>
-                        {col.renderCell ? col.renderCell(row[col.key], row) : row[col.key] || ''}
-                    </div>
-                </td>
-            ))}
+            {columns.map((col) => {
+                // Xử lý giá trị trước khi render
+                const cellValue = row[col.key];
+                let displayValue: React.ReactNode = '';
+
+                if (dayjs.isDayjs(cellValue)) {
+                    // Convert Dayjs sang string
+                    displayValue = cellValue.format('YYYY-MM-DD');
+                } else if (cellValue instanceof Date) {
+                    // Convert Date sang string
+                    displayValue = cellValue.toLocaleDateString();
+                } else if (typeof cellValue === 'boolean') {
+                    // Xử lý boolean
+                    displayValue = cellValue ? 'Yes' : 'No';
+                } else if (Array.isArray(cellValue)) {
+                    // Convert array sang string
+                    displayValue = JSON.stringify(cellValue);
+                } else if (cellValue instanceof File) {
+                    // Handle File objects
+                    displayValue = cellValue.name;
+                } else if (typeof cellValue === 'object' && cellValue !== null) {
+                    // Convert objects sang string
+                    displayValue = JSON.stringify(cellValue);
+                } else {
+                    // Giữ nguyên các giá trị hợp lệ hoặc convert sang string
+                    displayValue = cellValue !== undefined && cellValue !== null ? String(cellValue) : '';
+                }
+
+                return (
+                    <td
+                        key={col.key}
+                        style={{ width: col.width, ...col.style }}
+                    >
+                        <div className="data-grid-cell" style={col.style}>
+                            {col.renderCell
+                                ? col.renderCell(row[col.key], row)
+                                : displayValue
+                            }
+                        </div>
+                    </td>
+                );
+            })}
         </>
     );
 
