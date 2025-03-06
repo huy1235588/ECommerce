@@ -9,7 +9,7 @@ interface Column {
     sortAble?: boolean;
     style?: React.CSSProperties;
     width?: number;
-    renderCell?: (value: any, row: any) => React.ReactNode;
+    renderCell?: (value: Product[keyof Product], row: Product) => React.ReactNode;
 }
 
 interface DataGridOptions {

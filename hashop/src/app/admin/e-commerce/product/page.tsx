@@ -16,34 +16,37 @@ interface Column {
     sortAble?: boolean;
     style?: React.CSSProperties;
     width?: number;
-    renderCell?: (value: any, row: any) => React.ReactNode;
+    renderCell?: (value: Product[keyof Product], row: Product) => React.ReactNode;
 }
 
 
 function ECommerceProductsPage() {
     const router = useRouter();
 
-    const [data, setData] = useState<Product[]>([]);            // Dữ liệu bảng
-    const [total, setTotal] = useState<number>(0);              // Tổng số dòng
-    const [page, setPage] = useState<number>(1);                // Trang hiện tại
-    const [rowsPerPage, setRowsPerPage] = useState<number>(5);  // Số dòng mỗi trang
-    const [totalLoaded, setTotalLoaded] = useState<number>(0);          // Số bản ghi đã tải
-    const [loading, setLoading] = useState(false);              // Trạng thái đang tải
+    const [data, setData] = useState<Product[]>([]);                            // Dữ liệu bảng
+    const [total, setTotal] = useState<number>(0);                              // Tổng số dòng
+    const [page, setPage] = useState<number>(1);                                // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState<number>(5);                  // Số dòng mỗi trang
+    const [totalLoaded, setTotalLoaded] = useState<number>(0);                  // Số bản ghi đã tải
+    const [loading, setLoading] = useState(false);                              // Trạng thái đang tải
+    const [sortColumn, setSortColumn] = useState<string>('productId');          // Cột sắp xếp
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');  // Hướng sắp xếp
 
     // Các cột của bảng
     const columns: Column[] = [
         {
             key: 'headerImage',
-            label: 'IMAGE',
+            label: '',
             width: 270,
             style: {
                 textAlign: 'center',
                 padding: 0
             },
-            renderCell: (value: string) => (
+            sortAble: false,
+            renderCell: (value: Product[keyof Product]) => (
                 <CardMedia
                     component="img"
-                    image={value}
+                    image={value?.toString() || '/images/no-image.png'}
                     alt="Product image"
                     style={{
                         width: '100%',
@@ -52,7 +55,15 @@ function ECommerceProductsPage() {
                 />
             )
         },
-        { key: 'title', label: 'TITLE', width: 200 },
+        {
+            key: 'title',
+            label: 'TITLE',
+            width: 200,
+            style: {
+                fontWeight: 'bold',
+                textAlign: 'center'
+            },
+        },
         { key: 'type', label: 'TYPE', width: 70 },
         {
             key: 'price',
@@ -61,7 +72,7 @@ function ECommerceProductsPage() {
             style: {
                 textAlign: 'center'
             },
-            renderCell: (value: number) => {
+            renderCell: (value: Product[keyof Product]) => {
                 // Nếu = 0 thì hiển thị FREE
                 if (value === 0) {
                     return 'FREE';
@@ -77,6 +88,17 @@ function ECommerceProductsPage() {
             style: {
                 textAlign: 'center'
             },
+            renderCell: (value: Product[keyof Product]) => {
+                if (value) {
+                    return (
+                        <span style={{ color: '#69ad3e' }}>
+                            {String(value)}% <br />
+                        </span>
+                    );
+                } else {
+                    return '0%';
+                }
+            }
         },
     ];
 
@@ -93,7 +115,7 @@ function ECommerceProductsPage() {
         try {
             const response = await axios.post('/graphql', {
                 query: `query {
-                    paginatedProducts(page: ${page}, limit: ${rowsPerPage}) {
+                    paginatedProducts(page: ${page}, limit: ${rowsPerPage}, sortColumn: "${sortColumn}", sortOrder: "${sortDirection}") {
                         products {
                             productId
                             title
@@ -128,7 +150,7 @@ function ECommerceProductsPage() {
 
     // Hàm tải dữ liệu
     useEffect(() => {
-        fetchData(1, rowsPerPage * 5);
+        fetchData(1, rowsPerPage * 5, 'productId', 'asc');
     }, []);
 
     // Xử lý khi chuyển trang
@@ -170,12 +192,19 @@ function ECommerceProductsPage() {
                     rowsPerPage={rowsPerPage}
                     onPageChange={handlePageChange}
                     onRowsPerPageChange={(newRowsPerPage) => {
+                        setData([]);
+                        setTotalLoaded(0);
                         setRowsPerPage(newRowsPerPage);
                         setPage(1);
+                        fetchData(1, newRowsPerPage * 5, sortColumn, sortDirection);
                     }}
-                    onSort={(sortColumn, sortDirection) =>
+                    onSort={(sortColumn, sortDirection) => {
+                        setData([]);
+                        setTotalLoaded(0);
+                        setSortColumn(sortColumn);
+                        setSortDirection(sortDirection);
                         fetchData(page, rowsPerPage, sortColumn, sortDirection)
-                    }
+                    }}
                 />
 
             </div>

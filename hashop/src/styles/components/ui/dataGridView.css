@@ -23,7 +23,6 @@
 }
 
 .data-grid-table th {
-    /* background-color: #f4f4f4; */
     cursor: pointer;
 }
 
@@ -75,11 +74,12 @@
 /* Sort icon */
 .sort-icon {
     display: inline-block;
-    vertical-align: text-bottom;
-    width: 16px;
-    height: 16px;
+    vertical-align: middle;
+    width: 14px;
+    height: 14px;
+    margin-left: 2px;
     background-image: url(/icons/order.svg);
-    filter: opacity(.9);
+    filter: opacity(.9) invert(1);
 }
 
 .sort-icon.asc {
