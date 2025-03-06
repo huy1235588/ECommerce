@@ -413,7 +413,11 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                             open={Boolean(hoveredMenu.menuItem && hoveredMenu.menuItem.id === item.id)}
                             anchorEl={hoveredMenu.anchorEl}
                             placement="right-start"
-                            style={{ zIndex: 1300 }}
+                            style={{
+                                zIndex: 1300,
+                                maxHeight: 'calc(80vh - 64px)',
+                                overflowY: 'auto',
+                            }}
                         >
                             <Paper
                                 elevation={3}
@@ -432,7 +436,7 @@ const SidebarAdmin: React.FC<SidebarProps> = ({
                                         backgroundColor: '#000',
                                     }}
                                 >
-                                    {renderHoverMenuItems(item.children, currentPath, depth + 1)}
+                                    {renderHoverMenuItems(item.children, currentPath, depth - 1)}
                                 </List>
                             </Paper>
                         </Popper>
