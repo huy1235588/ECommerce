@@ -94,6 +94,7 @@ export type ProductOS = {
 
 export type Product = {
     _id?: number;
+    productId: number;
     title: string;
     type: string;
     description?: string;

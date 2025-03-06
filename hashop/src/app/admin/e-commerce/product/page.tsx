@@ -1,6 +1,6 @@
 'use client';
 
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+// import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import axios from "@/config/axios";
 import { useEffect, useState } from "react";
 import { Product } from "@/types/product";
@@ -9,22 +9,89 @@ import { Button, CardMedia, Rating } from "@mui/material";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import DataGrid from '@/components/ui/dataGridView';
+
 function ECommerceProductsPage() {
     const router = useRouter();
+    // const [rows, setRows] = useState<Product[]>([]);
 
-    const [rows, setRows] = useState<Product[]>([]);
+    const [data, setData] = useState<Product[]>([]);
+    const [total, setTotal] = useState<number>(0);
+    const [page, setPage] = useState<number>(1);
+    const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
     // Lấy dữ liệu từ API
-    const columns: GridColDef[] = [
+    // const columns: GridColDef[] = [
+    //     {
+    //         field: 'headerImage',
+    //         headerName: 'IMAGE',
+    //         width: 270,
+    //         align: 'center',
+    //         renderCell: (params: GridRenderCellParams) => (
+    //             <CardMedia
+    //                 component="img"
+    //                 image={params.value}
+    //                 alt="Product image"
+    //                 style={{
+    //                     width: '100%',
+    //                 }}
+    //                 loading="lazy"
+    //             />
+    //         )
+    //     },
+    //     {
+    //         field: 'title',
+    //         headerName: 'TITLE',
+    //         flex: 1,
+    //         minWidth: 200,
+    //         renderCell: (params: GridRenderCellParams) => (
+    //             <div style={{ display: 'flex', flexDirection: 'column' }}>
+    //                 <Link
+    //                     href={`/admin/e-commerce/product/${params.row._id}`}
+    //                     className="product-link"
+    //                 >
+    //                     {params.value}
+    //                 </Link>
+    //             </div>
+    //         )
+    //     },
+    //     { field: 'type', headerName: 'TYPE', width: 70 },
+    //     {
+    //         field: 'price',
+    //         headerName: 'PRICE',
+    //         width: 70,
+    //         renderCell: (params: GridRenderCellParams) => (
+    //             <span>${params.value}</span>
+    //         )
+    //     },
+    //     {
+    //         field: 'discount',
+    //         headerName: 'DISCOUNT',
+    //         width: 90,
+    //         align: 'center',
+    //         renderCell: (params: GridRenderCellParams) => (
+    //             <span>{params.value}%</span>
+    //         )
+    //     },
+    //     {
+    //         field: 'rating',
+    //         headerName: 'RATING',
+    //         width: 140,
+    //         renderCell: (params: GridRenderCellParams) => (
+    //             <Rating readOnly value={params.value} />
+    //         )
+    //     },
+    // ];
+
+    const columns = [
         {
-            field: 'headerImage',
-            headerName: 'IMAGE',
+            key: 'headerImage',
+            label: 'IMAGE',
             width: 270,
-            align: 'center',
-            renderCell: (params: GridRenderCellParams) => (
+            renderCell: (value: string) => (
                 <CardMedia
                     component="img"
-                    image={params.value}
+                    image={value}
                     alt="Product image"
                     style={{
                         width: '100%',
@@ -33,57 +100,21 @@ function ECommerceProductsPage() {
                 />
             )
         },
-        {
-            field: 'title',
-            headerName: 'TITLE',
-            flex: 1,
-            minWidth: 200,
-            renderCell: (params: GridRenderCellParams) => (
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <Link
-                        href={`/admin/e-commerce/product/${params.row._id}`}
-                        className="product-link"
-                    >
-                        {params.value}
-                    </Link>
-                </div>
-            )
-        },
-        { field: 'type', headerName: 'TYPE', width: 70 },
-        {
-            field: 'price',
-            headerName: 'PRICE',
-            width: 70,
-            renderCell: (params: GridRenderCellParams) => (
-                <span>${params.value}</span>
-            )
-        },
-        {
-            field: 'discount',
-            headerName: 'DISCOUNT',
-            width: 90,
-            align: 'center',
-            renderCell: (params: GridRenderCellParams) => (
-                <span>{params.value}%</span>
-            )
-        },
-        {
-            field: 'rating',
-            headerName: 'RATING',
-            width: 140,
-            renderCell: (params: GridRenderCellParams) => (
-                <Rating readOnly value={params.value} />
-            )
-        },
+        { key: 'title', label: 'TITLE', width: 200 },
+        { key: 'type', label: 'TYPE', width: 70 },
+        { key: 'price', label: 'PRICE', width: 70 },
+        { key: 'discount', label: 'DISCOUNT', width: 90 },
+        { key: 'rating', label: 'RATING', width: 140 }
     ];
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.post('/graphql', {
-                    query: `query {
+    // Hàm lấy dữ liệu từ API
+    const fetchData = async (page: number, rowsPerPage: number, sortColumn?: string, sortDirection?: 'asc' | 'desc') => {
+        try {
+            const response = await axios.post('/graphql', {
+                query: `query {
+                    paginatedProducts(page: ${page}, limit: ${rowsPerPage}) {
                         products {
-                            _id
+                            productId
                             title
                             type
                             price
@@ -91,20 +122,25 @@ function ECommerceProductsPage() {
                             rating
                             headerImage
                         }
-                    }`
-                });
+                    }
+                    
+                }`
+            });
 
-                if (response.status === 200) {
-                    setRows(response.data.data.products);
-                }
+            if (response.status === 200) {
+                // setRows(response.data.data.products);
 
-            } catch (error) {
-                console.error(error);
+                setData(response.data.data.paginatedProducts.products);
             }
-        };
 
-        fetchData();
-    }, []);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData(page, rowsPerPage);
+    }, [page, rowsPerPage]);
 
     return (
         <div>
@@ -127,7 +163,7 @@ function ECommerceProductsPage() {
 
             {/* List product */}
             <div>
-                <DataGrid
+                {/* <DataGrid
                     rows={rows}
                     columns={columns}
                     pageSizeOptions={[5, 20, 50]}
@@ -136,8 +172,8 @@ function ECommerceProductsPage() {
                     getRowId={(row) => row._id ?? ''}
                     rowHeight={120}
                     initialState={{
-                        pagination:{
-                            paginationModel:{
+                        pagination: {
+                            paginationModel: {
                                 pageSize: 5
                             }
                         }
@@ -153,7 +189,18 @@ function ECommerceProductsPage() {
                             }
                         }
                     }}
+                /> */}
+
+                <DataGrid
+                    data={data}
+                    columns={columns}
+                    total={total}
+                    page={page}
+                    rowsPerPage={rowsPerPage}
+                    onPageChange={(page) => setPage(page)}
+                    onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
                 />
+
             </div>
         </div>
     );
