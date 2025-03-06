@@ -8,6 +8,7 @@ import { Button, CardMedia } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 import DataGrid from '@/components/ui/dataGridView';
+import { useCurrentRoute } from "@/context/SidebarConext";
 
 interface Column {
     key: keyof Product;
@@ -21,6 +22,7 @@ interface Column {
 
 function ECommerceProductsPage() {
     const router = useRouter();
+    const { setCurrentRoute } = useCurrentRoute();
 
     const [data, setData] = useState<Product[]>([]);                            // Dữ liệu bảng
     const [total, setTotal] = useState<number>(0);                              // Tổng số dòng
@@ -162,6 +164,7 @@ function ECommerceProductsPage() {
     // Hàm tải dữ liệu
     useEffect(() => {
         fetchData(1, rowsPerPage * 5, 'productId', 'asc');
+        setCurrentRoute('e-commerce/product');
     }, []);
 
     // Xử lý khi chuyển trang
