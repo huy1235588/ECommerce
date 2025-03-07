@@ -127,3 +127,26 @@ export type Product = {
     createdAt?: Date;
     updatedAt?: Date;
 };
+
+
+
+// GraphQL
+interface PaginationInfo {
+    page: number;
+    limit: number;
+}
+
+interface PaginatedProducts {
+    products: Product[];
+    totalProducts: number;
+    previous: PaginationInfo | null;
+    next: PaginationInfo | null;
+}
+
+export interface ProductResponse {
+    data: {
+        paginatedProducts: PaginatedProducts;
+        products: Product[];
+        product: Product;
+    };
+}

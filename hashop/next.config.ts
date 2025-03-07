@@ -10,8 +10,12 @@ const nextConfig: NextConfig = {
         remotePatterns: [
             {
                 // Lấy ảnh từ server
-                hostname: process.env.NEXT_PUBLIC_SERVER_HOSTNAME || "",
-            }
+                hostname: process.env.NEXT_PUBLIC_SERVER_HOSTNAME || "localhost",
+            },
+            {
+                protocol: "https",
+                hostname: "**.steamstatic.com", // Tất cả subdomain
+            },
         ]
     },
     reactStrictMode: false,
