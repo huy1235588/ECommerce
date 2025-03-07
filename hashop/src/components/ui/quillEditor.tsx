@@ -84,12 +84,6 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
                 }
             });
 
-            // Thiết lập nội dung ban đầu
-            if (value) {
-                quill.current.setText(""); // Xóa nội dung mặc định
-                quill.current.clipboard.dangerouslyPasteHTML(value); // Gán nội dung mới
-            }
-
             // Thêm icon cho customImage
             const customImageButton = document.querySelector('.ql-customImage');
             if (customImageButton) {
@@ -112,6 +106,36 @@ const QuillEditor: React.FC<QuillEditorProps> = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (quill.current && value !== undefined) {
+            // Tách logic so sánh thành hàm riêng
+            const shouldUpdate = () => {
+                const currentHtml = quill.current!.root.innerHTML;
+                return currentHtml !== value;
+            };
+
+            if (!shouldUpdate()) return;
+
+            // Lưu vị trí con trỏ hiện tại
+            const selection = quill.current.getSelection();
+
+            // Tạm ngắt sự kiện
+            quill.current.off("text-change");
+
+            // Cập nhật nội dung
+            quill.current.clipboard.dangerouslyPasteHTML(value);
+
+            // Khôi phục vị trí con trỏ
+            if (selection) {
+                setTimeout(() => quill.current!.setSelection(selection), 0);
+            }
+
+            // Bật lại sự kiện
+            const handler = () => {/* ... */ };
+            quill.current.on("text-change", handler);
+        }
+    }, [value]);
 
     // Xử lý sự kiện thay đổi văn bản
     useEffect(() => {
