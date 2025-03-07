@@ -256,7 +256,7 @@ function ECommerceProductsPage() {
                         // Gọi API
                         setData([]);
                         setTotalLoaded(0);
-                        fetchData(1, rowsPerPage * 5, sortColumn, sortDirection, queryString);
+                        fetchData(1, rowsPerPage * 5, sortColumn, sortDirection, queryStr);
                     }}
                     onRowClick={handleRowClick}
                     isLoading={loading}

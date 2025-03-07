@@ -1,5 +1,5 @@
 import { Product } from '@/types/product';
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import '@/styles/components/ui/dataGridView.css';
 import dayjs from 'dayjs';
 
@@ -45,21 +45,23 @@ const DataGrid: React.FC<DataGridProps> = ({
     // Handler cho tìm kiếm với debounce
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Handler cho tìm kiếm với debounce
     const debouncedHandleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value;
         setSearchQuery(query);
 
-        // Implement debounce logic directly
+        // Clear timeout cũ
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
 
+        // Set timeout mới
         timeoutRef.current = setTimeout(() => {
             onSearch(query);
-        }, 300);
-    }, [onSearch, setSearchQuery]);
+        }, 500);
+    }, [onSearch]);
 
-    // Clean up timeout when component unmounts
+    // Dọn dẹp timeout khi component unmount
     useEffect(() => {
         return () => {
             if (timeoutRef.current) {
