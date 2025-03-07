@@ -42,11 +42,19 @@ export default function Home() {
                     "screenshots"
                 ];
 
+                const query = {
+                    // Lấy 3 screenshot đầu tiên
+                    screenshots: {
+                        $size: 4
+                    }
+                }
+
                 // Lấy danh sách sản phẩm
                 const resultAction = await dispatch(paginatedProducts({
                     page: 1,
                     limit: 10,
-                    fields: field
+                    fields: field,
+                    query: JSON.stringify(query)
                 }));
 
                 // Lấy danh sách sản phẩm thành công
