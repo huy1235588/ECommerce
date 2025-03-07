@@ -297,6 +297,11 @@ const CommonForm: React.FC<CommonFormProps> = ({
                             onFocus={() => clearErrorInput(control.name)} // Khi focus, ẩn lỗi
                             MenuProps={{
                                 disableScrollLock: true,
+                                PaperProps: {
+                                    sx: {
+                                        maxHeight: 'calc(53% - 96px)',
+                                    }
+                                }
                             }}
                         >
                             {control.options?.map((option) => (
