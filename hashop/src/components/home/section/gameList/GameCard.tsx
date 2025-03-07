@@ -14,9 +14,9 @@ function GameCard({
     onHover,
     isHovered,
 }: GameCardProps) {
-    // Tính giá gốc
-    const originalPrice = game.discount
-        ? game.price / (1 - game.discount / 100)
+    // Tính giá sau khi giảm giá
+    const discountedPrice = game.price && game.discount
+        ? (game.price - (game.price * game.discount) / 100).toFixed(2)
         : null;
 
     return (
@@ -53,8 +53,11 @@ function GameCard({
                     display: 'flex',
                     flexDirection: 'column',
                     flex: 1,
-                    paddingBottom: '2px',
+                    '&:last-child': {
+                        paddingBottom: 1,
+                    },
                 }}
+
             >
                 {/* Tên game */}
                 <Typography variant="h6"
@@ -102,7 +105,7 @@ function GameCard({
                         color: isHovered ? '#263645' : '#BEEE11'
                     }}
                 >
-                    {game.discount && (
+                    {discountedPrice && (
                         <Typography
                             variant="body2"
                             sx={{
@@ -120,7 +123,7 @@ function GameCard({
                     )}
 
                     {/* Giá gốc */}
-                    {originalPrice && (
+                    {discountedPrice && (
                         <span
                             style={{
                                 textDecoration: 'line-through',
@@ -128,12 +131,16 @@ function GameCard({
                                 marginRight: '8px'
                             }}
                         >
-                            {originalPrice}
+                            ${game.price}
                         </span>
                     )}
 
                     {/* Giá bán */}
-                    {game.price}
+                    <span style={{
+                        color: isHovered ? '#263645' : discountedPrice ? '#BEEE11' : '#A0A0A0',
+                    }}>
+                        ${discountedPrice || game.price}
+                    </span>
                 </Typography>
 
                 {/* Tags */}
@@ -145,20 +152,22 @@ function GameCard({
                         maxWidth: '100%',
                     }}
                 >
-                    {game.tags?.map((tag, index) => (
+                    {game.tags && game.tags?.map((tag, index) => (
                         <Typography
                             key={index}
                             variant="body2"
                             component="span"
                             sx={{
                                 marginRight: 1,
+                                fontSize: '0.75rem',
                                 borderRadius: 1,
                                 height: 'fit-content',
                                 whiteSpace: 'nowrap',
                                 color: isHovered ? '#263645' : '#738895',
                             }}
                         >
-                            {tag},
+                            {tag}
+                            {index < game.tags!.length - 1 && ','}
                         </Typography>
                     ))}
                 </Box>

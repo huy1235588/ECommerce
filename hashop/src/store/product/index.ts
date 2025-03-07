@@ -79,7 +79,7 @@ export const paginatedProducts = createAsyncThunk<
         fields: string[];
         page: number;
         limit: number;
-        sortColumn?: string;
+        sortColumn?: keyof Product;
         sortOrder?: 'asc' | 'desc';
         query?: string;
         slice?: string;
@@ -128,10 +128,10 @@ export const paginatedProducts = createAsyncThunk<
                     variables: {
                         page,
                         limit,
-                        sortColumn: sortColumn || null,
-                        sortDirection: sortOrder || null,
-                        query: query || null,
-                        slice: slice || null
+                        sortColumn: sortColumn || undefined,
+                        sortDirection: sortOrder || undefined,
+                        query: query || undefined,
+                        slice: slice || undefined
                     }
                 }
             );

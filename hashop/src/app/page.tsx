@@ -50,16 +50,18 @@ export default function Home() {
                     },
                     // Lấy 6 tag đầu tiên
                     tags: {
-                        $slice: 6
+                        $slice: 5
                     }
                 }
 
                 // Lấy danh sách sản phẩm
                 const resultAction = await dispatch(paginatedProducts({
-                    page: 1,
+                    page: 10,
                     limit: 7,
                     fields: field,
-                    slice: JSON.stringify(slice)
+                    slice: JSON.stringify(slice),
+                    // sortColumn: "productId",
+                    // sortOrder: "asc",
                 }));
 
                 // Lấy danh sách sản phẩm thành công
