@@ -82,6 +82,7 @@ export const paginatedProducts = createAsyncThunk<
         sortColumn?: string;
         sortOrder?: 'asc' | 'desc';
         query?: string;
+        slice?: string;
     },
     { rejectValue: GraphQLErrorResponse }
 >(
@@ -93,7 +94,8 @@ export const paginatedProducts = createAsyncThunk<
             limit,
             sortColumn,
             sortOrder,
-            query
+            query,
+            slice
         },
         { rejectWithValue }
     ) => {
@@ -107,6 +109,7 @@ export const paginatedProducts = createAsyncThunk<
                         $sortColumn: String
                         $sortOrder: String
                         $query: String
+                        $slice: String
                     ) {
                         paginatedProducts(
                             page: $page
@@ -114,6 +117,7 @@ export const paginatedProducts = createAsyncThunk<
                             sortColumn: $sortColumn
                             sortOrder: $sortOrder
                             query: $query
+                            slice: $slice
                         ) {
                             products {
                                 ${fields.join(" ")}
@@ -126,7 +130,8 @@ export const paginatedProducts = createAsyncThunk<
                         limit,
                         sortColumn: sortColumn || null,
                         sortDirection: sortOrder || null,
-                        query: query || null
+                        query: query || null,
+                        slice: slice || null
                     }
                 }
             );

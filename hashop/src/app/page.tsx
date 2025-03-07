@@ -39,22 +39,27 @@ export default function Home() {
                     "headerImage",
                     "description",
                     "tags",
-                    "screenshots"
+                    "screenshots",
+                    "platform"
                 ];
 
-                const query = {
+                const slice = {
                     // Lấy 3 screenshot đầu tiên
                     screenshots: {
-                        $size: 4
+                        $slice: 6
+                    },
+                    // Lấy 6 tag đầu tiên
+                    tags: {
+                        $slice: 6
                     }
                 }
 
                 // Lấy danh sách sản phẩm
                 const resultAction = await dispatch(paginatedProducts({
                     page: 1,
-                    limit: 10,
+                    limit: 7,
                     fields: field,
-                    query: JSON.stringify(query)
+                    slice: JSON.stringify(slice)
                 }));
 
                 // Lấy danh sách sản phẩm thành công

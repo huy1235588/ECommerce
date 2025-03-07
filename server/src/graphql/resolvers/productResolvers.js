@@ -31,7 +31,8 @@ const productResolver = {
                 limit,
                 sortColumn = 'productId',
                 sortOrder = 'asc',
-                query = '{}'
+                query = '{}',
+                slice
             }
         ) => {
             const filters = query ? JSON.parse(query) : {};
@@ -45,6 +46,7 @@ const productResolver = {
                     .sort({ [sortColumn]: sortOrder })
                     .skip(startIndex)
                     .limit(limit)
+                    .select(JSON.parse(slice))
                     .exec()
             ]);
 
