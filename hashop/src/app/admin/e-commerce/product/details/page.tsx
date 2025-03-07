@@ -18,6 +18,7 @@ import MultipleSelectForm from "@/components/ui/multipleSelectForm";
 import DateTimePickerForm from "@/components/ui/dateTimePickerForm";
 import SelectForm from "@/components/ui/selectForm";
 import dayjs, { Dayjs } from "dayjs";
+import QuillEditor from "@/components/ui/quillEditor";
 
 // Khai báo kiểu dữ liệu lỗi
 type ErrorForm = {
@@ -275,6 +276,14 @@ function ECommerceProductDetailsPage() {
         });
     };
 
+    // Hàm xử lý thay đổi giá trị của Quill
+    const handleQuillChange = (value: string) => {
+        setFormData({
+            ...formData,
+            detail: value
+        });
+    };
+
     // Hàm xử lý lỗi
     const handleSetError = (name: string, value: string) => {
         const newErrors = errors.map((error) => {
@@ -363,6 +372,18 @@ function ECommerceProductDetailsPage() {
                         error={errors.some((error) => error.path === 'description')}
                         setError={handleSetError}
                         errorText={errors.find((error) => error.path === 'description')?.msg}
+                    />
+
+                    {/* Detail */}
+                    <QuillEditor 
+                        id="detail"
+                        name="detail"
+                        label="Detail"
+                        placeholder="Type something..."
+                        value={formData.detail}
+                        onChange={handleQuillChange}
+                        error={errors.some((error) => error.path === 'detail')}
+                        setError={handleSetError}
                     />
 
                     {/* Price and Discount */}

@@ -98,6 +98,7 @@ export type Product = {
     title: string;
     type: string;
     description?: string;
+    detail?: string;
     price: number;
 
     discount?: number;
