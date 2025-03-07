@@ -9,7 +9,9 @@ const productResolver = {
 
         // Hàm này trả về một sản phẩm dựa vào id
         product: async (_, { id }) => {
-            return await Product.findById(id);
+            return await Product.findOne({
+                productId: id
+            });
         },
 
         // Hàm này trả về một danh sách sản phẩm dựa vào các điều kiện lọc

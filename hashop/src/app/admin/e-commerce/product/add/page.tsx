@@ -30,6 +30,7 @@ type ErrorForm = {
 
 // Khởi tạo formData ban đầu
 const initialFormData: Product = {
+    productId: -1,
     title: '',
     type: '',
     description: '',
