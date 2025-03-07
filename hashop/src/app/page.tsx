@@ -60,8 +60,6 @@ export default function Home() {
                     limit: 7,
                     fields: field,
                     slice: JSON.stringify(slice),
-                    // sortColumn: "productId",
-                    // sortOrder: "asc",
                 }));
 
                 // Lấy danh sách sản phẩm thành công

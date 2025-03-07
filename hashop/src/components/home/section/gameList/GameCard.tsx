@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
 import { Product } from '@/types/product';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface GameCardProps {
     game: Product;
@@ -14,6 +15,8 @@ function GameCard({
     onHover,
     isHovered,
 }: GameCardProps) {
+    const router = useRouter();
+
     // Tính giá sau khi giảm giá
     const discountedPrice = game.price && game.discount
         ? (game.price - (game.price * game.discount) / 100).toFixed(2)
@@ -24,10 +27,14 @@ function GameCard({
             onMouseEnter={() => {
                 onHover(game);
             }}
+            onClick={() => {
+                router.push(`/app/${game.productId}`);
+            }}
             sx={{
                 display: 'flex',
                 marginBottom: 2,
                 transition: 'transform 0.2s',
+                cursor: 'pointer',
                 background: isHovered
                     ? 'linear-gradient(to bottom, #ADD8E6, #87CEEB)'
                     : '#202d39',
