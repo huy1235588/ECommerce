@@ -33,6 +33,8 @@ function GameCard({
             sx={{
                 display: 'flex',
                 marginBottom: 2,
+                marginRight: isHovered ? -2.25 : 0,
+                paddingRight: isHovered ? 2.25 : 0,
                 transition: 'transform 0.2s',
                 cursor: 'pointer',
                 background: isHovered

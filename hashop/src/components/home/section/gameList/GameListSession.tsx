@@ -55,6 +55,9 @@ function GameList({ games }: GameListProps) {
                         sm: 5,
                         md: 4
                     }}
+                    sx={{
+                        background: 'radial-gradient(60% 62% at 100% 16%,rgb(191, 226, 250) 0%,rgb(160, 213, 232) 100%)',
+                    }}
                 >
                     {hoveredGame &&
                         <GameDetails

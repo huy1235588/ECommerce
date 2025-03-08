@@ -19,6 +19,7 @@ function GameDetails({ game }: GameDetailsProps) {
             <Typography
                 variant="h5"
                 sx={{
+                    color: '#10161b',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     display: '-webkit-box',
@@ -29,7 +30,7 @@ function GameDetails({ game }: GameDetailsProps) {
                 {game.title}
             </Typography>
 
-            {/* Mô tảrf */}
+            {/* Mô tả */}
             <Typography variant="body2"
                 sx={{
                     color: '#A0A0A0',
