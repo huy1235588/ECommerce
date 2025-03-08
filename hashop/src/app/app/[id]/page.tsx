@@ -6,7 +6,7 @@ import { Product, ProductField } from '@/types/product';
 import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import './style.css';
 import { GridCheckIcon } from '@mui/x-data-grid';
@@ -71,7 +71,7 @@ function ProductDetailPage() {
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null); // Swiper thumbnail
     const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null); // Swiper chính
     const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0); // Index của slide hiện tại
-    const [imageTimer, setImageTimer] = useState<NodeJS.Timeout | null>(null);
+    const timerRef = useRef<NodeJS.Timeout | null>(null);
 
     // Lấy thông tin sản phẩm khi component được render
     useEffect(() => {
@@ -156,19 +156,19 @@ function ProductDetailPage() {
     // Xử lý tự động chuyển slide cho hình ảnh (8s) khi slide thay đổi
     useEffect(() => {
         // Xóa timer cũ nếu có
-        if (imageTimer) clearTimeout(imageTimer);
+        if (timerRef.current) clearTimeout(timerRef.current);
 
         // Nếu slide hiện tại là hình ảnh và swiper chính đã sẵn sàng
         if (mediaItems[currentSlideIndex]?.type === 'image' && mainSwiper) {
-            const timer = setTimeout(() => {
+            // Tạo timer mới
+            timerRef.current = setTimeout(() => {
                 mainSwiper.slideNext();
             }, 8000);
-            setImageTimer(timer);
         }
-        
+
         // Dọn dẹp timer khi component unmount hoặc currentSlideIndex thay đổi
         return () => {
-            if (imageTimer) clearTimeout(imageTimer);
+            if (timerRef.current) clearTimeout(timerRef.current);
         };
     }, [currentSlideIndex, mainSwiper, mediaItems]);
 
