@@ -72,7 +72,75 @@ export const AllProduct = createAsyncThunk<
     }
 );
 
-//
+// Lấy thông tin sản phẩm theo ID
+export const getProductById = createAsyncThunk<
+    Product,
+    {
+        fields: string[];
+        id: number;
+    },
+    { rejectValue: GraphQLErrorResponse }
+>(
+    "/product/getById",
+    async (
+        {
+            fields,
+            id
+        },
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<{ data: { product: Product } }> = await axios.post(
+                '/graphql',
+                {
+                    query: `query GetProductById($id: Int!) {
+                        product(id: $id) {
+                            ${fields.join(" ")}
+                        }
+                    }`,
+                    variables: { id }
+                }
+            );
+
+            return response.data.data.product;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                // Xử lý lỗi GraphQL
+                if (error.response?.data?.errors) {
+                    return rejectWithValue({
+                        errors: error.response.data.errors
+                    });
+                }
+
+                // Xử lý lỗi mạng/HTTP khác
+                return rejectWithValue({
+                    errors: [{
+                        message: error.message,
+                        locations: [],
+                        extensions: {
+                            code: "HTTP_ERROR",
+                            stacktrace: error.stack?.split('\n')
+                        }
+                    }]
+                });
+            }
+
+            // Xử lý lỗi không xác định
+            return rejectWithValue({
+                errors: [{
+                    message: "Unknown error occurred",
+                    locations: [],
+                    extensions: {
+                        code: "UNKNOWN_ERROR"
+                    }
+                }]
+            });
+        }
+    }
+);
+
+// Lấy danh sách sản phẩm phân trang
 export const paginatedProducts = createAsyncThunk<
     ProductResponse,
     {
@@ -196,6 +264,27 @@ const productSlice = createSlice({
                 state.products = action.payload.data.products || [];
             })
             .addCase(AllProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || {
+                    errors: [{
+                        message: "Unexpected error occurred",
+                        locations: [],
+                        extensions: { code: "HTTP_ERROR" }
+                    }]
+                };
+            })
+
+            // Lấy thông tin sản phẩm theo ID
+            .addCase(getProductById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getProductById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.products = [action.payload];
+            })
+            .addCase(getProductById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || {
                     errors: [{

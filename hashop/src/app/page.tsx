@@ -10,7 +10,7 @@ import { checkAuthUser } from "@/store/auth";
 import { paginatedProducts } from "@/store/product";
 import { AppDispatch } from "@/store/store";
 import "@/styles/home.css?v=1";
-import { Product } from "@/types/product";
+import { Product, ProductField } from "@/types/product";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -25,10 +25,7 @@ export default function Home() {
 
         // Hàm lấy danh sách sản phẩm
         const getProducts = async () => {
-            try {
-                // Tạo type alias cho các field hợp lệ
-                type ProductField = keyof Product;
-
+            try {                
                 // Các trường cần lấy
                 const field: ProductField[] = [
                     "productId",
@@ -67,6 +64,7 @@ export default function Home() {
                     const products = unwrapResult(resultAction).data.paginatedProducts.products;
                     setSampleGames(products);
                 }
+
             } catch (error) {
                 console.log(error);
             }
@@ -89,7 +87,6 @@ export default function Home() {
 
             {/* Aside */}
             <HomeAside />
-
 
             <main>
                 {/* Discover Section */}

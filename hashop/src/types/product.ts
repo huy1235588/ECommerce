@@ -128,7 +128,8 @@ export type Product = {
     updatedAt?: Date;
 };
 
-
+// Tạo type alias cho các field hợp lệ
+export type ProductField = keyof Product;
 
 // GraphQL
 interface PaginationInfo {
