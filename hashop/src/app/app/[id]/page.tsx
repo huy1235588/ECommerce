@@ -86,6 +86,7 @@ function ProductDetailPage() {
                     'productId',
                     'title',
                     'description',
+                    'detail',
                     'price',
                     'discount',
                     'releaseDate',
@@ -492,7 +493,67 @@ function ProductDetailPage() {
                         </Box>
                     </Box>
 
-                
+                    {/* Chi tiết */}
+                    <div className="product-detail-container collapsed">
+                        <div className="product-detail-auto-collapse">
+                            {/* Chi tiết */}
+                            <div className="product-detail-area"
+                                dangerouslySetInnerHTML={{ __html: product.detail || "" }}
+                            />
+                        </div>
+                        {/* Nút xem thêm */}
+                        <div className="product-detail-toggle">
+                            <div className='product-detail-toggle-button'
+                                onClick={() => {
+                                    const productDetail = document.querySelector('.product-detail-container');
+
+                                    if (productDetail) {
+                                        productDetail.classList.toggle('collapsed');
+                                    }
+                                }}
+                            >
+                                Show More
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Bảng cấu hình */}
+                    <div className='product-sysReq-container'>
+                        <h2 className='product-sysReq-title'>
+                            System Requirements
+                        </h2>
+
+                        <div className="sysReq_contents">
+                            <div className="game_area_sys_req sysReq_content active" data-os="win">
+                                <div className="game_area_sys_req_leftCol">
+                                    <h3>Minimum:</h3>
+                                    <ul className="sysReq_leftCol">
+                                        {product.systemRequirements.win.map((item, index) => {
+                                            return item.minimum && item.recommended ? (
+                                                <li key={index}>
+                                                    <strong>{item.title}: </strong>
+                                                    <span>{item.minimum}</span>
+                                                </li>
+                                            ) : null;
+                                        })}
+                                    </ul>
+                                </div>
+                                <div className="game_area_sys_req_rightCol">
+                                    <h3>Recommended:</h3>
+                                    <ul className="sysReq_rightCol">
+                                        {product.systemRequirements.win.map((item, index) => {
+                                            return item.minimum && item.recommended ? (
+                                                <li key={index}>
+                                                    <strong>{item.title}: </strong>
+                                                    <span>{item.recommended}</span>
+                                                </li>
+                                            ) : null;
+                                        })}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </Grid2>
 
                 {/* Thông tin */}
@@ -504,10 +565,10 @@ function ProductDetailPage() {
                     sx={{
                         marginTop: 2,
                     }}
-                >       
+                >
                 </Grid2>
             </Grid2>
-        </Box>
+        </Box >
     );
 };
 
