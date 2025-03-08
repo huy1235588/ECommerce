@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
                 protocol: "https",
                 hostname: "**.steamstatic.com", // Tất cả subdomain
             },
+            {
+                protocol: "https",
+                hostname: "placehold.co", // Tất cả subdomain
+            },
         ]
     },
     reactStrictMode: false,

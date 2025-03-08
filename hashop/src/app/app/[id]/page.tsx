@@ -5,7 +5,7 @@ import { AppDispatch } from '@/store/store';
 import { Product, ProductField } from '@/types/product';
 import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import './style.css';
@@ -62,8 +62,14 @@ const initialProduct: Product = {
 
 function ProductDetailPage() {
     const router = useRouter();
+    const pathname = usePathname()
     const dispatch = useDispatch<AppDispatch>();
-    const [selectedImage, setSelectedImage] = useState(''); // State cho ảnh chính
+
+    // State cho ảnh chính
+    const [selectedHighligh, setSelectedHighligh] = useState({
+        type: 'image',
+        src: '',
+    });
     // Khai báo state
     const [product, setProduct] = useState<Product>(initialProduct);
 
@@ -72,6 +78,10 @@ function ProductDetailPage() {
         // Hàm lấy thông tin sản phẩm
         const getProduct = async () => {
             try {
+                // Lấy id sản phẩm từ url
+                const id = pathname.split('/').pop();
+
+                // Các field cần lấy
                 const fieldProduct: ProductField[] = [
                     'productId',
                     'title',
@@ -83,13 +93,14 @@ function ProductDetailPage() {
                     'publisher',
                     'headerImage',
                     'screenshots',
+                    'videos',
                     'platform',
                     'tags',
                 ];
 
                 // Gọi action lấy thông tin sản phẩm
                 const resultAction = await dispatch(getProductById({
-                    id: 52,
+                    id: Number(id),
                     fields: fieldProduct
                 }));
 
@@ -98,7 +109,10 @@ function ProductDetailPage() {
                     const fetchedProduct = unwrapResult(resultAction);
                     setProduct(fetchedProduct);
                     // Khởi tạo ảnh chính
-                    setSelectedImage(fetchedProduct.screenshots[0] || '');
+                    setSelectedHighligh({
+                        type: 'image',
+                        src: fetchedProduct.videos[0].mp4,
+                    });
                 }
 
             } catch (error) {
@@ -131,6 +145,7 @@ function ProductDetailPage() {
                 sx={{
                     color: '#fff',
                     textShadow: '0 0 10px #ff0',
+                    marginBottom: 2,
                 }}
             >
                 {product.title}
@@ -145,78 +160,100 @@ function ProductDetailPage() {
                         md: 8,
                     }}
                 >
-                    {/* Ảnh chính */}
-                    <Image
-                        src={selectedImage}
-                        alt="Product"
-                        objectFit="cover"
-                        width={703}
-                        height={395}
-                    />
+                    {/* Player chính */}
+                    <Box
+                        sx={{
+                            position: 'relative',
+                            width: '100%',
+                            height: '395px',
+                            backgroundColor: '#000',
+                        }}
+                    >
+                        {selectedHighligh.type === 'image' ? (
+                            <Image
+                                src={selectedHighligh.src || 'https://placehold.co/703x395/000/000/png'}
+                                alt="Screenshot"
+                                width={703}
+                                height={395}
+                                priority
+                            />
+                        ) : (
+                            <video
+                                src={selectedHighligh.src}
+                                controls
+                                autoPlay
+                                loop
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                }}
+                            />
+                        )}
+                    </Box>
 
-                    {/* Bộ sưu tập ảnh nhỏ với Swiper */}
+                    {/* Bộ sưu tập ảnh và video nhỏ với Swiper */}
                     <Swiper
                         spaceBetween={10}
                         slidesPerView={4}
                         freeMode={true}
-                        loop={true}
                         watchSlidesProgress={true}
                         modules={[FreeMode, Navigation, Thumbs, Scrollbar]}
                         className="swiper-screenshots"
                         style={{ marginTop: '16px' }}
-                        navigation={{
-
-                        }}
+                        navigation
                         scrollbar={{ draggable: true }}
+                        rewind={true}
                     >
-                        {product.screenshots.map((screenshot, index) => (
+                        {/* Hiển thị video nhỏ */}
+                        {product.videos.map((video, index) => (
                             <SwiperSlide key={index}>
                                 <Image
-                                    src={screenshot}
-                                    alt={`Screenshot ${index + 1}`}
-                                    objectFit="cover"
+                                    src={video.thumbnail || 'https://placehold.co/175x98/000/000/png'}
+                                    alt={`Video ${index + 1}`}
                                     width={175}
                                     height={98}
-                                    onClick={() => setSelectedImage(screenshot)}
+                                    onClick={() => setSelectedHighligh({ type: 'video', src: video.mp4 })}
                                     style={{
                                         userSelect: 'none',
                                         cursor: 'pointer',
-                                        border: selectedImage === screenshot ? '3px solid #fff' : 'none'
+                                        border: selectedHighligh.src === video.mp4 ? '3px solid #fff' : 'none'
+                                    }}
+                                />
+
+                                {/* Highlight movie marker */}
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: '50%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        width: '32px',
+                                        height: '32px',
+                                        backgroundImage: 'url(/image/play_video_button.png)',
+                                    }}
+                                />
+
+                            </SwiperSlide>
+                        ))}
+
+                        {/* Hiển thị ảnh nhỏ */}
+                        {product.screenshots.map((screenshot, index) => (
+                            <SwiperSlide key={index}>
+                                <Image
+                                    src={screenshot || 'https://placehold.co/175x98/000/000/png'}
+                                    alt={`Screenshot ${index + 1}`}
+                                    width={175}
+                                    height={98}
+                                    onClick={() => setSelectedHighligh({ type: 'image', src: screenshot })}
+                                    style={{
+                                        userSelect: 'none',
+                                        cursor: 'pointer',
+                                        border: selectedHighligh.src === screenshot ? '3px solid #fff' : 'none'
                                     }}
                                 />
                             </SwiperSlide>
                         ))}
                     </Swiper>
-
-                    {/* <Grid2 container spacing={1} sx={{ marginTop: 2 }}>
-                        {[1, 2, 3, 4].map((_, index) => (
-                            <Grid2
-                                size={{
-                                    xs: 3,
-                                    sm: 3,
-                                    md: 3
-                                }}
-                                key={index}
-                            >
-                                <Box
-                                    sx={{
-                                        height: '100px',
-                                        background: index % 2 === 0 ? '#555' : '#777',
-                                        borderRadius: 1,
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                                    }}
-                                >
-                                    <Image
-                                        src={product.screenshots[index]}
-                                        alt="Product"
-                                        objectFit="cover"
-                                        width={200}
-                                        height={100}
-                                    />
-                                </Box>
-                            </Grid2>
-                        ))}
-                    </Grid2> */}
 
                     {/* Nút hành động */}
                     <Grid2 container spacing={1} sx={{ marginTop: 3 }}>
@@ -257,9 +294,11 @@ function ProductDetailPage() {
                 >
                     {/* Hình ảnh header */}
                     <Image
-                        src={product.headerImage ? product.headerImage.toString() : '/placeholder.png'}
+                        src={product.headerImage
+                            ? product.headerImage.toString()
+                            : 'https://placehold.co/343x160/000/000/png'
+                        }
                         alt="Product"
-                        objectFit="cover"
                         width={343}
                         height={160}
                     />

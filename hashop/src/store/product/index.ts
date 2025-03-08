@@ -90,12 +90,34 @@ export const getProductById = createAsyncThunk<
         { rejectWithValue }
     ) => {
         try {
+            const fieldMap = fields.map(field => {
+                switch (field) {
+                    case 'systemRequirements':
+                        return `systemRequirements {
+                            os
+                            processor
+                            memory
+                            graphics
+                            storage
+                        }`;
+                    case 'videos':
+                        return `videos {
+                            thumbnail
+                            mp4
+                            webm
+                        }`;
+                    default:
+                        return field;
+                }
+            })  
+
+            // Gửi request lên server
             const response: AxiosResponse<{ data: { product: Product } }> = await axios.post(
                 '/graphql',
                 {
                     query: `query GetProductById($id: Int!) {
                         product(id: $id) {
-                            ${fields.join(" ")}
+                            ${fieldMap.join(" ")}
                         }
                     }`,
                     variables: { id }
