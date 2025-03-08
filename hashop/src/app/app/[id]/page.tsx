@@ -3,7 +3,7 @@
 import { getProductById } from '@/store/product';
 import { AppDispatch } from '@/store/store';
 import { Product, ProductField } from '@/types/product';
-import { Grid, Card, CardMedia, Typography, Button, AppBar, Toolbar, Container, CardContent, Paper, Chip, Stack, Box, Grid2, Divider, styled } from '@mui/material';
+import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -12,6 +12,13 @@ import './style.css';
 import { GridCheckIcon } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { FreeMode, Navigation, Scrollbar, Thumbs } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/navigation';
+import 'swiper/css/scrollbar';
+import 'swiper/css/thumbs';
 
 // Khởi tạo product ban đầu
 const initialProduct: Product = {
@@ -56,7 +63,7 @@ const initialProduct: Product = {
 function ProductDetailPage() {
     const router = useRouter();
     const dispatch = useDispatch<AppDispatch>();
-
+    const [selectedImage, setSelectedImage] = useState(''); // State cho ảnh chính
     // Khai báo state
     const [product, setProduct] = useState<Product>(initialProduct);
 
@@ -82,14 +89,16 @@ function ProductDetailPage() {
 
                 // Gọi action lấy thông tin sản phẩm
                 const resultAction = await dispatch(getProductById({
-                    id: 1,
+                    id: 52,
                     fields: fieldProduct
                 }));
 
                 // Lấy thông tin sản phẩm thành công
                 if (resultAction.meta.requestStatus === 'fulfilled') {
-                    // Cập nhật state
-                    setProduct(unwrapResult(resultAction));
+                    const fetchedProduct = unwrapResult(resultAction);
+                    setProduct(fetchedProduct);
+                    // Khởi tạo ảnh chính
+                    setSelectedImage(fetchedProduct.screenshots[0] || '');
                 }
 
             } catch (error) {
@@ -115,8 +124,7 @@ function ProductDetailPage() {
             minHeight: '100vh',
             width: '90%',
             margin: '20px auto',
-        }}
-        >
+        }}>
             {/* Tên */}
             <Typography
                 variant="h2"
@@ -138,31 +146,49 @@ function ProductDetailPage() {
                     }}
                 >
                     {/* Ảnh chính */}
-                    <Box
-                        sx={{
-                            height: '400px',
-                            background: `url(${product.screenshots[0]})`,
-                            backgroundSize: 'cover',
-                            position: 'relative',
-                            borderRadius: 1,
-                        }}
-                    >
-                        <Typography
-                            variant="h2"
-                            sx={{
-                                position: 'absolute',
-                                bottom: 10,
-                                left: 10,
-                                color: '#fff',
-                                textShadow: '0 0 10px #ff0',
-                            }}
-                        >
-                            {product.title}
-                        </Typography>
-                    </Box>
+                    <Image
+                        src={selectedImage}
+                        alt="Product"
+                        objectFit="cover"
+                        width={703}
+                        height={395}
+                    />
 
-                    {/* Bộ sưu tập ảnh thu nhỏ */}
-                    <Grid2 container spacing={1} sx={{ marginTop: 2 }}>
+                    {/* Bộ sưu tập ảnh nhỏ với Swiper */}
+                    <Swiper
+                        spaceBetween={10}
+                        slidesPerView={4}
+                        freeMode={true}
+                        loop={true}
+                        watchSlidesProgress={true}
+                        modules={[FreeMode, Navigation, Thumbs, Scrollbar]}
+                        className="swiper-screenshots"
+                        style={{ marginTop: '16px' }}
+                        navigation={{
+
+                        }}
+                        scrollbar={{ draggable: true }}
+                    >
+                        {product.screenshots.map((screenshot, index) => (
+                            <SwiperSlide key={index}>
+                                <Image
+                                    src={screenshot}
+                                    alt={`Screenshot ${index + 1}`}
+                                    objectFit="cover"
+                                    width={175}
+                                    height={98}
+                                    onClick={() => setSelectedImage(screenshot)}
+                                    style={{
+                                        userSelect: 'none',
+                                        cursor: 'pointer',
+                                        border: selectedImage === screenshot ? '3px solid #fff' : 'none'
+                                    }}
+                                />
+                            </SwiperSlide>
+                        ))}
+                    </Swiper>
+
+                    {/* <Grid2 container spacing={1} sx={{ marginTop: 2 }}>
                         {[1, 2, 3, 4].map((_, index) => (
                             <Grid2
                                 size={{
@@ -190,10 +216,10 @@ function ProductDetailPage() {
                                 </Box>
                             </Grid2>
                         ))}
-                    </Grid2>
+                    </Grid2> */}
 
                     {/* Nút hành động */}
-                    <Grid2 container spacing={1} sx={{ marginTop: 2 }}>
+                    <Grid2 container spacing={1} sx={{ marginTop: 3 }}>
                         <Grid2>
                             <Button
                                 variant="contained"
@@ -230,28 +256,13 @@ function ProductDetailPage() {
                     }}
                 >
                     {/* Hình ảnh header */}
-                    <Box
-                        sx={{
-                            height: '200px',
-                            background: `url(${product.headerImage})`,
-                            backgroundSize: 'cover',
-                            position: 'relative',
-                            borderRadius: 1,
-                        }}
-                    >
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                position: 'absolute',
-                                bottom: 10,
-                                left: 10,
-                                color: '#fff',
-                                textShadow: '0 0 10px #ff0',
-                            }}
-                        >
-                            {product.title}
-                        </Typography>
-                    </Box>
+                    <Image
+                        src={product.headerImage ? product.headerImage.toString() : '/placeholder.png'}
+                        alt="Product"
+                        objectFit="cover"
+                        width={343}
+                        height={160}
+                    />
 
                     {/* Mô tả trò chơi */}
                     <Typography variant="body1" sx={{ color: '#fff', marginTop: 2 }}>
