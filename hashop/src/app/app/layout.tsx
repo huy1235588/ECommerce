@@ -27,7 +27,7 @@ export default function AppLayout({
                     justifyContent: 'center',
                     minHeight: '100vh',
                     marginTop: '90px',
-                    background: 'linear-gradient(to bottom, #1b2838, #000)',
+                    background: 'linear-gradient(to bottom, #1b2838, #1b2838)',
                 }}
             >
                 {children}

@@ -96,6 +96,7 @@ function ProductDetailPage() {
                     'videos',
                     'platform',
                     'tags',
+                    'systemRequirements',
                 ];
 
                 // Gọi action lấy thông tin sản phẩm
@@ -404,6 +405,106 @@ function ProductDetailPage() {
                             </Grid2>
                         ))}
                     </Grid2>
+                </Grid2>
+            </Grid2>
+
+            {/* Thông tin chi tiết */}
+            <Grid2 container spacing={2}>
+                {/*  */}
+                <Grid2
+                    size={{
+                        xs: 12,
+                        md: 8,
+                    }}
+                    sx={{
+                        marginTop: 2,
+                    }}
+                >
+                    {/* Tiêu đề */}
+                    <Box sx={{
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        backgroundColor: '#333',
+                        padding: '16px',
+                        paddingBottom: '26px',
+                        marginBottom: 2,
+                        borderRadius: '5px',
+                        color: '#fff',
+                    }}>
+                        {/* Tiêu đề */}
+                        <Typography variant="h5" sx={{ color: '#fff' }}>
+                            Buy {product.title}
+                        </Typography>
+
+                        {/* Platform */}
+                        {product.platform.map((platform, index) => (
+                            <Typography
+                                key={index}
+                                variant="body2"
+                                sx={{
+                                    color: '#fff',
+                                    marginRight: '8px',
+                                }}
+                            >
+                                <Image
+                                    src={`/icons/platforms/${platform}.svg`}
+                                    alt={platform}
+                                    width={20}
+                                    height={20}
+                                    style={{
+                                        verticalAlign: 'middle',
+                                        marginRight: '4px',
+                                        filter: 'invert(80%)',
+                                    }}
+                                />
+                            </Typography>
+                        ))}
+
+                        {/* Giá tiền */}
+                        <Box sx={{
+                            position: 'absolute',
+                            right: '16px',
+                            bottom: '-17px',
+                        }}>
+                            {/* Giá gốc */}
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                backgroundColor: '#000',
+                                height: '36px',
+                                verticalAlign: 'bottom',
+                            }}>
+                                {/* Giá tiền */}
+                                <Typography variant="body1" sx={{
+                                    color: '#fff',
+                                    padding: '8px 12px',
+                                }}>
+                                    990.000đ
+                                </Typography>
+
+                                {/* Nút thêm vào giỏ hàng */}
+                                <Button variant="contained" color="success">
+                                    Add to Cart
+                                </Button>
+                            </Box>
+                        </Box>
+                    </Box>
+
+                
+                </Grid2>
+
+                {/* Thông tin */}
+                <Grid2
+                    size={{
+                        xs: 12,
+                        md: 4,
+                    }}
+                    sx={{
+                        marginTop: 2,
+                    }}
+                >       
                 </Grid2>
             </Grid2>
         </Box>

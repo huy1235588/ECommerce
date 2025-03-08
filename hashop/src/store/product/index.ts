@@ -94,11 +94,21 @@ export const getProductById = createAsyncThunk<
                 switch (field) {
                     case 'systemRequirements':
                         return `systemRequirements {
-                            os
-                            processor
-                            memory
-                            graphics
-                            storage
+                           win {
+                                title
+                                minimum
+                                recommended
+                            }
+                            mac {
+                                title
+                                minimum
+                                recommended
+                            }
+                            linux {
+                                title
+                                minimum
+                                recommended
+                            }
                         }`;
                     case 'videos':
                         return `videos {
@@ -109,7 +119,7 @@ export const getProductById = createAsyncThunk<
                     default:
                         return field;
                 }
-            })  
+            })
 
             // Gửi request lên server
             const response: AxiosResponse<{ data: { product: Product } }> = await axios.post(
