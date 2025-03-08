@@ -1,8 +1,8 @@
 'use client'
 
-import { getProductById, getSupportedLanguages } from '@/store/product';
+import { getAchievements, getProductById, getSupportedLanguages } from '@/store/product';
 import { AppDispatch } from '@/store/store';
-import { Product, ProductField, ProductLanguage } from '@/types/product';
+import { Product, ProductAchievement, ProductField, ProductLanguage } from '@/types/product';
 import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { usePathname, useRouter } from 'next/navigation';
@@ -67,6 +67,12 @@ const initialProductLanguage: ProductLanguage = {
     languages: [],
 }
 
+// Khởi tạo product achievement ban đầu
+const initialProductAchievement: ProductAchievement = {
+    productId: -1,
+    achievements: [],
+}
+
 function ProductDetailPage() {
     const router = useRouter();
     const pathname = usePathname()
@@ -75,6 +81,7 @@ function ProductDetailPage() {
     // Khai báo state
     const [product, setProduct] = useState<Product>(initialProduct); // Sản phẩm
     const [productLanguage, setProductLanguage] = useState<ProductLanguage>(initialProductLanguage); // Sản phẩm
+    const [productAchievement, setProductAchievement] = useState<ProductAchievement>(initialProductAchievement); // Sản phẩm
 
     // Swiper
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null); // Swiper thumbnail
@@ -131,6 +138,18 @@ function ProductDetailPage() {
                 if (resultActionLanguages.meta.requestStatus === 'fulfilled') {
                     const fetchedProductLanguage = unwrapResult(resultActionLanguages);
                     setProductLanguage(fetchedProductLanguage);
+                }
+
+                // Gọi action lấy thành tựu
+                const resultActionAchievement = await dispatch(getAchievements({
+                    id: Number(id),
+                    slice: 4
+                }));
+
+                // Lấy thông tin thành tựu thành công
+                if (resultActionAchievement.meta.requestStatus === 'fulfilled') {
+                    const fetchedProductAchievement = unwrapResult(resultActionAchievement);
+                    setProductAchievement(fetchedProductAchievement);
                 }
 
             } catch (error) {
@@ -658,6 +677,33 @@ function ProductDetailPage() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    {/* Achievements */}
+                    <div className="product-achievements-container">
+                        <Typography variant="h6" sx={{ color: '#fff' }}>
+                            Achievements
+                        </Typography>
+                        <div className='product-achievements-list'>
+                            {productAchievement.achievements.map((achievement, index) => (
+                                <div className='product-achievements-item'
+                                    key={index}
+                                >
+                                    <Image
+                                        src={achievement.image}
+                                        alt={achievement.title}
+                                        width={64}
+                                        height={64}
+                                    />
+                                </div>
+                            ))}
+
+                            {/* Nút xem thêm */}
+                            <a className='product-achievements-view-all'
+                                href="#">
+                                View  all 42
+                            </a>
                         </div>
                     </div>
                 </Grid2>

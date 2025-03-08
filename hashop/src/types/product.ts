@@ -143,6 +143,19 @@ export type ProductLanguage = {
     languages: Languages[]
 }
 
+// Tạo type thành tựu
+type Achievement = {
+    title: string,
+    description: string,
+    percent: number,
+    image: string // URL
+}
+
+export type ProductAchievement = {
+    productId: number;
+    achievements: Achievement[]
+}
+
 // Tạo type alias cho các field hợp lệ
 export type ProductField = keyof Product;
 

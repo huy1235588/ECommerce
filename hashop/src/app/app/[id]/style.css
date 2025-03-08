@@ -201,6 +201,17 @@
 }
 
 /* Feature */
+.product-achievements-container {
+    padding: 16px;
+    margin-bottom: 8px;
+    margin-top: 0;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
 .product-features-container {
     padding: 16px;
     margin-bottom: 8px;
@@ -291,4 +302,47 @@
 .product-languages-table td span {
     font-weight: bold;
     color: #67c1f5;
+}
+
+/* Achievements */
+.product-achievements-list {
+    padding: 4px 0px 4px 0px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.product-achievements-item {
+    float: left;
+    width: 64px;
+    height: 64px;
+    margin-right: 4px;
+}
+
+.product-achievements-item img {
+    width: 64px;
+    height: 64px;
+    user-select: none;
+}
+
+a.product-achievements-view-all {
+    background-color: rgba(103, 193, 245, 0.2);
+    border-radius: 1px;
+    font-size: 13px;
+    font-family: "Motiva Sans", Sans-serif;
+    font-weight: normal;
+    color: #67c1f5;
+    text-align: center;
+    height: 64px;
+    padding: 0 4px;
+    margin-right: 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    line-height: 14px;
+}
+
+a.product-achievements-view-all:hover {
+    background: linear-gradient(135deg, #67c1f5 0%, #417a9b 100%);
+    color: #ffffff;
 }

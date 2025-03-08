@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Product, ProductLanguage, ProductResponse } from "@/types/product";
+import { Product, ProductAchievement, ProductLanguage, ProductResponse } from "@/types/product";
 import axios from "@/config/axios";
 import axiosLib, { AxiosResponse } from "axios";
 import { GraphQLErrorResponse } from "@/types/graphql";
@@ -8,6 +8,7 @@ import { GraphQLErrorResponse } from "@/types/graphql";
 const initialState = {
     products: [] as Product[],
     productLanguage: {} as ProductLanguage,
+    productAchievement: {} as ProductAchievement,
     loading: false,
     error: null as GraphQLErrorResponse | null
 };
@@ -245,6 +246,84 @@ export const getSupportedLanguages = createAsyncThunk<
     }
 );
 
+// Lấy danh sách thành tựu theo ID sản phẩm
+export const getAchievements = createAsyncThunk<
+    ProductAchievement,
+    {
+        id: number;
+        slice?: number;
+    },
+    { rejectValue: GraphQLErrorResponse }
+>(
+    "/product/getAchievements",
+    async (
+        {
+            id,
+            slice = 0
+        },
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<{
+                data: {
+                    getAchievement: ProductAchievement,
+                }
+            }> = await axios.post(
+                '/graphql',
+                {
+                    query: `query GetAchievements($id: Int!, $slice: Int) {
+                        getAchievement(productId: $id, slice: $slice) {
+                            productId
+                            achievements {
+                               title
+                                description
+                                percent
+                                image
+                            }
+                        }
+                    }`,
+                    variables: { id, slice }
+                }
+            );
+
+            return response.data.data.getAchievement;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                // Xử lý lỗi GraphQL
+                if (error.response?.data?.errors) {
+                    return rejectWithValue({
+                        errors: error.response.data.errors
+                    });
+                }
+
+                // Xử lý lỗi mạng/HTTP khác
+                return rejectWithValue({
+                    errors: [{
+                        message: error.message,
+                        locations: [],
+                        extensions: {
+                            code: "HTTP_ERROR",
+                            stacktrace: error.stack?.split('\n')
+                        }
+                    }]
+                });
+            }
+
+            // Xử lý lỗi không xác định
+            return rejectWithValue({
+                errors: [{
+                    message: "Unknown error occurred",
+                    locations: [],
+                    extensions: {
+                        code: "UNKNOWN_ERROR"
+                    }
+                }]
+            });
+        }
+    }
+);
+
 // Lấy danh sách sản phẩm phân trang
 export const paginatedProducts = createAsyncThunk<
     ProductResponse,
@@ -411,6 +490,27 @@ const productSlice = createSlice({
                 state.productLanguage = action.payload;
             })
             .addCase(getSupportedLanguages.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || {
+                    errors: [{
+                        message: "Unexpected error occurred",
+                        locations: [],
+                        extensions: { code: "HTTP_ERROR" }
+                    }]
+                };
+            })
+
+            // Lấy danh sách thành tựu theo ID sản phẩm
+            .addCase(getAchievements.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getAchievements.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.productAchievement = action.payload;
+            })
+            .addCase(getAchievements.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || {
                     errors: [{

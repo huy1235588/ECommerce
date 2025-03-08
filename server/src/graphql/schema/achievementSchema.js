@@ -13,6 +13,7 @@ const achievementSchema = `
     
     type Query {
         getAchievementList: [AchievementList]
+        getAchievement(productId: Int!, slice: Int): AchievementList
         getLimitedAchievementList(limit: Int!): [AchievementList]
     }
     

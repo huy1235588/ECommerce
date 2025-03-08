@@ -6,6 +6,11 @@ const achievementResolvers = {
             return await Achievement
                 .find()
         },
+        getAchievement: async (_, { productId, slice}) => {
+            return await Achievement
+                .findOne({ productId })
+                .select(slice ? { achievements: { $slice: slice } } : {})
+        },
         getLimitedAchievementList: async (_, { limit }) => {
             return await Achievement
                 .find().limit(limit)
