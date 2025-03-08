@@ -1,24 +1,19 @@
 /* Swiper */
-.swiper.swiper-screenshots {
-    padding-bottom: 25px;
-    --swiper-scrollbar-size: 18px; /* Kích thước scrollbar */
-    --swiper-scrollbar-sides-offset: 32px; /* Khoảng cách scrollbar với viền */
-    --swiper-scrollbar-border-radius: 5px; /* Bo tròn scrollbar */
-
-    --swiper-navigation-top-offset: 87%; /* Khoảng cách nút điều hướng với viền trên */
+.swiper.main-player-swiper {
+    --swiper-navigation-top-offset: 522px; /* Khoảng cách nút điều hướng với viền trên */
     --swiper-navigation-sides-offset: 0px; /* Khoảng cách nút điều hướng với viền bên */
     --swiper-navigation-size: 12px; /* Kích thước nút điều hướng */
 }
 
-.swiper-screenshots .swiper-button-next,
-.swiper-screenshots .swiper-button-prev {
+.main-player-swiper .swiper-button-next,
+.main-player-swiper .swiper-button-prev {
     padding: 9px 16px; /* Kích thước nút điều hướng */
     color: #407899; /* Màu nút điều hướng */
     background: #233c5166;
 }
 
-.swiper-screenshots .swiper-button-next:hover,
-.swiper-screenshots .swiper-button-prev:hover {
+.main-player-swiper .swiper-button-next:hover,
+.main-player-swiper .swiper-button-prev:hover {
     background: linear-gradient(
         135deg,
         #3d6c8d 0%,
@@ -26,11 +21,19 @@
     ); /* Màu nút điều hướng khi hover */
 }
 
-.swiper-screenshots .swiper-scrollbar {
+/* Swiper thumb */
+.swiper.thumb-swiper {
+    padding-bottom: 25px;
+    --swiper-scrollbar-size: 18px; /* Kích thước scrollbar */
+    --swiper-scrollbar-sides-offset: 32px; /* Khoảng cách scrollbar với viền */
+    --swiper-scrollbar-border-radius: 5px; /* Bo tròn scrollbar */
+}
+
+.thumb-swiper .swiper-scrollbar {
     background: rgba(133, 133, 133, 0.3); /* Màu nền scrollbar */
 }
 
-.swiper-screenshots .swiper-scrollbar-drag {
+.thumb-swiper .swiper-scrollbar-drag {
     background: #30537066; /* Màu thanh kéo scrollbar */
 }
 
