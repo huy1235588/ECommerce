@@ -14,7 +14,7 @@ const languageSchema = `
 
     type Query {
         getLanguagesList: [LanguageList]
-        getLanguage(id: Int!): Languages
+        getLanguage(id: Int!): LanguageList
         getLimitedLanguagesList(limit: Int!): [LanguageList]
     }
 

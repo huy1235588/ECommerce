@@ -80,6 +80,7 @@ export type ProductVideos = {
     webm: string,
 }
 
+// Tạo type cho system requirements
 export type ProductSystemRequirements = {
     title: "OS" | "Processor" | "Memory" | "Graphics" | "DirectX" | "Storage" | "Sound Card" | "Additional Notes",
     minimum: string,
@@ -92,6 +93,7 @@ export type ProductOS = {
     linux?: ProductSystemRequirements[]
 }
 
+// Tạo type cho product
 export type Product = {
     _id?: number;
     productId: number;
@@ -127,6 +129,19 @@ export type Product = {
     createdAt?: Date;
     updatedAt?: Date;
 };
+
+// Tạo type cho ngôn ngữ
+type Languages = {
+    language: string,
+    interface: boolean,
+    fullAudio: boolean,
+    subtitles: boolean
+}
+
+export type ProductLanguage = {
+    productId: number;
+    languages: Languages[]
+}
 
 // Tạo type alias cho các field hợp lệ
 export type ProductField = keyof Product;

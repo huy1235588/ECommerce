@@ -1,8 +1,8 @@
 'use client'
 
-import { getProductById } from '@/store/product';
+import { getProductById, getSupportedLanguages } from '@/store/product';
 import { AppDispatch } from '@/store/store';
-import { Product, ProductField } from '@/types/product';
+import { Product, ProductField, ProductLanguage } from '@/types/product';
 import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { usePathname, useRouter } from 'next/navigation';
@@ -61,6 +61,12 @@ const initialProduct: Product = {
     },
 };
 
+// Khởi tạo product language ban đầu
+const initialProductLanguage: ProductLanguage = {
+    productId: -1,
+    languages: [],
+}
+
 function ProductDetailPage() {
     const router = useRouter();
     const pathname = usePathname()
@@ -68,6 +74,9 @@ function ProductDetailPage() {
 
     // Khai báo state
     const [product, setProduct] = useState<Product>(initialProduct); // Sản phẩm
+    const [productLanguage, setProductLanguage] = useState<ProductLanguage>(initialProductLanguage); // Sản phẩm
+
+    // Swiper
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null); // Swiper thumbnail
     const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null); // Swiper chính
     const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0); // Index của slide hiện tại
@@ -97,6 +106,7 @@ function ProductDetailPage() {
                     'videos',
                     'platform',
                     'tags',
+                    'features',
                     'systemRequirements',
                 ];
 
@@ -110,6 +120,17 @@ function ProductDetailPage() {
                 if (resultAction.meta.requestStatus === 'fulfilled') {
                     const fetchedProduct = unwrapResult(resultAction);
                     setProduct(fetchedProduct);
+                }
+
+                // Gọi action lấy ngôn ngữ
+                const resultActionLanguages = await dispatch(getSupportedLanguages(
+                    Number(id),
+                ));
+
+                // Lấy thông tin ngôn ngữ thành công
+                if (resultActionLanguages.meta.requestStatus === 'fulfilled') {
+                    const fetchedProductLanguage = unwrapResult(resultActionLanguages);
+                    setProductLanguage(fetchedProductLanguage);
                 }
 
             } catch (error) {
@@ -566,6 +587,79 @@ function ProductDetailPage() {
                         marginTop: 2,
                     }}
                 >
+                    {/* Features */}
+                    <div className="product-features-container">
+                        <Typography variant="h6" sx={{ color: '#fff' }}>
+                            Features
+                        </Typography>
+                        <div className='product-features-list'>
+                            {product.features?.map((feature, index) => (
+                                <a className='product-features-item'
+                                    href="#"
+                                    key={index}
+                                >
+                                    <div className='product-features-icon'>
+                                        <Image
+                                            src={`https://store.fastly.steamstatic.com/public/images/v6/ico/ico_singlePlayer.png`}
+                                            alt={feature}
+                                            width={26}
+                                            height={16}
+                                        />
+                                    </div>
+                                    <div className='product-features-text'>
+                                        {feature}
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Languages */}
+                    <div className="product-languages-container">
+                        <Typography variant="h6" sx={{ color: '#fff' }}>
+                            Languages
+                        </Typography>
+                        <div className='product-languages-list'>
+                            <table className='product-languages-table'>
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th className='checkCol'>Interface</th>
+                                        <th className='checkCol'>Full Audio</th>
+                                        <th className='checkCol'>Subtitles</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {productLanguage.languages.map((language, index) => (
+                                        <tr key={index}>
+                                            <td>{language.language}</td>
+                                            <td className='checkCol'>
+                                                {language.interface && (
+                                                    <span>
+                                                        ✔
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className='checkCol'>
+                                                {language.fullAudio && (
+                                                    <span>
+                                                        ✔
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className='checkCol'>
+                                                {language.subtitles && (
+                                                    <span>
+                                                        ✔
+                                                    </span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </Grid2>
             </Grid2>
         </Box >

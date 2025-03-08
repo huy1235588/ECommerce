@@ -6,12 +6,14 @@ const languageResolvers = {
             return await Language.find();
         },
         getLanguage: async (_, { id }) => {
-            return await Language.findById(id);
+            return await Language.findOne({
+                productId: id
+            });
         },
         getLimitedLanguagesList: async (_, { limit }) => {
             return await Language
-            .find()
-            .limit(limit);
+                .find()
+                .limit(limit);
         }
     },
     Mutation: {

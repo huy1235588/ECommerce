@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Product, ProductResponse } from "@/types/product";
+import { Product, ProductLanguage, ProductResponse } from "@/types/product";
 import axios from "@/config/axios";
 import axiosLib, { AxiosResponse } from "axios";
 import { GraphQLErrorResponse } from "@/types/graphql";
@@ -7,6 +7,7 @@ import { GraphQLErrorResponse } from "@/types/graphql";
 // Trạng thái ban đầu
 const initialState = {
     products: [] as Product[],
+    productLanguage: {} as ProductLanguage,
     loading: false,
     error: null as GraphQLErrorResponse | null
 };
@@ -135,6 +136,78 @@ export const getProductById = createAsyncThunk<
             );
 
             return response.data.data.product;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                // Xử lý lỗi GraphQL
+                if (error.response?.data?.errors) {
+                    return rejectWithValue({
+                        errors: error.response.data.errors
+                    });
+                }
+
+                // Xử lý lỗi mạng/HTTP khác
+                return rejectWithValue({
+                    errors: [{
+                        message: error.message,
+                        locations: [],
+                        extensions: {
+                            code: "HTTP_ERROR",
+                            stacktrace: error.stack?.split('\n')
+                        }
+                    }]
+                });
+            }
+
+            // Xử lý lỗi không xác định
+            return rejectWithValue({
+                errors: [{
+                    message: "Unknown error occurred",
+                    locations: [],
+                    extensions: {
+                        code: "UNKNOWN_ERROR"
+                    }
+                }]
+            });
+        }
+    }
+);
+
+// Lấy danh sách ngôn ngữ hỗ trợ theo ID sản phẩm
+export const getSupportedLanguages = createAsyncThunk<
+    ProductLanguage,
+    number,
+    { rejectValue: GraphQLErrorResponse }
+>(
+    "/product/getSupportedLanguages",
+    async (
+        id,
+        { rejectWithValue }
+    ) => {
+        try {
+            const response: AxiosResponse<{
+                data: {
+                    getLanguage: ProductLanguage
+                }
+            }> = await axios.post(
+                '/graphql',
+                {
+                    query: `query GetSupportedLanguages($id: Int!) {
+                        getLanguage(id: $id) {
+                            productId
+                            languages {
+                                language
+                                interface
+                                fullAudio
+                                subtitles
+                            }
+                        }
+                    }`,
+                    variables: { id }
+                }
+            );
+
+            return response.data.data.getLanguage;
 
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {
@@ -317,6 +390,27 @@ const productSlice = createSlice({
                 state.products = [action.payload];
             })
             .addCase(getProductById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || {
+                    errors: [{
+                        message: "Unexpected error occurred",
+                        locations: [],
+                        extensions: { code: "HTTP_ERROR" }
+                    }]
+                };
+            })
+
+            // Lấy danh sách ngôn ngữ hỗ trợ theo ID sản phẩm
+            .addCase(getSupportedLanguages.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSupportedLanguages.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.productLanguage = action.payload;
+            })
+            .addCase(getSupportedLanguages.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || {
                     errors: [{
