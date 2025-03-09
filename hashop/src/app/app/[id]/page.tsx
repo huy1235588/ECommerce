@@ -260,7 +260,7 @@ function ProductDetailPage() {
                         className="main-player-swiper"
                         style={{
                             position: 'unset',
-                            width: '703px',
+                            width: '747px',
                             height: '395px',
                             backgroundColor: '#000'
                         }}
@@ -270,9 +270,9 @@ function ProductDetailPage() {
                             <SwiperSlide key={index}>
                                 {media.type === 'image' ? (
                                     <Image
-                                        src={media.src || 'https://placehold.co/703x395/000/000/png'}
+                                        src={media.src || 'https://placehold.co/747x395/000/000/png'}
                                         alt="Screenshot"
-                                        width={703}
+                                        width={747}
                                         height={395}
                                         priority
                                     />
@@ -285,15 +285,15 @@ function ProductDetailPage() {
                                             muted
                                             onEnded={handleVideoEnded}
                                             style={{
-                                                width: '703px',
+                                                width: '747px',
                                                 height: '395px',
                                             }}
                                         />
                                     ) : (
                                         <Image
-                                            src={'https://placehold.co/703x395/000/000/png'}
+                                            src={'https://placehold.co/747x395/000/000/png'}
                                             alt="Video"
-                                            width={703}
+                                            width={747}
                                             height={395}
                                             priority
                                         />
