@@ -7,6 +7,7 @@ const achievementSchema = `
     }
     
     type AchievementList {
+        _id: ID
         productId: Int
         achievements: [Achievement]
     }
@@ -14,9 +15,24 @@ const achievementSchema = `
     type Query {
         getAchievementList: [AchievementList]
         getAchievement(productId: Int!, slice: Int): AchievementList
-        getLimitedAchievementList(limit: Int!): [AchievementList]
+        paginatedAchievements(page: Int, limit: Int, query: String, slice: String): PaginatedAchievements
     }
-    
+
+    # Định nghĩa kiểu dữ liệu trả về khi phân trang
+    type PaginatedAchievements {
+        totalAchievements: Int
+        achievements: [AchievementList]
+        previous: Pagination
+        next: Pagination
+    }
+
+    # Định nghĩa kiểu dữ liệu của phân trang
+    type Pagination {
+        page: Int
+        limit: Int
+    }
+
+    # Định nghĩa các mutation
     type Mutation {
         createAchievement(productId: Int!, title: String, description: String, percent: Int, image: String): Achievement
         updateAchievement(productId: Int!, title: String, description: String, percent: Int, image: String): Achievement

@@ -32,7 +32,7 @@ const productResolver = {
                 sortColumn = 'productId',
                 sortOrder = 'asc',
                 query = '{}',
-                slice
+                slice = '{}'
             }
         ) => {
             const filters = query ? JSON.parse(query) : {};

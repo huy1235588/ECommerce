@@ -11,9 +11,50 @@ const achievementResolvers = {
                 .findOne({ productId })
                 .select(slice ? { achievements: { $slice: slice } } : {})
         },
-        getLimitedAchievementList: async (_, { limit }) => {
-            return await Achievement
-                .find().limit(limit)
+        paginatedAchievements: async (_, { 
+            page, 
+            limit, 
+            query = '{}', 
+            slice = '{}'
+         }) => {
+            const filters = query ? JSON.parse(query) : {};
+            const startIndex = (page - 1) * limit;
+            const endIndex = page * limit;
+
+            const [totalAchievements, achievements] = await Promise.all([
+                Achievement.countDocuments(filters),
+                Achievement.find(filters)
+                    .skip(startIndex)
+                    .limit(limit)
+                    .select(JSON.parse(slice))
+                    .exec()
+            ]);
+
+            // Kết quả phân trang
+            const results = {
+                totalAchievements,
+                achievements,
+                previous: null,
+                next: null
+            };
+
+            // Trang tiếp theo
+            if (endIndex < totalAchievements) {
+                results.next = {
+                    page: page + 1,
+                    limit
+                };
+            }
+
+            // Trang trước
+            if (startIndex > 0) {
+                results.previous = {
+                    page: page - 1,
+                    limit
+                };
+            }
+
+            return results;
         }
     },
     Mutation: {

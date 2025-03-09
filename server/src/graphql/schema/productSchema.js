@@ -18,6 +18,7 @@ type Requirements {
 }
 
 type Product {
+    _id: ID!
     productId: Int!
     title: String!
     type: String!
