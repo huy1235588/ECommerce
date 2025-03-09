@@ -10,10 +10,42 @@ const languageResolvers = {
                 productId: id
             });
         },
-        getLimitedLanguagesList: async (_, { limit }) => {
-            return await Language
-                .find()
-                .limit(limit);
+        paginatedLanguages: async (_, { page, limit, query = "{}", slice = "{}" }) => {
+            const filters = query ? JSON.parse(query) : {};
+            const startIndex = (page - 1) * limit;
+            const endIndex = page * limit;
+
+            const [totalLanguages, languages] = await Promise.all([
+                Language.countDocuments(filters),
+                Language.find(filters)
+                    .skip(startIndex)
+                    .limit(limit)
+                    .select(JSON.parse(slice))
+                    .exec()
+            ]);
+
+            const results = {
+                totalLanguages,
+                languages,
+                previous: null,
+                next: null
+            };
+
+            if (endIndex < totalLanguages) {
+                results.next = {
+                    page: page + 1,
+                    limit
+                };
+            }
+
+            if (startIndex > 0) {
+                results.previous = {
+                    page: page - 1,
+                    limit
+                };
+            }
+
+            return results;
         }
     },
     Mutation: {

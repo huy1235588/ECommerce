@@ -7,6 +7,7 @@ const languageSchema = `
     }
 
     type LanguageList {
+        _id: ID
         productId: Int
         languages: [Languages]
         createdAt: String
@@ -15,7 +16,19 @@ const languageSchema = `
     type Query {
         getLanguagesList: [LanguageList]
         getLanguage(id: Int!): LanguageList
-        getLimitedLanguagesList(limit: Int!): [LanguageList]
+        paginatedLanguages(page: Int, limit: Int, query: String, slice: String): PaginatedLanguages
+    }
+
+    type PaginatedLanguages {
+        totalLanguages: Int
+        languages: [LanguageList]
+        previous: Pagination
+        next: Pagination
+    }
+
+    type Pagination {
+        page: Int
+        limit: Int
     }
 
     type Mutation {
