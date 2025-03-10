@@ -106,7 +106,7 @@ class FetchApiService {
                 addDataToJson(`json/${jsonId}/data.json`, data, id);
 
                 // Ghi ID vào file success.txt
-                fs.appendFileSync(`${logDir}/success.txt`, `${id},\n`, 'utf8');s
+                fs.appendFileSync(`${logDir}/success.txt`, `${id},\n`, 'utf8');
 
             } catch (error) {
                 // Ghi ID vào file error.txt
