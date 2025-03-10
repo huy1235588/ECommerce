@@ -680,6 +680,39 @@ const crawlByMultipleId = async (req, res) => {
                             : null;
                     };
 
+                    // Hàm lấy platform từ selector
+                    const getPlatform = (selector) => {
+                        const platforms = document.querySelector(selector);
+
+                        // Nếu không có sysreq_tabs, giả định là chỉ có Windowss
+                        const sysreq_tabs = platforms.querySelector('.sysreq_tabs');
+                        if (sysreq_tabs) {
+                            return Array.from(sysreq_tabs.children).map(tab => {
+                                // Lấy giá trị data-os
+                                const os = tab.getAttribute('data-os');
+
+                                return os;
+                            });
+                        }
+                        else {
+                            return [
+                                'Windows',
+                            ];
+                        }
+                    };
+
+                    // Hàm lấy feature từ selector
+                    const getFeature = (selector) => {
+                        const features = document.querySelectorAll(selector);
+
+                        return Array.from(features).map(feature => {
+                            return {
+                                title: feature.querySelector('div.label').innerText,
+                                image: feature.querySelector('img').src,
+                            }
+                        });
+                    };
+
                     // Xác định giá và giảm giá
                     let price = 0, discount = 0, discountStartDate, discountEndDate;
 
@@ -840,9 +873,9 @@ const crawlByMultipleId = async (req, res) => {
                             '#game_highlights > div.rightcol > div > div.glance_ctn_responsive_left > div:nth-child(4) > div.summary.column',
                             'a'
                         ),
-                        platform: [
-                            "Windows",
-                        ],
+                        platform: getPlatform(
+                            '.#tabletGrid > div.page_content_ctn > div:nth-child(6) > div.leftcol.game_description_column > div:nth-child(12) > div.game_page_autocollapse.sys_req'
+                        ),
                         tags: getListText(
                             '#glanceCtnResponsiveRight > div.glance_tags_ctn.popular_tags_ctn > div.glance_tags.popular_tags',
                             'a'
@@ -851,9 +884,8 @@ const crawlByMultipleId = async (req, res) => {
                             '#genresAndManufacturer > span',
                             'a'
                         ),
-                        features: getListText(
-                            '#category_block > div.game_area_features_list_ctn',
-                            'a > div.label'
+                        features: getFeature(
+                            '#category_block > div.game_area_features_list_ctn'
                         ),
                         headerImage: getSrc('#gameHeaderImageCtn > img'),
                         screenshots: getListSrc(

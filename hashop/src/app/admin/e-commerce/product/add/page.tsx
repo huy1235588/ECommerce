@@ -309,58 +309,58 @@ function ECommerceAddProductPage() {
             inputValue = inputValue.replace(/,\s*$/, "").trim();
 
             // Gửi request lên server để crawl dữ liệu
-            const response = await axios.post('/api/crawl/list', {
-                listAppId: inputValue
+            const response = await axios.post('/api/fetch/ids', {
+                ids: inputValue
             });
 
-            if (response.status === 200) {
-                // Lấy dữ liệu từ response
-                const result = response.data;
+            // if (response.status === 200) {
+            //     // Lấy dữ liệu từ response
+            //     const result = response.data;
 
-                // Lấy id của json
-                const jsonId = result.jsonId;
-                // Lấy danh sách App ID lỗi
-                const errorIds = result.errorIds;
-                // Lấy danh sách errorIdsAchievement
-                const errorIdsAchievement = result.errorIdsAchievement;
+            //     // Lấy id của json
+            //     const jsonId = result.jsonId;
+            //     // Lấy danh sách App ID lỗi
+            //     const errorIds = result.errorIds;
+            //     // Lấy danh sách errorIdsAchievement
+            //     const errorIdsAchievement = result.errorIdsAchievement;
 
-                // Hiển thị loading
-                setButtonDialogState((prevState) => ({
-                    ...prevState,
-                    loading: "Adding list",
-                }));
+            //     // Hiển thị loading
+            //     setButtonDialogState((prevState) => ({
+            //         ...prevState,
+            //         loading: "Adding list",
+            //     }));
 
-                // Gọi API thêm danh sách App ID vào database
-                const responseAddList = await axios.post('/api/product/addFromFile', {
-                    jsonId: jsonId,
-                    errorIds: errorIds,
-                    errorIdsAchievement: errorIdsAchievement
-                });
+            //     // Gọi API thêm danh sách App ID vào database
+            //     const responseAddList = await axios.post('/api/product/addFromFile', {
+            //         jsonId: jsonId,
+            //         errorIds: errorIds,
+            //         errorIdsAchievement: errorIdsAchievement
+            //     });
 
-                // Kiểm tra response
-                if (responseAddList.status === 200) {
-                    const resultAddList = responseAddList.data;
+            //     // Kiểm tra response
+            //     if (responseAddList.status === 200) {
+            //         const resultAddList = responseAddList.data;
 
-                    // Hiển thị thông báo thành công
-                    setButtonDialogState((prevState) => ({
-                        ...prevState,
-                        success: resultAddList.message,
-                        successLinks: {
-                            title: {
-                                text: "Error IDs: ",
-                                color: "#ff4545"
-                            },
-                            links: resultAddList.errorIds.map((id: string) => ({
-                                href: `https://steamdb.info/app/${id}`,
-                                text: id,
-                                color: "#ff4545"
-                            }))
-                        }
-                    }));
-                }
+            //         // Hiển thị thông báo thành công
+            //         setButtonDialogState((prevState) => ({
+            //             ...prevState,
+            //             success: resultAddList.message,
+            //             successLinks: {
+            //                 title: {
+            //                     text: "Error IDs: ",
+            //                     color: "#ff4545"
+            //                 },
+            //                 links: resultAddList.errorIds.map((id: string) => ({
+            //                     href: `https://steamdb.info/app/${id}`,
+            //                     text: id,
+            //                     color: "#ff4545"
+            //                 }))
+            //             }
+            //         }));
+            //     }
 
-                return result;
-            }
+            //     return result;
+            // }
 
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {

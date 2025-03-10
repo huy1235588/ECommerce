@@ -1,5 +1,3 @@
-const achievementService = require("../services/achievementService");
-const languageService = require("../services/languageService");
 const ProductService = require("../services/productService");
 const { readDataFromJson } = require("../utils/interactJson");
 
@@ -72,24 +70,7 @@ class ProductController {
             }
 
             // Thêm sản phẩm vào Database
-            await productData.forEach(async (product) => {
-                const productAdded = await ProductService.addProduct(product);
-
-                const appId = product.appId;
-                const productId = productAdded.productId;
-
-                // Thêm danh sách ngôn ngữ vào Database dựa trên appId
-                const languages = languageData.find(language => language.appId === appId);
-                languages.productId = productId;
-                await languageService.addLanguage(languages);
-
-                // Thêm danh sách thành tựu vào Database dựa trên appId
-                const achievements = achievementData.find(achievement => achievement.appId === appId);
-                achievements.productId = productId;
-                await achievementService.addAchievement(achievements);
-            });
-
-            console.log(`Products added successfully: ${productData.length} products`);
+            await ProductService.addProducts(productData);
 
             // Trả về kết quả
             res.status(201).json({

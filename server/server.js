@@ -7,10 +7,11 @@ const authRoute = require('./src/routers/authRoute');
 const userRoute = require('./src/routers/userRoute');
 const productRouter = require('./src/routers/productRoute');
 const crawlRouter = require('./src/routers/crawlRoute');
-const { ApolloServer } = require('@apollo/server');
-const { expressMiddleware } = require('@apollo/server/express4');
-const typeDefs = require('./src/graphql/schema');
-const resolvers = require('./src/graphql/resolvers');
+const fetchRouter = require('./src/routers/fetchApiRoute');
+// const { ApolloServer } = require('@apollo/server');
+// const { expressMiddleware } = require('@apollo/server/express4');
+// const typeDefs = require('./src/graphql/schema');
+// const resolvers = require('./src/graphql/resolvers');
 
 // Đọc các biến môi trường từ file .env
 dotnet.config();
@@ -58,19 +59,20 @@ app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
 app.use('/api/product', productRouter);
 app.use('/api/crawl', crawlRouter);
+app.use('/api/fetch', fetchRouter);
 
 // Cấu hình cho GraphQL
-const server = new ApolloServer({
-    typeDefs: typeDefs,
-    resolvers: resolvers,
-});
+// const server = new ApolloServer({
+//     typeDefs: typeDefs,
+//     resolvers: resolvers,
+// });
 
 // Khởi động server
 (async () => {
-    await server.start();
+    // await server.start();
 
-    // Kết nối Apollo Server với Express
-    app.use('/graphql', expressMiddleware(server));
+    // // Kết nối Apollo Server với Express
+    // app.use('/graphql', expressMiddleware(server));
 
     const PORT = process.env.PORT || 3001; // Cổng
 
