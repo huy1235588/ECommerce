@@ -3,9 +3,9 @@ const getNextSequenceValue = require('../utils/autoIncrement');
 
 const productSchema = new mongoose.Schema(
     {
-        productId: {
+        _id: {
             type: Number,
-            unique: true,
+            required: true,
         },
 
         // Thông tin sản phẩm
@@ -21,39 +21,44 @@ const productSchema = new mongoose.Schema(
             required: true,
         },
 
-        // Mô tả sản phẩm
-        description: {
+        // Danh sách dlc
+        dlc: [{
+            type: String,
+        }],
+
+        // Mô tả ngắn gọn sản phẩm
+        short_description: {
             type: String,
         },
 
         // Mô tả chi tiết sản phẩm
-        detail: {
+        detailed_description: {
             type: String,
         },
 
-        // Giá sản phẩm
-        price: {
-            type: Number,
-            required: true,
-            min: 0,
+        // Thông tin về sản phẩm
+        about_the_game: {
+            type: String,
         },
 
-        // Giảm giá
-        discount: {
-            type: Number,
-            default: 0,
-        },
-        discountStartDate: {
-            type: Date,
-        },
-        discountEndDate: {
-            type: Date,
+        // Ngôn ngữ hỗ trợ
+        supported_languages: {
+            type: String,
         },
 
-        // Ngày phát hành
-        releaseDate: {
-            type: Date,
-            default: Date.now,
+        // Đánh giá sản phẩm
+        reviews: {
+            type: String,
+        },
+
+        // Hình ảnh đại diện
+        header_image: {
+            type: String,
+        },
+
+        // Hình ảnh ảo
+        capsule_image: {
+            type: String,
         },
 
         // Nhà phát triển và phát hành
@@ -68,87 +73,85 @@ const productSchema = new mongoose.Schema(
             required: true,
         }],
 
-        // Nền tảng hỗ trợ
-        platform: [{
-            type: String,
-            required: true,
-        }],
-
-        // Đánh giá sản phẩm
-        rating: {
-            type: Number,
-            default: 0,
-            min: 0,
-            max: 5,
-        },
-
-        // Trạng thái sản phẩm
-        isActive: {
-            type: Boolean,
-            default: true,
-        },
-
-        // Hình ảnh đại diện
-        headerImage: {
-            type: String,
-        },
-
-        // Danh sách hình ảnh
-        screenshots: [{
-            type: String,
-            required: true,
-        }],
-
-        // Video
-        videos: [
-            {
-                // Đường dẫn video mp4
-                mp4: {
-                    type: String,
-                },
-                // Đường dẫn video webm
-                webm: {
-                    type: String,
-                },
-                // Hình ảnh đại diện cho video
-                thumbnail: {
-                    type: String,
-                },
+        // Thông tin giá sản phẩm
+        price_overview: {
+            // Loại tiền tệ
+            currency: {
+                type: String,
             },
-        ],
+            // Giá gốc
+            initial: {
+                type: Number,
+            },
+            // Giá sau khi giảm giá
+            final: {
+                type: Number,
+            },
+            // Phần trăm giảm giá
+            discount_percent: {
+                type: Number,
+            },
+        },
+
+        // Danh sách gói sản phẩm
+        packages: [{
+            type: Number,
+        }],
+
+        // Nền tảng hỗ trợ
+        platform: {
+            windows: {
+                type: Boolean,
+                default: true,
+            },
+            mac: {
+                type: Boolean,
+                default: false,
+            },
+            linux: {
+                type: Boolean,
+                default: false,
+            },
+        },
+
+        categories: [{
+            id: {
+                type: Number,
+            },
+            description: {
+                type: String,
+            },
+        }],
 
         // Danh sách thể loại
         genres: [{
-            type: String
+            id: {
+                type: Number,
+            },
+            description: {
+                type: String,
+            },
         }],
 
-        // Danh sách thẻ liên quan
-        tags: [{
-            type: String
-        }],
+        // Ngày phát hành
+        release_date: {
+            coming_soon: {
+                type: Boolean,
+                default: false,
+            },
+            date: {
+                type: String,
+            },
+        },
 
-        // Danh sách tính năng đặc biệt
-        features: [{
-            type: String
-        }],
+        // URL nền
+        background: {
+            type: String,
+        },
 
-        // Danh sách cấu hình yêu cầu
-        systemRequirements: {
-            win: [{
-                title: String,
-                minimum: String,
-                recommended: String
-            }],
-            mac: [{
-                title: String,
-                minimum: String,
-                recommended: String
-            }],
-            linux: [{
-                title: String,
-                minimum: String,
-                recommended: String
-            }],
+        // URL nền (raw)
+        background_raw: {
+            type: String,
         },
 
         // Ngày tạo
@@ -156,33 +159,67 @@ const productSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
-
         // Ngày cập nhật
         updatedAt: {
             type: Date,
             default: Date.now,
         },
 
+        // Tham chiếu đến các collection khác
+        // Danh sách screenshots
+        screenshots: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Screenshot',
+        }],
+        // Danh sách movies
+        movies: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Movie',
+        }],
+
+        // Danh sách achievements
+        achievements: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Achievement',
+        }],
+        // Danh sách package_groups
+        package_groups: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'PackageGroup',
+        }],
+
+        // Danh sách pc_requirements
+        pc_requirements: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Requirement',
+        },
+        // Danh sách mac_requirements
+        mac_requirements: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Requirement',
+        },
+        // Danh sách linux_requirements
+        linux_requirements: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Requirement',
+        },
+
     }, {
     timestamps: true,
+    _id: false,
 });
 
-// Tạo productId tự tăng
-productSchema.pre('insertMany', async function (next, docs) {
+// middleware để tạo _id tự tăng
+productSchema.pre('save', async function (next) {
     try {
-        // Duyệt qua từng sản phẩm
-        for (let doc of docs) {
-            if (!doc.productId) {
-                // Tạo productId tự tăng
-                doc.productId = await getNextSequenceValue('productId');
-            }
+        // Chỉ tạo _id tự tăng khi tạo mới sản phẩm
+        if (this.isNew) {
+            this._id = await getNextSequenceValue('productid');
         }
-
+        next();
     } catch (error) {
-        return next(error);
+        next(error);
     }
-
-    next();
 });
 
 const Product = mongoose.model('Product', productSchema);

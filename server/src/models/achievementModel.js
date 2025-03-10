@@ -1,38 +1,13 @@
-const mongoose = require('mongoose');
+const { default: mongoose } = require("mongoose");
 
 const achievementSchema = new mongoose.Schema({
-   // Tham chiếu đến product
-    productId: {
-        type: Number,
-        ref: 'Product',
-        required: true
-    },
-
-    // Mảng các thành tựu
-    achievements: [{
-        // Tên thành tựu
-        title: {
-            type: String,
-            default: null
-        },
-        // Mô tả
-        description: {
-            type: String,
-            default: null
-        },
-        // Phần trăm người chơi đạt được
-        percent: {
-            type: Number,
-            default: 0
-        },
-        // Ảnh
-        image: {
-            type: String,
-            default: null
-        }
-    }],
+    game_id: { type: mongoose.Schema.Types.Number, required: true }, // Liên kết với steam_appid của game
+    total: Number,
+    highlighted: [{
+        name: String,
+        path: String
+    }]
 });
 
 const Achievement = mongoose.model('Achievement', achievementSchema);
-
 module.exports = Achievement;
