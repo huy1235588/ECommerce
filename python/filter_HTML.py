@@ -1,27 +1,43 @@
 from bs4 import BeautifulSoup
-import re
+import json
 
-# Đọc file HTML
-with open('python/test.html', 'r', encoding='utf-8') as f:
-    # Phân tích cú pháp HTML bằng BeautifulSoup
-    soup = BeautifulSoup(f, 'html.parser')
+htmlFile = [
+    "python/html/current.html",
+    "python/html/24h_peak.html",
+    "python/html/all_time_peak.html",
+]
 
-# Mở file để ghi kết quả
-with open('python/ids/app_ids6.txt', 'w', encoding='utf-8') as out_file:
-    # Tìm tất cả thẻ <a> trong HTML
-    for a_tag in soup.find_all('a'):
-        # Chỉ xử lý thẻ <a> có nội dung text
-        if a_tag.text.strip():
-            href = a_tag.get('href')
-            if href:
-                # Tìm và trích xuất ID từ href dạng /app/{id}/
-                match = re.search(r'/app/(\d+)/', href)
-                if match:
-                    # Ghi ID vào file, thêm dấu phẩy ở cuối
-                    out_file.write(match.group(1) + ',\n')
-                    
-                # Tìm và trích xuất ID từ href dạng /app/{id}/charts/
-                # match = re.search(r'/app/(\d+)/charts/', href)
-                # if match:
-                #     # Ghi ID vào file, thêm dấu phẩy ở cuối
-                #     out_file.write(match.group(1) + ',\n')
+jsonFile = [
+    "python/json/current.json",
+    "python/json/24h_peak.json",
+    "python/json/all_time_peak.json",
+]
+
+for file in htmlFile:
+    # Đọc file HTML
+    with open(file, "r", encoding="utf-8") as f:
+        # Phân tích cú pháp HTML bằng BeautifulSoup
+        soup = BeautifulSoup(f, "html.parser")
+
+    games = []
+
+    # Lặp qua từng dòng trong bảng và trích xuất thông tin,
+    # loại bỏ các game có title chứa từ "demo" hoặc "(demo)" ở cuối title
+    for row in soup.find_all("tr", class_="app"):
+        game_data = {
+            "id": row.get("data-appid"),
+            "title": row.find_all("td")[2].a.text.strip(),
+            "current": int(row.find_all("td")[3].get("data-sort")),
+            "24h_peak": int(row.find_all("td")[4].get("data-sort")),
+            "all_time_peak": int(row.find_all("td")[5].get("data-sort")),
+        }
+
+        if game_data["title"].lower().endswith("demo") or game_data["title"].lower().endswith("(demo)"):
+            continue
+        games.append(game_data)
+
+    # Mở file để ghi kết quả
+    with open(jsonFile[htmlFile.index(file)], "w", encoding="utf-8") as f:
+        # Ghi dữ liệu dưới dạng JSON
+        json.dump(games, f, indent=4)
+        print(f"Đã ghi file {jsonFile[htmlFile.index(file)]}")

@@ -15,3 +15,6 @@ python/ids/app_ids.txt
 server/achievement.json
 server/language.json
 python/json
+python/html
+
+python/ai_agent
