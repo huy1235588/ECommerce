@@ -1,7 +1,7 @@
 'use client'
 
-import { GenreData, PlatformData, Product, ProductVideos, TypeData } from "@/types/product";
-import { Box, Button, Checkbox, FormControlLabel, Grid2, SelectChangeEvent } from "@mui/material";
+import { GenreData, Product, ProductMovie, TypeData } from "@/types/product";
+import { Box, Button, Grid2, SelectChangeEvent } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { useState } from "react";
@@ -19,7 +19,6 @@ import ButtonWithDialog from "@/components/ui/buttonWIthDialog";
 import { useLoading } from "@/context/LoadingContext";
 import DynamicInputVideo from "@/components/admin/dynamicInputVideos";
 import SelectForm from "@/components/ui/selectForm";
-import DynamicInputRequirements from "@/components/admin/dynamicInputRequirements";
 import { useNotification } from "@/context/NotificationContext";
 import { v4 as uuidv4 } from "uuid";
 
@@ -30,42 +29,27 @@ type ErrorForm = {
 
 // Khởi tạo formData ban đầu
 const initialFormData: Product = {
-    productId: -1,
-    title: '',
+    _id: -1,
+    name: '',
     type: '',
-    description: '',
-    price: 0,
-    discount: 0,
-    discountStartDate: null,
-    discountEndDate: null,
-    releaseDate: null,
-    developer: [],
-    publisher: [],
-    platform: [],
-    rating: 0,
-    isActive: false,
+    short_description: '',
+    price_overview: {
+        currency: 'USD',
+        initial: 0,
+        final: 0,
+        discount_percent: 0
+    },
+    release_date: {
+        coming_soon: false,
+        date: dayjs()
+    },
+    developers: [],
+    publishers: [],
     genres: [],
     tags: [],
-    features: [],
-    headerImage: null,
+    header_image: "",
     screenshots: [],
-    videos: [{
-        thumbnail: '',
-        mp4: '',
-        webm: ''
-    }],
-    systemRequirements: {
-        win: [
-            { title: "OS", minimum: "", recommended: "" },
-            { title: "Processor", minimum: "", recommended: "" },
-            { title: "Memory", minimum: "", recommended: "" },
-            { title: "Graphics", minimum: "", recommended: "" },
-            { title: "DirectX", minimum: "", recommended: "" },
-            { title: "Storage", minimum: "", recommended: "" },
-            { title: "Sound Card", minimum: "", recommended: "" },
-            { title: "Additional Notes", minimum: "", recommended: "" },
-        ],
-    },
+    movies: [],
 };
 
 function ECommerceAddProductPage() {
@@ -95,12 +79,6 @@ function ECommerceAddProductPage() {
         setFormData({ ...formData, [name]: value });
     };
 
-    // Xử lý thay đổi checkbox
-    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = e.target;
-        setFormData({ ...formData, [name]: checked });
-    };
-
     // Xử lý submit form
     const handleSubmit = async () => {
         try {
@@ -126,7 +104,7 @@ function ECommerceAddProductPage() {
             // Tạo form data mới không chứa ảnh
             const newFormData: Product = {
                 ...formData,
-                headerImage: ""
+                header_image: ""
             };
 
             // Gửi dữ liệu form lên server
@@ -135,7 +113,7 @@ function ECommerceAddProductPage() {
             // Tạo form data để upload ảnh
             const formDataImage = new FormData();
             formDataImage.append('id', response.data.id as string);
-            formDataImage.append('headerImage', formData.headerImage as File);
+            formDataImage.append('headerImage', formData.header_image);
 
             // Upload ảnh lên server
             const headerImage = await axios.post('/api/product/uploadImage',
@@ -193,8 +171,13 @@ function ECommerceAddProductPage() {
 
     // Hàm xóa giá trị khỏi danh sách đã chọn
     const handleDeleteValueSelect = (valueToDelete: string) => {
-        // Lọc ra các giá trị khác giá trị cần xóa
-        const newValue = formData.platform.filter((value) => value !== valueToDelete);
+        // Ensure all platform properties are defined and update the selected one to false
+        const currentPlatform = formData.platform || { windows: false, mac: false, linux: false };
+        const newValue = {
+            windows: valueToDelete === "windows" ? false : currentPlatform.windows,
+            mac: valueToDelete === "mac" ? false : currentPlatform.mac,
+            linux: valueToDelete === "linux" ? false : currentPlatform.linux
+        };
 
         // Cập nhật giá trị mới vào form data
         setFormData({
@@ -212,7 +195,7 @@ function ECommerceAddProductPage() {
     };
 
     // Hàm xử lý thay đổi giá trị của video
-    const handleChangeDynamicInput = (name: string, values: ProductVideos[]) => {
+    const handleChangeDynamicInput = (name: string, values: ProductMovie[]) => {
         setFormData({
             ...formData,
             [name]: values
@@ -256,25 +239,22 @@ function ECommerceAddProductPage() {
                 // Cập nhật dữ liệu vào form data
                 setFormData((prev) => ({
                     ...prev,
-                    title: result.title ? result.title : "",
+                    name: result.name ? result.name : "",
                     type: result.type ? result.type : "",
-                    description: result.description ? result.description : "",
+                    description: result.short_description ? result.short_description : "",
                     // "$39.99 USD" => 39.99
-                    price: result.price ? Number(result.price.toString().replace(/[^0-9.]/g, "")) : 0,
+                    price: result.price_overview.initial ? Number(result.price_overview.initial.toString().replace(/[^0-9.]/g, "")) : 0,
                     // "-10%" => 10
-                    discount: result.discount ? Number(result.discount.toString().replace(/[-%]/g, "")) : 0,
-                    discountEndDate: result.discountEndDate ? dayjs(result.discountEndDate) : null,
-                    releaseDate: dayjs(result.releaseDate),
-                    developer: result.developer,
-                    publisher: result.publisher,
-                    platform: result.platform ? result.platform : [],
+                    discount: result.price_overview.discount_percent ? Number(result.price_overview.discount_percent.toString().replace(/[-%]/g, "")) : 0,
+                    releaseDate: dayjs(result.release_date.date),
+                    developer: result.developers,
+                    publisher: result.publishers,
                     genres: result.genres,
                     tags: result.tags,
-                    features: result.features,
-                    headerImage: result.headerImage,
+                    headerImage: result.header_image,
                     screenshots: result.screenshots,
-                    videos: result.videos,
-                    systemRequirements: result.systemRequirements
+                    videos: result.movies,
+                    systemRequirements: result.pc_requirements
                 }));
 
                 // Hiển thị thông báo thành công
@@ -377,74 +357,6 @@ function ECommerceAddProductPage() {
         }
     };
 
-    // Hàm thêm mô tả sản phẩm
-    const handleAddAboutProduct = async (inputValue: string) => {
-        try {
-            // Hiển thị loading
-            setLoading(true);
-
-            // Loại bỏ dấu phẩy và khoảng trắng ở cuối
-            inputValue = inputValue.replace(/,\s*$/, "").trim();
-
-            // Gửi request lên server để crawl dữ liệu
-            const response = await axios.post('/api/crawl/detail', {
-                listAppId: inputValue
-            });
-
-            if (response.status === 200) {
-                // Lấy dữ liệu từ response
-                const result = response.data;
-
-                // Lấy danh sách App ID lỗi
-                const errorIds = result.errorIds;
-
-                // Lấy id của json
-                const jsonId = result.jsonId;
-
-                // Hiển thị loading
-                setButtonDialogState((prevState) => ({
-                    ...prevState,
-                    loading: "Adding list",
-                }));
-
-                // Gọi API thêm detail của danh sách App ID vào database
-                const responseAddList = await axios.post('/api/product/add/detail', {
-                    jsonId: jsonId,
-                    errorIds: errorIds
-                });
-
-                // Kiểm tra response
-                if (responseAddList.status === 200) {
-                    const resultAddList = responseAddList.data;
-
-                    // Hiển thị thông báo thành công
-                    setButtonDialogState((prevState) => ({
-                        ...prevState,
-                        success: resultAddList.message,
-                    }));
-                }
-
-                return result;
-            }
-
-        } catch (error) {
-            if (axiosLib.isAxiosError(error) && error.response) {
-                // Hiển thị thông báo lỗi
-                setButtonDialogState((prevState) => ({
-                    ...prevState,
-                    error: error.response?.data.message
-                }));
-            }
-        } finally {
-            setLoading(false);
-            // Xoá loading
-            setButtonDialogState((prevState) => ({
-                ...prevState,
-                loading: "",
-            }));
-        }
-    };
-
     return (
         <div className="">
             {/* Page Header */}
@@ -520,29 +432,6 @@ function ECommerceAddProductPage() {
                                 setButtonDialogState((prevState) => ({ ...prevState, loading }))
                             }
                         />
-
-                        {/* Thêm mô tả sản phẩm */}
-                        <ButtonWithDialog
-                            buttonText="Add about product"
-                            title="Add about product"
-                            label="Enter list App ID (separate by comma)"
-                            type="text"
-                            multiple={true}
-                            onSubmit={handleAddAboutProduct}
-                            success={buttonDialogState.success}
-                            successLinks={buttonDialogState.successLinks}
-                            setSuccess={(success) =>
-                                setButtonDialogState((prevState) => ({ ...prevState, success }))
-                            }
-                            error={buttonDialogState.error}
-                            setError={(error) =>
-                                setButtonDialogState((prevState) => ({ ...prevState, error }))
-                            }
-                            loading={buttonDialogState.loading}
-                            setLoading={(loading) =>
-                                setButtonDialogState((prevState) => ({ ...prevState, loading }))
-                            }
-                        />
                     </Box>
                 </div>
             </div>
@@ -557,7 +446,7 @@ function ECommerceAddProductPage() {
                         label="Title"
                         type="text"
                         placeholder="Title"
-                        value={formData.title}
+                        value={formData.name}
                         onChange={handleChange}
                         error={errors.some((error) => error.path === 'title')}
                         setError={handleSetError}
@@ -589,7 +478,7 @@ function ECommerceAddProductPage() {
                         labelOptional="(Optional)"
                         type="text"
                         placeholder="Description"
-                        value={formData.description}
+                        value={formData.short_description}
                         onChange={handleChange}
                         error={errors.some((error) => error.path === 'description')}
                         setError={handleSetError}
@@ -619,7 +508,7 @@ function ECommerceAddProductPage() {
                                 label="Price"
                                 type="number"
                                 placeholder="Price"
-                                value={formData.price}
+                                value={formData.price_overview.initial}
                                 sx={{
                                     margin: "0"
                                 }}
@@ -643,7 +532,7 @@ function ECommerceAddProductPage() {
                                 label="Discount"
                                 type="number"
                                 placeholder="Discount"
-                                value={formData.discount}
+                                value={formData.price_overview.discount_percent}
                                 onChange={handleChange}
                                 sx={{
                                     margin: "0"
@@ -659,25 +548,11 @@ function ECommerceAddProductPage() {
                         </Grid2>
                     </Grid2>
 
-                    {/* Discount Date */}
-                    {/* Nếu Discount lớn hơn 0 thì hiển thị ngày giảm giá */}
-                    {formData.discount && formData.discount > 0 ? (
-                        <DateTimePickerForm
-                            name="discountEndDate"
-                            label="Discount End Date"
-                            value={formData.discountEndDate}
-                            onChange={handleDateTimeChange}
-                            error={errors.some((error) => error.path === 'discountEndDate')}
-                            setError={handleSetError}
-                            errorText={errors.find((error) => error.path === 'discountEndDate')?.msg}
-                        />
-                    ) : null}
-
                     {/* Release Date */}
                     <DateTimePickerForm
                         name="releaseDate"
                         label="Release Date"
-                        value={formData.releaseDate}
+                        value={formData.release_date.date}
                         onChange={handleDateTimeChange}
                         error={errors.some((error) => error.path === 'releaseDate')}
                         setError={handleSetError}
@@ -707,7 +582,7 @@ function ECommerceAddProductPage() {
                                 label="Developer"
                                 type="text"
                                 placeholder="Developer"
-                                value={formData.developer}
+                                value={formData.developers}
                                 onChange={handleChange}
                                 sx={{
                                     margin: "0",
@@ -731,7 +606,7 @@ function ECommerceAddProductPage() {
                                 label="Publisher"
                                 type="text"
                                 placeholder="Publisher"
-                                value={formData.publisher}
+                                value={formData.publishers}
                                 onChange={handleChange}
                                 sx={{
                                     margin: "0",
@@ -743,28 +618,13 @@ function ECommerceAddProductPage() {
                         </Grid2>
                     </Grid2>
 
-                    {/* Platform */}
-                    <MultipleSelectForm
-                        id="platform"
-                        name="platform"
-                        label="Platform"
-                        placeholder="Select Platform"
-                        value={formData.platform} // Truyền giá trị đã chọn vào
-                        menuItems={PlatformData} // Các mục menu để chọn
-                        onChange={handleSelectChange} // Hàm xử lý thay đổi giá trị
-                        onDelete={handleDeleteValueSelect} // Hàm xử lý xóa giá trị
-                        error={errors.some((error) => error.path === 'platform')}
-                        setError={handleSetError}
-                        errorText={errors.find((error) => error.path === 'platform')?.msg}
-                    />
-
                     {/* Genres */}
                     <MultipleSelectForm
                         id="genres"
                         name="genres"
                         label="Genres"
                         placeholder="Select Genres"
-                        value={formData.genres}
+                        value={formData.genres.map((genre) => genre.description)}
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
@@ -794,7 +654,7 @@ function ECommerceAddProductPage() {
                         name="features"
                         label="Features"
                         placeholder="Select Features"
-                        value={formData.features}
+                        value={formData.categories?.map((category) => category.description)}
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
@@ -807,12 +667,12 @@ function ECommerceAddProductPage() {
                     <UploadImages
                         id="header-image"
                         name="headerImage"
-                        value={formData.headerImage}
-                        title={formData.title}
+                        value={formData.header_image}
+                        title={formData.name}
                         label="Header Image"
                         onChange={(url) => setFormData({
                             ...formData,
-                            headerImage: url
+                            header_image: url?.name || ""
                         })}
                     />
 
@@ -820,7 +680,7 @@ function ECommerceAddProductPage() {
                     <FileUploader
                         id="images"
                         name="images"
-                        values={formData.screenshots}
+                        values={formData.screenshots.map((screenshot) => screenshot.path_full)}
                         label="Images"
                         acceptFile="image/*"
                         type="img"
@@ -830,37 +690,8 @@ function ECommerceAddProductPage() {
                     <DynamicInputVideo
                         name="videos"
                         label="Videos"
-                        values={formData.videos}
+                        values={formData.movies.map((video) => video)}
                         onChange={handleChangeDynamicInput}
-                    />
-
-                    {/* System Requirements */}
-                    <DynamicInputRequirements
-                        name="systemRequirements"
-                        label="System Requirements"
-                        values={formData.systemRequirements}
-                        onChange={(name, value) => {
-                            setFormData({
-                                ...formData,
-                                [name]: value
-                            });
-                        }}
-                    />
-
-                    {/* Active */}
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                name="isActive"
-                                checked={formData.isActive}
-                                onChange={handleCheckboxChange}
-                            />
-                        }
-                        label="Active"
-                        sx={{
-                            width: "100%",
-                            marginLeft: 0.125
-                        }}
                     />
 
                     {/* Submit */}

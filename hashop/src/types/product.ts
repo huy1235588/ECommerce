@@ -83,15 +83,15 @@ export type Product = {
     dlc?: string[];
 
     short_description: string;
-    detailed_description: string;
-    about_the_game: string;
-    supported_languages: string;
-    reviews: string;
+    detailed_description?: string;
+    about_the_game?: string;
+    supported_languages?: string;
+    reviews?: string;
 
     header_image: string;
-    capsule_image: string;
-    background: string;
-    background_raw: string;
+    capsule_image?: string;
+    background?: string;
+    background_raw?: string;
 
     developers: string[];
     publishers: string[];
@@ -102,14 +102,14 @@ export type Product = {
         final: number
         discount_percent: number
     };
-    packages: number[];
-    platform: {
+    packages?: number[];
+    platform?: {
         windows: boolean,
         mac: boolean,
         linux: boolean
     }
 
-    categories: {
+    categories?: {
         id: number,
         description: string
     }[];
@@ -117,6 +117,9 @@ export type Product = {
         id: number,
         description: string
     }[];
+    tags: string[];
+
+
     release_date: {
         coming_soon: boolean,
         date: Dayjs
@@ -125,11 +128,11 @@ export type Product = {
     screenshots: ProductScreenshot[];
     movies: ProductMovie[];
 
-    achievements: [Achievement];
+    achievements?: [Achievement];
 
-    pc_requirements: Requirement;
-    mac_requirements: Requirement;
-    linux_requirements: Requirement;
+    pc_requirements?: Requirement;
+    mac_requirements?: Requirement;
+    linux_requirements?: Requirement;
 
     created_at?: Dayjs;
     updated_at?: Dayjs;
@@ -142,7 +145,7 @@ type ProductScreenshot = {
     path_full: string;
 }
 
-type ProductMovie = {
+export type ProductMovie = {
     productId: number;
     id: number;
     name: string;
