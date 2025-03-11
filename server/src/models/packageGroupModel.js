@@ -1,13 +1,13 @@
 const { default: mongoose } = require("mongoose");
 
 const packageGroupSchema = new mongoose.Schema({
-    game_id: { type: mongoose.Schema.Types.Number, required: true }, // Liên kết với steam_appid của game
+    productId: { type: mongoose.Schema.Types.Number, required: true }, // Liên kết với steam_appid của game
     name: String,
     title: String,
     description: String,
     selection_text: String,
     save_text: String,
-    display_type: Number,
+    display_type: String,
     is_recurring_subscription: String,
     subs: [{
         packageid: Number,

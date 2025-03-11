@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 
 const movieSchema = new mongoose.Schema({
-    game_id: { type: mongoose.Schema.Types.Number, required: true }, // Liên kết với steam_appid của game
+    productId: { type: mongoose.Schema.Types.Number, required: true }, // Liên kết với steam_appid của game
     id: Number,
     name: String,
     thumbnail: String,

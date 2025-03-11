@@ -5,11 +5,10 @@ const productSchema = new mongoose.Schema(
     {
         _id: {
             type: Number,
-            required: true,
         },
 
         // Thông tin sản phẩm
-        title: {
+        name: {
             type: String,
             required: true,
             unique: true,
@@ -214,7 +213,9 @@ productSchema.pre('save', async function (next) {
     try {
         // Chỉ tạo _id tự tăng khi tạo mới sản phẩm
         if (this.isNew) {
-            this._id = await getNextSequenceValue('productid');
+            const nextId = await getNextSequenceValue('productId');
+            console.log('Next ID:', nextId);
+            this._id = nextId;
         }
         next();
     } catch (error) {

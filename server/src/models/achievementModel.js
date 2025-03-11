@@ -1,7 +1,7 @@
 const { default: mongoose } = require("mongoose");
 
 const achievementSchema = new mongoose.Schema({
-    game_id: { type: mongoose.Schema.Types.Number, required: true }, // Liên kết với steam_appid của game
+    productId: { type: mongoose.Schema.Types.Number, required: true }, // Liên kết với steam_appid của game
     total: Number,
     highlighted: [{
         name: String,
