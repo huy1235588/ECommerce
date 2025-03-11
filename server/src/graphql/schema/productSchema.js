@@ -1,50 +1,62 @@
 const productSchema = `
-type Video {
-    mp4: String!
-    webm: String
-    thumbnail: String!
-}
-
-type SystemRequirement {
-    title: String
-    minimum: String
-    recommended: String
-}
-
-type Requirements {
-    win: [SystemRequirement]
-    mac: [SystemRequirement]
-    linux: [SystemRequirement]
-}
-
 type Product {
     _id: ID!
-    productId: Int!
-    title: String!
+    name: String!
     type: String!
-    description: String
-    detail: String
-    price: Float!
-    discount: Float
-    discountStartDate: String
-    discountEndDate: String
-    releaseDate: String
-    developer: [String]!
-    publisher: [String]!
-    platform: [String]!
-    rating: Float
-    isActive: Boolean!
+    dlc: [String]
+
+    shortDescription: String
+    detailedDescription: String
+    aboutTheGame: String
+    supportedLanguages: String
+    reviews: String
+
     headerImage: String
-    screenshots: [String]!
-    videos: [Video]
-    genres: [String]
-    tags: [String]
-    features: [String]
-    systemRequirements: Requirements
-    createdAt: String
-    updatedAt: String
+    capsuleImage: String
+    background: String
+    backgroundRaw: String
+
+    developers: [String]
+    publishers: [String]
+
+    priceOverview: PriceOverview
+    packages: [Int]
+    platform: Platform
+
+    categories: [Category]
+    genres: [Genre]
+    releaseDate: ReleaseDate
 }
 
+type PriceOverview {
+    currency: String
+    initial: Float
+    final: Float
+    discountPercent: Int
+}
+
+type Platform {
+    windows: Boolean
+    mac: Boolean
+    linux: Boolean
+}
+
+type Category {
+    id: Int
+    description: String
+}
+
+type Genre {
+    id: Int
+    description: String
+}
+
+type ReleaseDate {
+    comingSoon: Boolean
+    date: String
+}
+
+# Truy vấn
 type Query {
     products: [Product]         # Lấy tất cả sản phẩm
     product(id: Int!): Product  # Lấy sản phẩm theo ID
@@ -81,52 +93,24 @@ type Page {
     limit: Int
 }
 
-# Input cho mutation
-input VideoInput {
-    mp4: String!
-    webm: String
-    thumbnail: String!
-}
-
-input SystemRequirementInput {
-    title: String
-    minimum: String
-    recommended: String
-}
-
-input RequirementsInput {
-    win: [SystemRequirementInput]
-    mac: [SystemRequirementInput]
-    linux: [SystemRequirementInput]
-}
-
-input ProductInput {
-    title: String!
-    type: String!
-    description: String
-    price: Float!
-    discount: Float
-    discountStartDate: String
-    discountEndDate: String
-    releaseDate: String
-    developer: [String]!
-    publisher: [String]!
-    platform: [String]!
-    rating: Float
-    isActive: Boolean
-    headerImage: String
-    screenshots: [String]!
-    videos: [VideoInput]
-    genres: [String]
-    tags: [String]
-    features: [String]
-    systemRequirements: RequirementsInput
-}
-
+# Cập nhật dữ liệu
 type Mutation {
-    createProduct(input: ProductInput!): Product
-    updateProduct(id: Int!, input: ProductInput!): Product
-    deleteProduct(id: Int!): Product
+    # Cập nhật thông tin sản phẩm
+    UpdateProduct(
+        productId: Int!
+        title: String
+        discountStartDate: String
+        discountEndDate: String
+        releaseDate: String
+        developer: [String]
+        publisher: [String]
+        platform: [String]
+        rating: Float
+        isActive: Boolean
+        genres: [String]
+        tags: [String]
+        features: [String]
+    ): Product 
 }
 `;
 

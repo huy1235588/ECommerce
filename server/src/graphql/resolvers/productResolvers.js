@@ -9,9 +9,7 @@ const productResolver = {
 
         // Hàm này trả về một sản phẩm dựa vào id
         product: async (_, { id }) => {
-            return await Product.findOne({
-                productId: id
-            });
+            return await Product.findById(id);
         },
 
         // Hàm này trả về một danh sách sản phẩm dựa vào các điều kiện lọc
@@ -78,12 +76,14 @@ const productResolver = {
         },
     },
     Mutation: {
-        createProduct: async (_, { input }) => {
-            const product = new Product(input);
-            return await product.save();
-        },
-        updateProduct: async (_, { id, input }) => {
-            return await Product.findByIdAndUpdate(id, input, { new: true });
+        // Hàm này dùng để cập nhật thông tin sản phẩm
+        UpdateProduct: async (_, args) => {
+            const { productId, ...data } = args;
+            return await Product.findOneAndUpdate(
+                { productId },
+                { $set: data },
+                { new: true }
+            );
         },
     },
 };

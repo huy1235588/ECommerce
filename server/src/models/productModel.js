@@ -206,9 +206,7 @@ productSchema.pre('save', async function (next) {
     try {
         // Chỉ tạo _id tự tăng khi tạo mới sản phẩm
         if (this.isNew) {
-            const nextId = await getNextSequenceValue('productId');
-            console.log('Next ID:', nextId);
-            this._id = nextId;
+            this._id = await getNextSequenceValue('products');
         }
         next();
     } catch (error) {
