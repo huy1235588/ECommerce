@@ -27,6 +27,6 @@ def main(txt_file, json_file, output_file):
 
 if __name__ == '__main__':
     txt_file = 'server/json/data-20250311/logs/success.txt'
-    json_file = 'server/json/data-20250311/data.json'
-    output_file = 'python/sorted_data.json'
+    json_file = 'python/json/filtered_data.json'
+    output_file = 'python/json/sorted_data.json'
     main(txt_file, json_file, output_file)

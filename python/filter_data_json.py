@@ -3,7 +3,7 @@ import json
 # Đường dẫn tới các file
 json_input_file = 'server/json/data-20250311/data.json'
 txt_input_file = 'server/json/data-20250311/logs/success.txt'
-json_output_file = 'python/filtered_data.json'
+json_output_file = 'python/json/filtered_data.json'
 
 # Đọc file txt chứa các id, giả sử các id được phân tách bằng ",\n"
 with open(txt_input_file, 'r', encoding='utf-8') as f:
