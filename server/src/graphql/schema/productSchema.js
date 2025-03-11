@@ -1,12 +1,16 @@
 const achievementSchema = require("./achievementSchema");
 const movieSchema = require("./movieSchema");
+const packageGroupSchema = require("./packageGroupSchema");
 const requirementSchema = require("./requirementSchema");
 const screenshotSchema = require("./screenshotSchema");
+const tagSchema = require("./tagSchema");
 
 const productSchema = `
+${tagSchema}
 ${screenshotSchema}
 ${movieSchema}
 ${achievementSchema}
+${packageGroupSchema}
 ${requirementSchema}
 
 type Product {
@@ -35,14 +39,15 @@ type Product {
 
     categories: [Category]
     genres: [Genre]
-    tags: [String]
+    tags: [Tag]
 
     release_date: ReleaseDate
 
     screenshots: [Screenshot]
     movies: [Movie]
 
-    achievements: [Achievement]
+    achievements: Achievement
+    package_groups: PackageGroup
 
     pc_requirements: Requirement
     mac_requirements: Requirement
@@ -86,7 +91,7 @@ type Query {
     products: [Product]
     
     # Lấy sản phẩm theo ID
-    product(id: Int!): Product
+    product(id: Int!, slice: String): Product
     
     # Lọc sản phẩm theo nhiều tiêu chí
     filterProducts(

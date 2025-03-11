@@ -5,7 +5,7 @@ const achievementSchema = `
     }
 
     type Achievement {
-        productId: Float!
+        productId: Int
         total: Int
         highlighted: [Highlighted]
     }

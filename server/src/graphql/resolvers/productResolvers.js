@@ -8,11 +8,26 @@ const productResolver = {
         },
 
         // Hàm này trả về một sản phẩm dựa vào id
-        product: async (_, { id }) => {
+        product: async (_, { id, slice = '{}' }) => {
+            // Parse JSON string thành object
+            const sliceObj = JSON.parse(slice);
+
+            // Lấy thông tin sản phẩm dựa vào id
             const product = await Product.findById(id)
+                .populate('tags')
                 .populate('screenshots')
                 .populate('movies')
-                .populate('achievements')
+                .populate({
+                    path: 'achievements',
+                    options: {
+                        // Giới hạn mảng highlighted trong achievements
+                        select: {
+                            'highlighted': {
+                                $slice: sliceObj.achievements.highlighted.limit
+                            }
+                        }
+                    }
+                }).populate('package_groups')
                 .populate('pc_requirements')
                 .populate('mac_requirements')
                 .populate('linux_requirements')
@@ -50,9 +65,11 @@ const productResolver = {
             const [totalProducts, products] = await Promise.all([
                 Product.countDocuments(filters),
                 Product.find(filters)
+                    .populate('tags')
                     .populate('screenshots')
                     .populate('movies')
                     .populate('achievements')
+                    .populate('package_groups')
                     .populate('pc_requirements')
                     .populate('mac_requirements')
                     .populate('linux_requirements')

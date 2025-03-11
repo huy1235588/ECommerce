@@ -133,10 +133,6 @@ const productSchema = new mongoose.Schema(
                 type: String,
             },
         }],
-        // Danh sách tags
-        tags: [{
-            type: String,
-        }],
 
         // Ngày phát hành
         release_date: {
@@ -150,6 +146,12 @@ const productSchema = new mongoose.Schema(
         },
 
         // Tham chiếu đến các collection khác
+        // Danh sách tags
+        tags: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Tag',
+        }],
+
         // Danh sách screenshots
         screenshots: [{
             type: mongoose.Schema.Types.ObjectId,
@@ -162,15 +164,15 @@ const productSchema = new mongoose.Schema(
         }],
 
         // Danh sách achievements
-        achievements: [{
+        achievements: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Achievement',
-        }],
+        },
         // Danh sách package_groups
-        package_groups: [{
+        package_groups: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'PackageGroup',
-        }],
+        },
 
         // Danh sách pc_requirements
         pc_requirements: {

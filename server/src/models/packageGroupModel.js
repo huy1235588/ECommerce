@@ -10,7 +10,7 @@ const packageGroupSchema = new mongoose.Schema({
     display_type: String,
     is_recurring_subscription: String,
     subs: [{
-        packageid: Number,
+        packageId: Number,
         percent_savings_text: String,
         percent_savings: Number,
         option_text: String,

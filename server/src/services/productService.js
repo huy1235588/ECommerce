@@ -4,6 +4,7 @@ const Movie = require("../models/movieModel");
 const Achievement = require("../models/achievementModel");
 const PackageGroup = require("../models/packageGroupModel");
 const Requirement = require("../models/requirementModel");
+const Tag = require("../models/tagModel");
 
 class ProductService {
     // Thêm sản phẩm
@@ -25,23 +26,33 @@ class ProductService {
                 capsule_image: data.capsule_image,
                 background: data.background,
                 background_raw: data.background_raw,
-                
+
                 developers: data.developers,
                 publishers: data.publishers,
 
                 price_overview: data.price_overview,
                 packages: data.packages,
                 platforms: data.platforms,
-                
+
                 categories: data.categories,
                 genres: data.genres,
-                tags: data.tags,
 
                 release_date: data.release_date,
             });
 
             // Lưu sản phẩm
             await product.save();
+
+            // Lưu tags
+            if (data.tags) {
+                const tags = Object.entries(data.tags).map(([name, id]) => new Tag({
+                    productId: product._id,
+                    id: id, // Value của object tags
+                    name: name // Key của object tags
+                }));
+                await Tag.insertMany(tags);
+                product.tags = tags.map(t => t._id);
+            }
 
             // Lưu screenshots
             if (data.screenshots) {
@@ -84,19 +95,30 @@ class ProductService {
             }
 
             // Lưu package_groups
-            const packageGroups = data.package_groups.map(pg => new PackageGroup({
-                productId: product._id,
-                name: pg.name,
-                title: pg.title,
-                description: pg.description,
-                selection_text: pg.selection_text,
-                save_text: pg.save_text,
-                display_type: pg.display_type,
-                is_recurring_subscription: pg.is_recurring_subscription,
-                subs: pg.subs
-            }));
-            await PackageGroup.insertMany(packageGroups);
-            product.package_groups = packageGroups.map(pg => pg._id);
+            if (data.package_groups[0]) {
+                const packageGroups = new PackageGroup({
+                    productId: product._id,
+                    name: data.package_groups[0].name,
+                    title: data.package_groups[0].title,
+                    description: data.package_groups[0].description,
+                    selection_text: data.package_groups[0].selection_text,
+                    save_text: data.package_groups[0].save_text,
+                    display_type: data.package_groups[0].display_type,
+                    is_recurring_subscription: data.package_groups[0].is_recurring_subscription,
+                    subs: data.package_groups[0].subs.map(sub => ({
+                        packageId: sub.packageid,
+                        percent_savings_text: sub.percent_savings_text,
+                        percent_savings: sub.percent_savings,
+                        option_text: sub.option_text,
+                        option_description: sub.option_description,
+                        can_get_free_license: sub.can_get_free_license,
+                        is_free_license: sub.is_free_license,
+                        price_in_cents_with_discount: sub.price_in_cents_with_discount
+                    }))
+                });
+                await packageGroups.save();
+                product.package_groups = packageGroups._id;
+            }
 
             // Lưu requirements
             const requirements = [
