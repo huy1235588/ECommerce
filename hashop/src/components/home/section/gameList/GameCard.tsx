@@ -79,9 +79,9 @@ function GameCard({
                 </Typography>
 
                 {/* Platform */}
-                {Object.keys(game.platform)
+                {Object.keys(game.platform || {})
                     .map((platform, index) => {
-                        if (!game.platform[platform as keyof typeof game.platform]) {
+                        if (!game.platform?.[platform as keyof typeof game.platform]) {
                             return null;
                         }
 

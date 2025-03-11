@@ -93,8 +93,8 @@ export type Product = {
     background?: string;
     background_raw?: string;
 
-    developers: string[];
-    publishers: string[];
+    developers?: string[];
+    publishers?: string[];
 
     price_overview: {
         currency: string

@@ -1,8 +1,8 @@
 'use client'
 
-import { getAchievements, getProductById, getSupportedLanguages } from '@/store/product';
+import { getProductById } from '@/store/product';
 import { AppDispatch } from '@/store/store';
-import { Product, ProductAchievement, ProductField, ProductLanguage } from '@/types/product';
+import { Product } from '@/types/product';
 import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,54 +23,41 @@ import 'swiper/css/thumbs';
 
 // Khởi tạo product ban đầu
 const initialProduct: Product = {
-    productId: -1,
-    title: '',
+    _id: -1,
+    name: '',
     type: '',
-    description: '',
-    price: 0,
-    discount: 0,
-    discountStartDate: null,
-    discountEndDate: null,
-    releaseDate: null,
-    developer: [],
-    publisher: [],
-    platform: [],
-    rating: 0,
-    isActive: false,
+    short_description: '',
+    price_overview: {
+        currency: '',
+        initial: 0,
+        final: 0,
+        discount_percent: 0,
+    },
+    release_date: {
+        date: dayjs(),
+        coming_soon: false,
+    },
+    developers: [],
+    publishers: [],
+    platform: {
+        windows: false,
+        mac: false,
+        linux: false,
+    },
     genres: [],
     tags: [],
-    features: [],
-    headerImage: null,
+    categories: [],
+    header_image: "",
     screenshots: [],
-    videos: [{
-        thumbnail: '',
-        mp4: '',
-        webm: ''
-    }],
-    systemRequirements: {
-        win: [
-            { title: "OS", minimum: "", recommended: "" },
-            { title: "Processor", minimum: "", recommended: "" },
-            { title: "Memory", minimum: "", recommended: "" },
-            { title: "Graphics", minimum: "", recommended: "" },
-            { title: "DirectX", minimum: "", recommended: "" },
-            { title: "Storage", minimum: "", recommended: "" },
-            { title: "Sound Card", minimum: "", recommended: "" },
-            { title: "Additional Notes", minimum: "", recommended: "" },
-        ],
-    },
+    movies: [],
 };
 
-// Khởi tạo product language ban đầu
-const initialProductLanguage: ProductLanguage = {
-    productId: -1,
-    languages: [],
-}
-
-// Khởi tạo product achievement ban đầu
-const initialProductAchievement: ProductAchievement = {
-    productId: -1,
-    achievements: [],
+// Định nghĩa interface cho mỗi ngôn ngữ
+interface Language {
+    name: string;
+    interface: boolean;
+    fullAudio: boolean;
+    subtitles: boolean;
 }
 
 function ProductDetailPage() {
@@ -80,8 +67,6 @@ function ProductDetailPage() {
 
     // Khai báo state
     const [product, setProduct] = useState<Product>(initialProduct); // Sản phẩm
-    const [productLanguage, setProductLanguage] = useState<ProductLanguage>(initialProductLanguage); // Sản phẩm
-    const [productAchievement, setProductAchievement] = useState<ProductAchievement>(initialProductAchievement); // Sản phẩm
 
     // Swiper
     const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null); // Swiper thumbnail
@@ -98,24 +83,65 @@ function ProductDetailPage() {
                 const id = pathname.split('/').pop();
 
                 // Các field cần lấy
-                const fieldProduct: ProductField[] = [
-                    'productId',
-                    'title',
-                    'description',
-                    'detail',
-                    'price',
-                    'discount',
-                    'releaseDate',
-                    'developer',
-                    'publisher',
-                    'headerImage',
-                    'screenshots',
-                    'videos',
-                    'platform',
-                    'tags',
-                    'features',
-                    'systemRequirements',
-                ];
+                const fieldProduct = `
+                     _id
+                    name
+                    short_description
+                    detailed_description
+                    about_the_game
+                    price_overview {
+                        initial
+                        final
+                        discount_percent
+                        currency
+                    }
+                    release_date {
+                        date
+                    }
+                    developers
+                    publishers
+                    header_image
+                    screenshots {
+                        path_thumbnail
+                    }
+                    movies {
+                        thumbnail
+                        mp4 {
+                            _480
+                            max
+                        }
+                        webm {
+                            _480
+                            max
+                        }
+                    }
+                    platform {
+                        windows
+                        mac
+                        linux
+                    }
+                    tags
+                    categories {
+                        id
+                        description
+                    }
+                    pc_requirements {
+                        type
+                        minimum
+                        recommended
+                    }
+                    mac_requirements {
+                        type
+                        minimum
+                        recommended
+                    }
+                    linux_requirements {
+                        type
+                        minimum
+                        recommended
+                    }
+                    supported_languages
+                `;
 
                 // Gọi action lấy thông tin sản phẩm
                 const resultAction = await dispatch(getProductById({
@@ -127,29 +153,6 @@ function ProductDetailPage() {
                 if (resultAction.meta.requestStatus === 'fulfilled') {
                     const fetchedProduct = unwrapResult(resultAction);
                     setProduct(fetchedProduct);
-                }
-
-                // Gọi action lấy ngôn ngữ
-                const resultActionLanguages = await dispatch(getSupportedLanguages(
-                    Number(id),
-                ));
-
-                // Lấy thông tin ngôn ngữ thành công
-                if (resultActionLanguages.meta.requestStatus === 'fulfilled') {
-                    const fetchedProductLanguage = unwrapResult(resultActionLanguages);
-                    setProductLanguage(fetchedProductLanguage);
-                }
-
-                // Gọi action lấy thành tựu
-                const resultActionAchievement = await dispatch(getAchievements({
-                    id: Number(id),
-                    slice: 4
-                }));
-
-                // Lấy thông tin thành tựu thành công
-                if (resultActionAchievement.meta.requestStatus === 'fulfilled') {
-                    const fetchedProductAchievement = unwrapResult(resultActionAchievement);
-                    setProductAchievement(fetchedProductAchievement);
                 }
 
             } catch (error) {
@@ -170,21 +173,21 @@ function ProductDetailPage() {
 
     // Media
     const mediaItems = useMemo(() => [
-        ...product.videos.map(video => ({ type: 'video', src: video.mp4 })),
-        ...product.screenshots.map(screenshot => ({ type: 'image', src: screenshot }))
-    ], [product.videos, product.screenshots]);
+        ...product.movies.map(video => ({ type: 'video', src: video.mp4.max })),
+        ...product.screenshots.map(screenshot => ({ type: 'image', src: screenshot.path_thumbnail }))
+    ], [product.movies, product.screenshots]);
 
     // Thumbs
     const thumbItems = [
-        ...product.videos.map(video => ({
+        ...product.movies.map(video => ({
             type: 'video',
             src: video.mp4,
             thumbnail: video.thumbnail
         })),
         ...product.screenshots.map(screenshot => ({
             type: 'image',
-            src: screenshot,
-            thumbnail: screenshot
+            src: screenshot.path_full,
+            thumbnail: screenshot.path_thumbnail
         }))
     ];
 
@@ -214,6 +217,25 @@ function ProductDetailPage() {
         };
     }, [currentSlideIndex, mainSwiper, mediaItems]);
 
+    // Parse ngôn ngữ hỗ trợ
+    const parseSupportedLanguages = (supportedLanguages: string): Language[] => {
+        const languages: Language[] = [];
+        const languageEntries = supportedLanguages.split(', ');
+
+        languageEntries.forEach(entry => {
+            const hasFullAudio = entry.includes('<strong>*</strong>');
+            const name = entry.replace('<strong>*</strong>', '').trim();
+            languages.push({
+                name,
+                interface: true,
+                fullAudio: hasFullAudio,
+                subtitles: true,
+            });
+        });
+
+        return languages;
+    };
+
     return (
         <Box sx={{
             padding: 2,
@@ -230,7 +252,7 @@ function ProductDetailPage() {
                     marginBottom: 2,
                 }}
             >
-                {product.title}
+                {product.name}
             </Typography>
 
             {/* Nội dung trang */}
@@ -323,7 +345,7 @@ function ProductDetailPage() {
                         {thumbItems.map((media, index) => (
                             <SwiperSlide key={index}>
                                 <Image
-                                    src={media.thumbnail || 'https://placehold.co/175x98/000/000/png'}
+                                    src={media.thumbnail.toString() || 'https://placehold.co/175x98/000/000/png'}
                                     alt={`Video ${index + 1}`}
                                     width={175}
                                     height={98}
@@ -391,8 +413,8 @@ function ProductDetailPage() {
                 >
                     {/* Hình ảnh header */}
                     <Image
-                        src={product.headerImage
-                            ? product.headerImage.toString()
+                        src={product.header_image
+                            ? product.header_image
                             : 'https://placehold.co/343x160/000/000/png'
                         }
                         alt="Product"
@@ -403,7 +425,7 @@ function ProductDetailPage() {
 
                     {/* Mô tả trò chơi */}
                     <Typography variant="body1" sx={{ color: '#fff', marginTop: 2 }}>
-                        {product.description}
+                        {product.short_description}
                     </Typography>
 
                     {/* Đánh giá */}
@@ -416,13 +438,13 @@ function ProductDetailPage() {
 
                     {/* Thông tin phát hành */}
                     <Typography variant="body2" sx={{ color: '#fff', marginTop: 2 }}>
-                        Release Date: {dayjs(product.releaseDate).format('DD/MM/YYYY')}
+                        Release Date: {dayjs(product.release_date.date).format('DD/MM/YYYY')}
                     </Typography>
                     <Typography variant="body2" sx={{ color: '#fff' }}>
-                        Developer: {product.developer.join(', ')}
+                        Developer: {product.developers?.join(', ')}
                     </Typography>
                     <Typography variant="body2" sx={{ color: '#fff' }}>
-                        Publisher: {product.publisher.join(', ')}
+                        Publisher: {product.publishers?.join(', ')}
                     </Typography>
 
                     {/* Thẻ tag */}
@@ -476,32 +498,40 @@ function ProductDetailPage() {
                     }}>
                         {/* Tiêu đề */}
                         <Typography variant="h5" sx={{ color: '#fff' }}>
-                            Buy {product.title}
+                            Buy {product.name}
                         </Typography>
 
                         {/* Platform */}
-                        {product.platform.map((platform, index) => (
-                            <Typography
-                                key={index}
-                                variant="body2"
-                                sx={{
-                                    color: '#fff',
-                                    marginRight: '8px',
-                                }}
-                            >
-                                <Image
-                                    src={`/icons/platforms/${platform}.svg`}
-                                    alt={platform}
-                                    width={20}
-                                    height={20}
-                                    style={{
-                                        verticalAlign: 'middle',
-                                        marginRight: '4px',
-                                        filter: 'invert(80%)',
-                                    }}
-                                />
-                            </Typography>
-                        ))}
+                        {Object.keys(product.platform || {})
+                            .map((platform, index) => {
+                                if (!product.platform?.[platform as keyof typeof product.platform]) {
+                                    return null;
+                                }
+
+                                return (
+                                    <Typography
+                                        key={index}
+                                        variant="body2"
+                                        sx={{
+                                            color: '#fff',
+                                            marginRight: '8px',
+                                        }}
+                                    >
+                                        <Image
+                                            src={`/icons/platforms/${platform}.svg`}
+                                            alt={platform}
+                                            width={20}
+                                            height={20}
+                                            style={{
+                                                verticalAlign: 'middle',
+                                                marginRight: '4px',
+                                                filter: 'invert(80%)',
+                                            }}
+                                        />
+                                    </Typography>
+                                )
+                            })
+                        }
 
                         {/* Giá tiền */}
                         <Box sx={{
@@ -538,7 +568,7 @@ function ProductDetailPage() {
                         <div className="product-detail-auto-collapse">
                             {/* Chi tiết */}
                             <div className="product-detail-area"
-                                dangerouslySetInnerHTML={{ __html: product.detail || "" }}
+                                dangerouslySetInnerHTML={{ __html: product.about_the_game || "" }}
                             />
                         </div>
                         {/* Nút xem thêm */}
@@ -566,30 +596,14 @@ function ProductDetailPage() {
                         <div className="sysReq_contents">
                             <div className="game_area_sys_req sysReq_content active" data-os="win">
                                 <div className="game_area_sys_req_leftCol">
-                                    <h3>Minimum:</h3>
-                                    <ul className="sysReq_leftCol">
-                                        {product.systemRequirements.win.map((item, index) => {
-                                            return item.minimum && item.recommended ? (
-                                                <li key={index}>
-                                                    <strong>{item.title}: </strong>
-                                                    <span>{item.minimum}</span>
-                                                </li>
-                                            ) : null;
-                                        })}
-                                    </ul>
+                                    <div className="product-detail-area"
+                                        dangerouslySetInnerHTML={{ __html: product.pc_requirements?.minimum || "" }}
+                                    />
                                 </div>
                                 <div className="game_area_sys_req_rightCol">
-                                    <h3>Recommended:</h3>
-                                    <ul className="sysReq_rightCol">
-                                        {product.systemRequirements.win.map((item, index) => {
-                                            return item.minimum && item.recommended ? (
-                                                <li key={index}>
-                                                    <strong>{item.title}: </strong>
-                                                    <span>{item.recommended}</span>
-                                                </li>
-                                            ) : null;
-                                        })}
-                                    </ul>
+                                    <div className="product-detail-area"
+                                        dangerouslySetInnerHTML={{ __html: product.pc_requirements?.recommended || "" }}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -612,7 +626,7 @@ function ProductDetailPage() {
                             Features
                         </Typography>
                         <div className='product-features-list'>
-                            {product.features?.map((feature, index) => (
+                            {product.categories?.map((feature, index) => (
                                 <a className='product-features-item'
                                     href="#"
                                     key={index}
@@ -620,13 +634,13 @@ function ProductDetailPage() {
                                     <div className='product-features-icon'>
                                         <Image
                                             src={`https://store.fastly.steamstatic.com/public/images/v6/ico/ico_singlePlayer.png`}
-                                            alt={feature}
+                                            alt={feature.description}
                                             width={26}
                                             height={16}
                                         />
                                     </div>
                                     <div className='product-features-text'>
-                                        {feature}
+                                        {feature.description}
                                     </div>
                                 </a>
                             ))}
@@ -649,32 +663,22 @@ function ProductDetailPage() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {productLanguage.languages.map((language, index) => (
-                                        <tr key={index}>
-                                            <td>{language.language}</td>
-                                            <td className='checkCol'>
-                                                {language.interface && (
-                                                    <span>
-                                                        ✔
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className='checkCol'>
-                                                {language.fullAudio && (
-                                                    <span>
-                                                        ✔
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className='checkCol'>
-                                                {language.subtitles && (
-                                                    <span>
-                                                        ✔
-                                                    </span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                    {product.supported_languages && parseSupportedLanguages(product.supported_languages)
+                                        .map((language, index) => (
+                                            <tr key={index}>
+                                                <td>{language.name}</td>
+                                                <td className='checkCol'>
+                                                    {language.interface ? '✔' : ''}
+                                                </td>
+                                                <td className='checkCol'>
+                                                    {language.fullAudio ? '✔' : ''}
+                                                </td>
+                                                <td className='checkCol'>
+                                                    {language.subtitles ? '✔' : ''}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -686,24 +690,24 @@ function ProductDetailPage() {
                             Achievements
                         </Typography>
                         <div className='product-achievements-list'>
-                            {productAchievement.achievements.map((achievement, index) => (
+                            {/* {product.achievements[0].highlighted.map((achievement, index) => (
                                 <div className='product-achievements-item'
                                     key={index}
                                 >
                                     <Image
-                                        src={achievement.image}
-                                        alt={achievement.title}
+                                        src={achievement.highlighted.path}
+                                        alt={achievement.highlighted.name}
                                         width={64}
                                         height={64}
                                     />
                                 </div>
-                            ))}
+                            ))} */}
 
                             {/* Nút xem thêm */}
-                            <a className='product-achievements-view-all'
+                            {/* <a className='product-achievements-view-all'
                                 href="#">
-                                View  all 42
-                            </a>
+                                View all {product.achievements[0].total}
+                            </a> */}
                         </div>
                     </div>
                 </Grid2>

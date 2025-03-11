@@ -4,7 +4,7 @@ import { styled } from '@mui/system';
 import { BiCart, BiSolidXCircle } from 'react-icons/bi';
 import { FaSearch } from 'react-icons/fa';
 import Image from 'next/image';
-import { Product, ProductField } from '@/types/product';
+import { Product } from '@/types/product';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
 import { paginatedProducts } from '@/store/product';
@@ -39,16 +39,17 @@ const NavigationBar: React.FC = () => {
         const getProducts = async () => {
             try {
                 // Các trường cần lấy
-                const field: ProductField[] = [
-                    "productId",
-                    "title",
-                    "price",
-                    "discount",
-                    "headerImage",
-                ];
+                const field= `
+                    _id
+                    name
+                    price_overview {
+                        final
+                    }
+                    header_image
+                `;
 
                 const query = {
-                    title: {
+                    name: {
                         $regex: search,
                         $options: 'i'
                     }
@@ -199,25 +200,25 @@ const NavigationBar: React.FC = () => {
                             >
                                 {searchResults.map(product => (
                                     <Box className='search-result-item'
-                                        key={product.productId}
+                                        key={product._id}
                                     >
-                                        <a href={`/app/${product.productId}`}
+                                        <a href={`/app/${product._id}`}
                                             className='search-result-link'
                                         >
                                             <Image className='search-result-image'
-                                                src={product.headerImage?.toString() || ''}
-                                                alt={product.title}
+                                                src={product.header_image || ''}
+                                                alt={product.name}
                                                 width={231}
                                                 height={87}
                                             />
 
                                             <Box className='search-result-info'>
                                                 <span className='search-result-title'>
-                                                    {product.title}
+                                                    {product.name}
                                                 </span>
                                                 <span className='search-result-price'>
                                                     $
-                                                    {product.price}
+                                                    {product.price_overview.final}
                                                 </span>
                                             </Box>
                                         </a>
