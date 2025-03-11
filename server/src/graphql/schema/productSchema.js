@@ -1,7 +1,13 @@
 const achievementSchema = require("./achievementSchema");
+const movieSchema = require("./movieSchema");
+const requirementSchema = require("./requirementSchema");
+const screenshotSchema = require("./screenshotSchema");
 
 const productSchema = `
+${screenshotSchema}
+${movieSchema}
 ${achievementSchema}
+${requirementSchema}
 
 type Product {
     _id: ID!
@@ -31,7 +37,14 @@ type Product {
     genres: [Genre]
     releaseDate: ReleaseDate
 
+    screenshots: [Screenshot]
+    movies: [Movie]
+
     achievements: [Achievement]
+
+    pc_requirements: Requirement
+    mac_requirements: Requirement
+    linux_requirements: Requirement
 }
 
 type PriceOverview {

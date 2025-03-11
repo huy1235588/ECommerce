@@ -1,6 +1,5 @@
 const Achievement = require("../../models/achievementModel");
 
-
 const achievementResolvers = {
     Query: {
         // Trả về một achievement dựa vào productId
@@ -17,16 +16,14 @@ const achievementResolvers = {
     },
 
     Mutation: {
+        // Cập nhật một achievement
         UpdateAchievement: async (_, args) => {
             const { productId, total, highlighted } = args;
-            const achievement = await context.prisma.achievement.update({
-                where: {
-                    productId: productId
-                },
-                data: {
-                    total: total,
-                    highlighted: highlighted
-                }
+            const achievement = await Achievement.updateOne({
+                productId: productId
+            }, {
+                total: total,
+                highlighted: highlighted
             });
             return achievement;
         }

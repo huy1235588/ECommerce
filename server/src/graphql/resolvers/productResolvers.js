@@ -10,7 +10,13 @@ const productResolver = {
         // Hàm này trả về một sản phẩm dựa vào id
         product: async (_, { id }) => {
             const product = await Product.findById(id)
-                .populate('achievements');
+                .populate('screenshots')
+                .populate('movies')
+                .populate('achievements')
+                .populate('pc_requirements')
+                .populate('mac_requirements')
+                .populate('linux_requirements')
+                .exec();
 
             return product;
         },
