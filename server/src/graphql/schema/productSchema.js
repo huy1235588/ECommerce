@@ -1,4 +1,8 @@
+const { achievementType } = require("./achievementSchema");
+
 const productSchema = `
+${achievementType}
+
 type Product {
     _id: ID!
     name: String!
@@ -26,6 +30,8 @@ type Product {
     categories: [Category]
     genres: [Genre]
     releaseDate: ReleaseDate
+
+    achievements: [Achievement]
 }
 
 type PriceOverview {
@@ -58,9 +64,14 @@ type ReleaseDate {
 
 # Truy vấn
 type Query {
-    products: [Product]         # Lấy tất cả sản phẩm
-    product(id: Int!): Product  # Lấy sản phẩm theo ID
-    filterProducts(             # Lọc sản phẩm theo nhiều tiêu chí
+    # Lấy tất cả sản phẩm
+    products: [Product]
+    
+    # Lấy sản phẩm theo ID
+    product(id: Int!): Product
+    
+    # Lọc sản phẩm theo nhiều tiêu chí
+    filterProducts(
         productId: Int
         title: String
         discountStartDate: String
