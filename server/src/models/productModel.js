@@ -29,22 +29,18 @@ const productSchema = new mongoose.Schema(
         short_description: {
             type: String,
         },
-
         // Mô tả chi tiết sản phẩm
         detailed_description: {
             type: String,
         },
-
         // Thông tin về sản phẩm
         about_the_game: {
             type: String,
         },
-
         // Ngôn ngữ hỗ trợ
         supported_languages: {
             type: String,
         },
-
         // Đánh giá sản phẩm
         reviews: {
             type: String,
@@ -54,9 +50,16 @@ const productSchema = new mongoose.Schema(
         header_image: {
             type: String,
         },
-
         // Hình ảnh ảo
         capsule_image: {
+            type: String,
+        },
+        // URL nền
+        background: {
+            type: String,
+        },
+        // URL nền (raw)
+        background_raw: {
             type: String,
         },
 
@@ -65,7 +68,6 @@ const productSchema = new mongoose.Schema(
             type: String,
             required: true,
         }],
-
         // Nhà xuất bản
         publisher: [{
             type: String,
@@ -113,6 +115,7 @@ const productSchema = new mongoose.Schema(
             },
         },
 
+        // Danh mục
         categories: [{
             id: {
                 type: Number,
@@ -121,7 +124,6 @@ const productSchema = new mongoose.Schema(
                 type: String,
             },
         }],
-
         // Danh sách thể loại
         genres: [{
             id: {
@@ -141,27 +143,6 @@ const productSchema = new mongoose.Schema(
             date: {
                 type: String,
             },
-        },
-
-        // URL nền
-        background: {
-            type: String,
-        },
-
-        // URL nền (raw)
-        background_raw: {
-            type: String,
-        },
-
-        // Ngày tạo
-        createdAt: {
-            type: Date,
-            default: Date.now,
-        },
-        // Ngày cập nhật
-        updatedAt: {
-            type: Date,
-            default: Date.now,
         },
 
         // Tham chiếu đến các collection khác
@@ -201,6 +182,18 @@ const productSchema = new mongoose.Schema(
         linux_requirements: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Requirement',
+        },
+
+
+        // Ngày tạo
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        },
+        // Ngày cập nhật
+        updatedAt: {
+            type: Date,
+            default: Date.now,
         },
 
     }, {

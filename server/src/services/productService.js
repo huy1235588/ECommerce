@@ -11,31 +11,31 @@ class ProductService {
         try {
             // Tạo mới sản phẩm
             const product = new Product({
-                type: data.type,
                 name: data.name,
-                required_age: data.required_age,
-                is_free: data.is_free,
-                controller_support: data.controller_support,
+                type: data.type,
                 dlc: data.dlc,
+
+                short_description: data.short_description,
                 detailed_description: data.detailed_description,
                 about_the_game: data.about_the_game,
-                short_description: data.short_description,
                 supported_languages: data.supported_languages,
                 reviews: data.reviews,
+
                 header_image: data.header_image,
                 capsule_image: data.capsule_image,
-                capsule_imagev5: data.capsule_imagev5,
-                legal_notice: data.legal_notice,
+                background: data.background,
+                background_raw: data.background_raw,
+                
                 developers: data.developers,
                 publishers: data.publishers,
+
                 price_overview: data.price_overview,
                 packages: data.packages,
                 platforms: data.platforms,
                 categories: data.categories,
                 genres: data.genres,
+
                 release_date: data.release_date,
-                background: data.background,
-                background_raw: data.background_raw
             });
 
             // Lưu sản phẩm
