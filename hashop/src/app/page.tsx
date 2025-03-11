@@ -10,7 +10,7 @@ import { checkAuthUser } from "@/store/auth";
 import { paginatedProducts } from "@/store/product";
 import { AppDispatch } from "@/store/store";
 import "@/styles/home.css?v=1";
-import { Product, ProductField } from "@/types/product";
+import { Product } from "@/types/product";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -27,18 +27,28 @@ export default function Home() {
         const getProducts = async () => {
             try {                
                 // Các trường cần lấy
-                const field: ProductField[] = [
-                    "productId",
-                    "title",
-                    "price",
-                    "discount",
-                    "releaseDate",
-                    "headerImage",
-                    "description",
-                    "tags",
-                    "screenshots",
-                    "platform"
-                ];
+                const field: string = `
+                    _id
+                    name
+                    price_overview {
+                        initial
+                        final
+                        discount_percent
+                    }
+                    release_date {
+                        date
+                    }
+                    header_image
+                    short_description
+                    screenshots {
+                        path_thumbnail
+                    }
+                    platform {
+                        windows
+                        mac
+                        linux
+                    }
+                `
 
                 const slice = {
                     // Lấy 3 screenshot đầu tiên

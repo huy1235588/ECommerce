@@ -74,90 +74,105 @@ export const FeatureData = [
     'Other'
 ];
 
-export type ProductVideos = {
-    thumbnail: string,
-    mp4: string,
-    webm: string,
-}
-
-// Tạo type cho system requirements
-export type ProductSystemRequirements = {
-    title: "OS" | "Processor" | "Memory" | "Graphics" | "DirectX" | "Storage" | "Sound Card" | "Additional Notes",
-    minimum: string,
-    recommended: string
-}
-
-export type ProductOS = {
-    win: ProductSystemRequirements[],
-    mac?: ProductSystemRequirements[],
-    linux?: ProductSystemRequirements[]
-}
-
 // Tạo type cho product
 export type Product = {
     _id?: number;
-    productId: number;
-    title: string;
+
+    name: string;
     type: string;
-    description?: string;
-    detail?: string;
-    price: number;
+    dlc?: string[];
 
-    discount?: number;
-    discountStartDate: Dayjs | null;
-    discountEndDate: Dayjs | null;
+    short_description: string;
+    detailed_description: string;
+    about_the_game: string;
+    supported_languages: string;
+    reviews: string;
 
-    releaseDate: Dayjs | null;
+    header_image: string;
+    capsule_image: string;
+    background: string;
+    background_raw: string;
 
-    developer: string[];
-    publisher: string[];
-    platform: string[];
+    developers: string[];
+    publishers: string[];
 
-    rating?: number;
-    isActive?: boolean;
+    price_overview: {
+        currency: string
+        initial: number
+        final: number
+        discount_percent: number
+    };
+    packages: number[];
+    platform: {
+        windows: boolean,
+        mac: boolean,
+        linux: boolean
+    }
 
-    headerImage: File | string | null;
-    screenshots: string[];
-    videos: ProductVideos[];
+    categories: {
+        id: number,
+        description: string
+    }[];
+    genres: {
+        id: number,
+        description: string
+    }[];
+    release_date: {
+        coming_soon: boolean,
+        date: Dayjs
+    };
 
-    genres?: string[];
-    tags?: string[];
-    features?: string[];
+    screenshots: ProductScreenshot[];
+    movies: ProductMovie[];
 
-    systemRequirements: ProductOS;
+    achievements: [Achievement];
 
-    createdAt?: Date;
-    updatedAt?: Date;
+    pc_requirements: Requirement;
+    mac_requirements: Requirement;
+    linux_requirements: Requirement;
+
+    created_at?: Dayjs;
+    updated_at?: Dayjs;
 };
 
-// Tạo type cho ngôn ngữ
-type Languages = {
-    language: string,
-    interface: boolean,
-    fullAudio: boolean,
-    subtitles: boolean
-}
-
-export type ProductLanguage = {
+type ProductScreenshot = {
     productId: number;
-    languages: Languages[]
+    id: number;
+    path_thumbnail: string;
+    path_full: string;
 }
 
-// Tạo type thành tựu
+type ProductMovie = {
+    productId: number;
+    id: number;
+    name: string;
+    thumbnail: string;
+    webm: {
+        480: string,
+        max: string,
+    };
+    mp4: {
+        480: string,
+        max: string,
+    }
+    highlight: boolean;
+}
+
 type Achievement = {
-    title: string,
-    description: string,
-    percent: number,
-    image: string // URL
-}
-
-export type ProductAchievement = {
     productId: number;
-    achievements: Achievement[]
+    total: number;
+    highlighted: {
+        name: string,
+        path: string,
+    }
 }
 
-// Tạo type alias cho các field hợp lệ
-export type ProductField = keyof Product;
+type Requirement = {
+    productId: number;
+    type: string;
+    minimum: string;
+    recommended: string;
+}
 
 // GraphQL
 interface PaginationInfo {

@@ -17,18 +17,13 @@ function GameCard({
 }: GameCardProps) {
     const router = useRouter();
 
-    // Tính giá sau khi giảm giá
-    const discountedPrice = game.price && game.discount
-        ? (game.price - (game.price * game.discount) / 100).toFixed(2)
-        : null;
-
     return (
         <Card
             onMouseEnter={() => {
                 onHover(game);
             }}
             onClick={() => {
-                router.push(`/app/${game.productId}`);
+                router.push(`/app/${game._id}`);
             }}
             sx={{
                 display: 'flex',
@@ -49,8 +44,8 @@ function GameCard({
             <CardMedia
                 component="img"
                 height="140"
-                image={game.headerImage as string}
-                alt={game.title}
+                image={game.header_image as string}
+                alt={game.name}
                 sx={{
                     maxWidth: '300px',
                 }}
@@ -80,32 +75,40 @@ function GameCard({
                         WebkitBoxOrient: 'vertical',
                     }}
                 >
-                    {game.title}
+                    {game.name}
                 </Typography>
 
                 {/* Platform */}
-                {game.platform.map((platform, index) => (
-                    <Typography
-                        key={index}
-                        variant="body2"
-                        sx={{
-                            color: isHovered ? '#263645' : '#738895',
-                            marginRight: '8px',
-                        }}
-                    >
-                        <Image
-                            src={`/icons/platforms/${platform}.svg`}
-                            alt={platform}
-                            width={16}
-                            height={16}
-                            style={{
-                                verticalAlign: 'middle',
-                                marginRight: '4px',
-                                filter: isHovered ? 'invert(40%)' : 'invert(60%)',
-                            }}
-                        />
-                    </Typography>
-                ))}
+                {Object.keys(game.platform)
+                    .map((platform, index) => {
+                        if (!game.platform[platform as keyof typeof game.platform]) {
+                            return null;
+                        }
+
+                        return (
+                            <Typography
+                                key={index}
+                                variant="body2"
+                                sx={{
+                                    color: isHovered ? '#263645' : '#738895',
+                                    marginRight: '8px',
+                                }}
+                            >
+                                <Image
+                                    src={`/icons/platforms/${platform}.svg`}
+                                    alt={platform}
+                                    width={16}
+                                    height={16}
+                                    style={{
+                                        verticalAlign: 'middle',
+                                        marginRight: '4px',
+                                        filter: isHovered ? 'invert(40%)' : 'invert(60%)',
+                                    }}
+                                />
+                            </Typography>
+                        )
+                    })
+                }
 
                 {/* Giá tiền */}
                 <Typography variant="body1"
@@ -114,7 +117,7 @@ function GameCard({
                         color: isHovered ? '#263645' : '#BEEE11'
                     }}
                 >
-                    {discountedPrice && (
+                    {game.price_overview.discount_percent && (
                         <Typography
                             variant="body2"
                             sx={{
@@ -127,12 +130,12 @@ function GameCard({
                                 fontWeight: 'bold',
                             }}
                         >
-                            -{game.discount}%
+                            -{game.price_overview.discount_percent}%
                         </Typography>
                     )}
 
                     {/* Giá gốc */}
-                    {discountedPrice && (
+                    {game.price_overview.discount_percent && (
                         <span
                             style={{
                                 textDecoration: 'line-through',
@@ -140,15 +143,15 @@ function GameCard({
                                 marginRight: '8px'
                             }}
                         >
-                            ${game.price}
+                            ${game.price_overview.initial}
                         </span>
                     )}
 
                     {/* Giá bán */}
                     <span style={{
-                        color: isHovered ? '#263645' : discountedPrice ? '#BEEE11' : '#A0A0A0',
+                        color: isHovered ? '#263645' : game.price_overview.discount_percent ? '#BEEE11' : '#A0A0A0',
                     }}>
-                        ${discountedPrice || game.price}
+                        ${game.price_overview.discount_percent || game.price_overview.initial}
                     </span>
                 </Typography>
 
@@ -161,7 +164,7 @@ function GameCard({
                         maxWidth: '100%',
                     }}
                 >
-                    {game.tags && game.tags?.map((tag, index) => (
+                    {/* {game.tags && game.tags?.map((tag, index) => (
                         <Typography
                             key={index}
                             variant="body2"
@@ -178,7 +181,7 @@ function GameCard({
                             {tag}
                             {index < game.tags!.length - 1 && ','}
                         </Typography>
-                    ))}
+                    ))} */}
                 </Box>
 
             </CardContent>

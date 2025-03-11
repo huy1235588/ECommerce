@@ -15,27 +15,27 @@ type Product {
     type: String!
     dlc: [String]
 
-    shortDescription: String
-    detailedDescription: String
-    aboutTheGame: String
-    supportedLanguages: String
+    short_description: String
+    detailed_description: String
+    about_the_game: String
+    supported_languages: String
     reviews: String
 
-    headerImage: String
-    capsuleImage: String
+    header_image: String
+    capsule_image: String
     background: String
-    backgroundRaw: String
+    background_raw: String
 
     developers: [String]
     publishers: [String]
 
-    priceOverview: PriceOverview
+    price_overview: PriceOverview
     packages: [Int]
     platform: Platform
 
     categories: [Category]
     genres: [Genre]
-    releaseDate: ReleaseDate
+    release_date: ReleaseDate
 
     screenshots: [Screenshot]
     movies: [Movie]
@@ -45,13 +45,16 @@ type Product {
     pc_requirements: Requirement
     mac_requirements: Requirement
     linux_requirements: Requirement
+
+    created_at: String
+    updated_at: String
 }
 
 type PriceOverview {
     currency: String
     initial: Float
     final: Float
-    discountPercent: Int
+    discount_percent: Int
 }
 
 type Platform {
@@ -71,7 +74,7 @@ type Genre {
 }
 
 type ReleaseDate {
-    comingSoon: Boolean
+    coming_soon: Boolean
     date: String
 }
 
@@ -85,16 +88,16 @@ type Query {
     
     # Lọc sản phẩm theo nhiều tiêu chí
     filterProducts(
-        productId: Int
+        product_id: Int
         title: String
-        discountStartDate: String
-        discountEndDate: String
-        releaseDate: String
+        discount_start_date: String
+        discount_end_date: String
+        release_date: String
         developer: [String]
         publisher: [String]
         platform: [String]
         rating: Float
-        isActive: Boolean
+        is_active: Boolean
         genres: [String]
         tags: [String]
         features: [String]
@@ -121,16 +124,16 @@ type Page {
 type Mutation {
     # Cập nhật thông tin sản phẩm
     UpdateProduct(
-        productId: Int!
+        product_id: Int!
         title: String
-        discountStartDate: String
-        discountEndDate: String
-        releaseDate: String
+        discount_start_date: String
+        discount_end_date: String
+        release_date: String
         developer: [String]
         publisher: [String]
         platform: [String]
         rating: Float
-        isActive: Boolean
+        is_active: Boolean
         genres: [String]
         tags: [String]
         features: [String]

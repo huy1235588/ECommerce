@@ -50,6 +50,12 @@ const productResolver = {
             const [totalProducts, products] = await Promise.all([
                 Product.countDocuments(filters),
                 Product.find(filters)
+                    .populate('screenshots')
+                    .populate('movies')
+                    .populate('achievements')
+                    .populate('pc_requirements')
+                    .populate('mac_requirements')
+                    .populate('linux_requirements')
                     .sort({ [sortColumn]: sortOrder })
                     .skip(startIndex)
                     .limit(limit)

@@ -27,13 +27,13 @@ function GameDetails({ game }: GameDetailsProps) {
                     WebkitBoxOrient: 'vertical',
                 }}
             >
-                {game.title}
+                {game.name}
             </Typography>
 
             {/* Mô tả */}
             <Typography variant="body2"
                 sx={{
-                    color: '#A0A0A0',
+                    color: '#263645',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     display: '-webkit-box',
@@ -41,7 +41,7 @@ function GameDetails({ game }: GameDetailsProps) {
                     WebkitBoxOrient: 'vertical',
                 }}
             >
-                {game.description}
+                {game.short_description}
             </Typography>
 
             {/* Thể loại */}
@@ -54,7 +54,7 @@ function GameDetails({ game }: GameDetailsProps) {
                     overflow: 'hidden',
                 }}
             >
-                {game.tags?.map((tag, index) => (
+                {/* {game.tags?.map((tag, index) => (
                     <Typography
                         key={index}
                         variant="body2"
@@ -71,7 +71,7 @@ function GameDetails({ game }: GameDetailsProps) {
                     >
                         {tag}
                     </Typography>
-                ))}
+                ))} */}
             </Box>
 
             {/* Hình ảnh */}
@@ -79,7 +79,7 @@ function GameDetails({ game }: GameDetailsProps) {
                 {game.screenshots.map((image, index) => (
                     <Image
                         key={index}
-                        src={image}
+                        src={image.path_thumbnail}
                         alt={`Screenshot ${index + 1}`}
                         width={300}
                         height={156}
