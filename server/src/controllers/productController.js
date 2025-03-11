@@ -48,11 +48,10 @@ class ProductController {
             const {
                 jsonId,
                 errorIds,
-                errorIdsAchievement
             } = req.body;
 
             // Kiểm tra xem người dùng đã nhập đúng các trường cần thiết chưa
-            if (!jsonId || !errorIds || !errorIdsAchievement) {
+            if (!jsonId || !errorIds) {
                 return res.status(400).json({ error: 'Missing required fields' });
             }
 
@@ -61,11 +60,9 @@ class ProductController {
 
             // Đọc dữ liệu từ tệp JSON
             const productData = readDataFromJson(`${folder}/data.json`);
-            const achievementData = readDataFromJson(`${folder}/achievement.json`);
-            const languageData = readDataFromJson(`${folder}/language.json`);
 
             // Kiểm tra xem dữ liệu có tồn tại không
-            if (!productData || !achievementData || !languageData) {
+            if (!productData) {
                 return res.status(400).json({ error: 'Data not found' });
             }
 

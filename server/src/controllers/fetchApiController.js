@@ -62,7 +62,7 @@ class FetchApiController {
                 fileJSONName = `data-${jsonId}`;
             } else {
                 // Khởi tạo tên file JSON theo định dạng data-yyyymmdd
-                const date = new Date();
+                const date = new Date(); 
                 jsonId = `${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
                 fileJSONName = `data-${jsonId}`;
 

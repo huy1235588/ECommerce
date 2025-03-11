@@ -1,4 +1,10 @@
 const Product = require("../models/productModel");
+const Screenshot = require("../models/screenshotModel");
+const Movie = require("../models/movieModel");
+const Achievement = require("../models/achievementModel");
+const PackageGroup = require("../models/packageGroupModel");
+const Requirement = require("../models/requirementModel");
+
 class ProductService {
     // Thêm sản phẩm
     async addProduct(data) {
@@ -32,41 +38,52 @@ class ProductService {
                 background_raw: data.background_raw
             });
 
+            // Lưu sản phẩm
+            await product.save();
+
             // Lưu screenshots
-            const screenshots = data.screenshots.map(screenshot => new Screenshot({
-                game_id: game._id,
-                id: screenshot.id,
-                path_thumbnail: screenshot.path_thumbnail,
-                path_full: screenshot.path_full
-            }));
-            await Screenshot.insertMany(screenshots);
-            game.screenshots = screenshots.map(s => s._id);
+            if (data.screenshots) {
+                const screenshots = data.screenshots.map(screenshot => new Screenshot({
+                    productId: product._id,
+                    id: screenshot.id,
+                    path_thumbnail: screenshot.path_thumbnail,
+                    path_full: screenshot.path_full
+                }));
+                await Screenshot.insertMany(screenshots);
+                product.screenshots = screenshots.map(s => s._id);
+            }
 
             // Lưu movies
-            const movies = gameData.movies.map(movie => new Movie({
-                game_id: game._id,
-                id: movie.id,
-                name: movie.name,
-                thumbnail: movie.thumbnail,
-                webm: movie.webm,
-                mp4: movie.mp4,
-                highlight: movie.highlight
-            }));
-            await Movie.insertMany(movies);
-            game.movies = movies.map(m => m._id);
+            if (data.movies) {
+                const movies = data.movies.map(movie => new Movie({
+                    productId: product._id,
+                    id: movie.id,
+                    name: movie.name,
+                    thumbnail: movie.thumbnail,
+                    webm: movie.webm,
+                    mp4: movie.mp4,
+                    highlight: movie.highlight
+                }));
+                await Movie.insertMany(movies);
+                product.movies = movies.map(m => m._id);
+            }
 
             // Lưu achievements
-            const achievement = new Achievement({
-                game_id: game._id,
-                total: gameData.achievements.total,
-                highlighted: gameData.achievements.highlighted
-            });
-            await achievement.save();
-            game.achievements = achievement._id;
+            if (data.achievements) {
+                const achievement = new Achievement({
+                    productId: product._id,
+                    total: data.achievements.total,
+                    highlighted: data.achievements.highlighted
+                });
+                await achievement.save();
+                product.achievements = achievement._id;
+            } else {
+                product.achievements = null;
+            }
 
             // Lưu package_groups
-            const packageGroups = gameData.package_groups.map(pg => new PackageGroup({
-                game_id: game._id,
+            const packageGroups = data.package_groups.map(pg => new PackageGroup({
+                productId: product._id,
                 name: pg.name,
                 title: pg.title,
                 description: pg.description,
@@ -77,37 +94,37 @@ class ProductService {
                 subs: pg.subs
             }));
             await PackageGroup.insertMany(packageGroups);
-            game.package_groups = packageGroups.map(pg => pg._id);
+            product.package_groups = packageGroups.map(pg => pg._id);
 
             // Lưu requirements
-            const pcReq = new Requirement({
-                game_id: game._id,
-                type: 'pc',
-                minimum: gameData.pc_requirements.minimum,
-                recommended: gameData.pc_requirements.recommended
-            });
-            await pcReq.save();
-            game.pc_requirements = pcReq._id;
+            const requirements = [
+                {
+                    type: 'pc',
+                    minimum: data.pc_requirements.minimum,
+                    recommended: data.pc_requirements.recommended
+                },
+                {
+                    type: 'mac',
+                    minimum: data.mac_requirements.minimum,
+                    recommended: data.mac_requirements.recommended
+                },
+                {
+                    type: 'linux',
+                    minimum: data.linux_requirements.minimum,
+                    recommended: data.linux_requirements.recommended
+                }
+            ].filter(req => req.minimum || req.recommended);
 
-            const macReq = new Requirement({
-                game_id: game._id,
-                type: 'mac',
-                minimum: gameData.mac_requirements.minimum,
-                recommended: gameData.mac_requirements.recommended
-            });
-            await macReq.save();
-            game.mac_requirements = macReq._id;
+            // Lưu requirements
+            const savedRequirements = await Requirement.insertMany(requirements.map(req => ({
+                productId: product._id,
+                ...req
+            })));
+            product.pc_requirements = savedRequirements.find(req => req.type === 'pc')._id;
+            product.mac_requirements = savedRequirements.find(req => req.type === 'mac')?._id;
+            product.linux_requirements = savedRequirements.find(req => req.type === 'linux')?._id;
 
-            const linuxReq = new Requirement({
-                game_id: game._id,
-                type: 'linux',
-                minimum: gameData.linux_requirements.minimum,
-                recommended: gameData.linux_requirements.recommended
-            });
-            await linuxReq.save();
-            game.linux_requirements = linuxReq._id;
-
-            // Lưu sản phẩm
+            // Cập nhật sản phẩm với các references
             await product.save();
             return product;
 
@@ -127,14 +144,15 @@ class ProductService {
                 const batch = products.slice(i, i + BATCH_SIZE);
 
                 // Thêm sản phẩm vào Database
-                await Promise.all(batch.map(async product => {
+                for (const product of batch) {
                     await this.addProduct(product);
-                }));
+                }
 
                 console.log(`Products added successfully: ${batch.length} products`);
             }
 
         } catch (error) {
+            console.log(error);
             throw error;
         }
     }
