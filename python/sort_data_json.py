@@ -25,6 +25,8 @@ def main(txt_file, json_file, output_file):
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(sorted_data, f, ensure_ascii=False, indent=2)
 
+    print(f"Đã ghi dữ liệu đã sắp xếp vào {output_file}")
+
 if __name__ == '__main__':
     txt_file = 'server/json/data-20250311/logs/success.txt'
     json_file = 'python/json/filtered_data.json'

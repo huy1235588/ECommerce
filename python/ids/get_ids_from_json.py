@@ -54,13 +54,45 @@ def merge_unique_ids(file1, file2, output_file):
     print(f"Unique IDs have been written to {output_file}.")
 
 
+def print_duplicate_title_ids(json_filename):
+    try:
+        with open(json_filename, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"Error reading JSON: {e}")
+        return
+
+    if not isinstance(data, list):
+        print("JSON structure is not an array of objects.")
+        return
+
+    # Group ids by title
+    title_to_ids = {}
+    for obj in data:
+        if isinstance(obj, dict) and "title" in obj and "id" in obj:
+            title = obj["title"]
+            title_to_ids.setdefault(title, []).append(str(obj["id"]))
+
+    # Print ids for duplicate titles
+    duplicates_found = False
+    for title, ids in title_to_ids.items():
+        if len(ids) > 1:
+            duplicates_found = True
+            print(f"Title '{title}' has duplicate ids: {', '.join(ids)}")
+    if not duplicates_found:
+        print("No duplicate titles found.")
+
+
 if __name__ == "__main__":
     # Adjust the file names as needed
-    json_file = "python/json/games_with_score4.json"  # Your JSON file
-    output_file = "python/ids/ids_from_json4.txt"  # Output text file
-    extract_ids(json_file, output_file)
+    # json_file = "python/json/games_with_score4.json"  # Your JSON file
+    # output_file = "python/ids/ids_from_json4.txt"  # Output text file
+    # extract_ids(json_file, output_file)
 
     # txt_file1 = "python/ids/all_game_ids.txt"  # Your first text file
     # txt_file2 = "server/json/data-20250311/logs/success.txt"  # Your second text file
     # output_file = "python/ids/error.txt"  # Output text file
     # merge_unique_ids(txt_file1, txt_file2, output_file)
+
+    json_file = "python/json/games.json"  # Your JSON file
+    print_duplicate_title_ids(json_file)
