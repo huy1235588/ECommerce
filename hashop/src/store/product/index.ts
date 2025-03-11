@@ -78,6 +78,7 @@ export const getProductById = createAsyncThunk<
     {
         fields: string;
         id: number;
+        slice?: string;
     },
     { rejectValue: GraphQLErrorResponse }
 >(
@@ -85,7 +86,8 @@ export const getProductById = createAsyncThunk<
     async (
         {
             fields,
-            id
+            id,
+            slice = null
         },
         { rejectWithValue }
     ) => {
@@ -94,12 +96,12 @@ export const getProductById = createAsyncThunk<
             const response: AxiosResponse<{ data: { product: Product } }> = await axios.post(
                 '/graphql',
                 {
-                    query: `query GetProductById($id: Int!) {
-                        product(id: $id) {
+                    query: `query GetProductById($id: Int!, $slice: String) {
+                        product(id: $id, slice: $slice) {
                             ${fields}
                         }
                     }`,
-                    variables: { id }
+                    variables: { id, slice }
                 }
             );
 

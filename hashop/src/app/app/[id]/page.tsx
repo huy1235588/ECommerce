@@ -20,6 +20,7 @@ import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 import 'swiper/css/thumbs';
+import { convertCurrency } from '@/utils/currencyConverter';
 
 // Khởi tạo product ban đầu
 const initialProduct: Product = {
@@ -120,7 +121,10 @@ function ProductDetailPage() {
                         mac
                         linux
                     }
-                    tags
+                     tags {
+                        id
+                        name
+                    }
                     categories {
                         id
                         description
@@ -141,17 +145,77 @@ function ProductDetailPage() {
                         recommended
                     }
                     supported_languages
+                        achievements {
+                        total
+                        highlighted {
+                            name
+                            path
+                        }
+                    }
+                    package_groups {
+                        name
+                        title
+                        description
+                        selection_text
+                        save_text
+                        display_type
+                        is_recurring_subscription
+                        subs {
+                            packageId
+                            percent_savings_text
+                            percent_savings
+                            option_text
+                            option_description
+                            can_get_free_license
+                            is_free_license
+                            price_in_cents_with_discount
+                        }
+                    }
+                    achievements {
+                        total
+                        highlighted {
+                            name
+                            path
+                        }
+                    }
                 `;
+
+                // Lấy tối đa 5 achievements highlighted
+                const slice = {
+                    achievements: {
+                        highlighted: {
+                            limit: 4
+                        }
+                    }
+                }
 
                 // Gọi action lấy thông tin sản phẩm
                 const resultAction = await dispatch(getProductById({
                     id: Number(id),
-                    fields: fieldProduct
+                    fields: fieldProduct,
+                    slice: JSON.stringify(slice),
                 }));
 
                 // Lấy thông tin sản phẩm thành công
                 if (resultAction.meta.requestStatus === 'fulfilled') {
+                    // Lấy sản phẩm từ kết quả
                     const fetchedProduct = unwrapResult(resultAction);
+
+                    // Chuyển đổi giá tiền cuối cùng sang USD
+                    fetchedProduct.price_overview.final = convertCurrency(
+                        fetchedProduct.price_overview.final / 100,
+                        fetchedProduct.price_overview.currency,
+                        'USD'
+                    );
+
+                    // Chuyển đổi giá tiền gốc sang USD
+                    fetchedProduct.price_overview.initial = convertCurrency(
+                        fetchedProduct.price_overview.initial / 100,
+                        fetchedProduct.price_overview.currency,
+                        'USD'
+                    );
+
+                    // Cập nhật state
                     setProduct(fetchedProduct);
                 }
 
@@ -458,10 +522,10 @@ function ProductDetailPage() {
                     >
                         {product.tags?.map((tag) => (
                             <Grid2
-                                key={tag}
+                                key={tag.id}
                             >
                                 <Chip
-                                    label={tag}
+                                    label={tag.name}
                                     sx={{ backgroundColor: '#1976d2', color: '#fff', '&:hover': { backgroundColor: '#115293' } }}
                                     clickable
                                 />
@@ -552,7 +616,7 @@ function ProductDetailPage() {
                                     color: '#fff',
                                     padding: '8px 12px',
                                 }}>
-                                    990.000đ
+                                    ${product.price_overview.initial.toFixed(2)}
                                 </Typography>
 
                                 {/* Nút thêm vào giỏ hàng */}
@@ -690,24 +754,24 @@ function ProductDetailPage() {
                             Achievements
                         </Typography>
                         <div className='product-achievements-list'>
-                            {/* {product.achievements[0].highlighted.map((achievement, index) => (
+                            {product.achievements?.highlighted.map((achievement, index) => (
                                 <div className='product-achievements-item'
                                     key={index}
                                 >
                                     <Image
-                                        src={achievement.highlighted.path}
-                                        alt={achievement.highlighted.name}
+                                        src={achievement.path}
+                                        alt={achievement.name}
                                         width={64}
                                         height={64}
                                     />
                                 </div>
-                            ))} */}
+                            ))}
 
                             {/* Nút xem thêm */}
-                            {/* <a className='product-achievements-view-all'
+                            <a className='product-achievements-view-all'
                                 href="#">
-                                View all {product.achievements[0].total}
-                            </a> */}
+                                View all {product.achievements?.total}
+                            </a>
                         </div>
                     </div>
                 </Grid2>

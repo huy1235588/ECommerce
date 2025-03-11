@@ -117,7 +117,7 @@ export type Product = {
         id: number,
         description: string
     }[];
-    tags: string[];
+    tags: ProductTags[];
 
 
     release_date: {
@@ -128,7 +128,7 @@ export type Product = {
     screenshots: ProductScreenshot[];
     movies: ProductMovie[];
 
-    achievements?: [Achievement];
+    achievements?: Achievement;
 
     pc_requirements?: Requirement;
     mac_requirements?: Requirement;
@@ -137,6 +137,12 @@ export type Product = {
     created_at?: Dayjs;
     updated_at?: Dayjs;
 };
+
+type ProductTags = {
+    productId: number;
+    id: number;
+    name: string;
+}
 
 type ProductScreenshot = {
     productId: number;
@@ -167,7 +173,7 @@ type Achievement = {
     highlighted: {
         name: string,
         path: string,
-    }
+    }[];
 }
 
 type Requirement = {
