@@ -1,4 +1,4 @@
-const achievementType = `
+const achievementSchema = `
     type Highlighted {
         name: String
         path: String
@@ -9,11 +9,7 @@ const achievementType = `
         total: Int
         highlighted: [Highlighted]
     }
-`;
 
-const achievementSchema = `
-    ${achievementType}
-    
     # Truy vấn
     type Query {
         achievement(productId: Float!): Achievement
@@ -31,7 +27,4 @@ const achievementSchema = `
     }
 `;
 
-module.exports = {
-    achievementSchema,
-    achievementType
-};
+module.exports = achievementSchema;

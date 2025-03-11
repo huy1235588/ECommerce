@@ -1,7 +1,7 @@
-const { achievementType } = require("./achievementSchema");
+const achievementSchema = require("./achievementSchema");
 
 const productSchema = `
-${achievementType}
+${achievementSchema}
 
 type Product {
     _id: ID!
