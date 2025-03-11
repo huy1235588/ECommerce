@@ -133,6 +133,10 @@ const productSchema = new mongoose.Schema(
                 type: String,
             },
         }],
+        // Danh sách tags
+        tags: [{
+            type: String,
+        }],
 
         // Ngày phát hành
         release_date: {

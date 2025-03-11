@@ -35,6 +35,8 @@ type Product {
 
     categories: [Category]
     genres: [Genre]
+    tags: [String]
+
     release_date: ReleaseDate
 
     screenshots: [Screenshot]

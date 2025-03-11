@@ -32,8 +32,10 @@ class ProductService {
                 price_overview: data.price_overview,
                 packages: data.packages,
                 platforms: data.platforms,
+                
                 categories: data.categories,
                 genres: data.genres,
+                tags: data.tags,
 
                 release_date: data.release_date,
             });

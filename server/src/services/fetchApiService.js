@@ -8,10 +8,12 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 class FetchApiService {
     // Đường dẫn API
     url = 'https://store.steampowered.com/api/appdetails';
+    urlTags = 'https://steamspy.com/api.php?request=appdetails&appid=';
 
     // Thời gian chờ giữa các lần gọi API
     delay = 1000;
 
+    // Hàm gọi API để lấy dữ liệu từ Steam
     fetchApi = async (id) => {
         try {
             // Gọi API để lấy dữ liệu
@@ -76,12 +78,32 @@ class FetchApiService {
         }
     }
 
+    // Hàm gọi API để lấy dữ liệu từ SteamSpy
+    fetchTags = async (id) => {
+        try {
+            // Gọi API để lấy dữ liệu
+            const response = await axios.get(`${this.urlTags}${id}`);
+
+            // Lấy dữ liệu từ phần data
+            const gameData = response.data;
+
+            return gameData.tags;
+
+        } catch (error) {
+            console.error(`Error fetching tags for id ${id}:`, error);
+            throw error;
+        }
+    }
+
     // Hàm gọi API để lấy dữ liệu từ Steam
     fetchById = async (id) => {
         console.log(`Fetching data for id ${id}...`);
 
         // Lấy dữ liệu từ API
         const data = await this.fetchApi(id);
+
+        // Lấy dữ liệu tags từ API
+        data.tags = await this.fetchTags(id);
 
         // Thêm dữ liệu vào file JSON
         addDataToJson('json/data.json', data);
@@ -101,6 +123,9 @@ class FetchApiService {
 
                 // Lấy dữ liệu từ API
                 const data = await this.fetchApi(id);
+
+                // Lấy dữ liệu tags từ API
+                data.tags = await this.fetchTags(id);
 
                 // Thêm dữ liệu vào file JSON
                 addDataToJson(`json/${jsonId}/data.json`, data, id);
