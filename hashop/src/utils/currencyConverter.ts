@@ -11,6 +11,7 @@ const conversionRates: { [currency: string]: number } = {
     VND: 23000,  // Vietnamese Dong
     CAD: 1.4463,   // Canadian Dollar
     KRW: 1451.73 , // South Korean Wons
+    SGD: 1.35,   // Singapore Dollar
 };
 
 /**

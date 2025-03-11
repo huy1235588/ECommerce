@@ -117,7 +117,7 @@ function GameCard({
                         color: isHovered ? '#263645' : '#BEEE11'
                     }}
                 >
-                    {game.price_overview.discount_percent && (
+                    {game.price_overview.discount_percent ? (
                         <Typography
                             variant="body2"
                             sx={{
@@ -132,10 +132,10 @@ function GameCard({
                         >
                             -{game.price_overview.discount_percent}%
                         </Typography>
-                    )}
+                    ) : null}
 
                     {/* Giá gốc */}
-                    {game.price_overview.discount_percent && (
+                    {game.price_overview.discount_percent ? (
                         <span
                             style={{
                                 textDecoration: 'line-through',
@@ -143,15 +143,21 @@ function GameCard({
                                 marginRight: '8px'
                             }}
                         >
-                            ${game.price_overview.initial}
+                            {game.price_overview.initial != null
+                                ? `$${game.price_overview.initial.toFixed(2)}`
+                                : 'Free'
+                            }
                         </span>
-                    )}
+                    ) : null}
 
                     {/* Giá bán */}
                     <span style={{
                         color: isHovered ? '#263645' : game.price_overview.discount_percent ? '#BEEE11' : '#A0A0A0',
                     }}>
-                        ${game.price_overview.discount_percent || game.price_overview.initial}
+                        {game.price_overview.final != null
+                            ? `$${game.price_overview.final.toFixed(2)}`
+                            : 'Free'
+                        }
                     </span>
                 </Typography>
 
@@ -164,7 +170,7 @@ function GameCard({
                         maxWidth: '100%',
                     }}
                 >
-                    {/* {game.tags && game.tags?.map((tag, index) => (
+                    {game.tags && game.tags?.map((tag, index) => (
                         <Typography
                             key={index}
                             variant="body2"
@@ -178,10 +184,10 @@ function GameCard({
                                 color: isHovered ? '#263645' : '#738895',
                             }}
                         >
-                            {tag}
+                            {tag.name}
                             {index < game.tags!.length - 1 && ','}
                         </Typography>
-                    ))} */}
+                    ))}
                 </Box>
 
             </CardContent>

@@ -11,6 +11,7 @@ import { paginatedProducts } from "@/store/product";
 import { AppDispatch } from "@/store/store";
 import "@/styles/home.css?v=1";
 import { Product } from "@/types/product";
+import { convertCurrency } from "@/utils/currencyConverter";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -25,7 +26,7 @@ export default function Home() {
 
         // Hàm lấy danh sách sản phẩm
         const getProducts = async () => {
-            try {                
+            try {
                 // Các trường cần lấy
                 const field: string = `
                     _id
@@ -34,6 +35,7 @@ export default function Home() {
                         initial
                         final
                         discount_percent
+                        currency
                     }
                     release_date {
                         date
@@ -47,6 +49,9 @@ export default function Home() {
                         windows
                         mac
                         linux
+                    }
+                    tags {
+                        name
                     }
                 `
 
@@ -63,7 +68,7 @@ export default function Home() {
 
                 // Lấy danh sách sản phẩm
                 const resultAction = await dispatch(paginatedProducts({
-                    page: 10,
+                    page: 1,
                     limit: 7,
                     fields: field,
                     slice: JSON.stringify(slice),
@@ -71,8 +76,29 @@ export default function Home() {
 
                 // Lấy danh sách sản phẩm thành công
                 if (resultAction.meta.requestStatus === "fulfilled") {
-                    const products = unwrapResult(resultAction).data.paginatedProducts.products;
-                    setSampleGames(products);
+                    const fetchedProduct = unwrapResult(resultAction).data.paginatedProducts.products;
+
+                    // Chuyển đổi giá tiền cuối cùng sang USD
+                    fetchedProduct.forEach((product) => {
+                        if (product.price_overview && product.price_overview.currency) {
+                            // Chuyển đổi giá tiền cuối cùng sang USD
+                            product.price_overview.final = convertCurrency(
+                                product.price_overview.final / 100,
+                                product.price_overview.currency,
+                                'USD'
+                            );
+
+                            // Chuyển đổi giá tiền gốc sang USD
+                            product.price_overview.initial = convertCurrency(
+                                product.price_overview.initial / 100,
+                                product.price_overview.currency,
+                                'USD'
+                            );
+                        }
+                    });
+
+                    // Lưu danh sách sản phẩm vào state
+                    setSampleGames(fetchedProduct);
                 }
 
             } catch (error) {

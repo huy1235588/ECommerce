@@ -119,7 +119,6 @@ export type Product = {
     }[];
     tags: ProductTags[];
 
-
     release_date: {
         coming_soon: boolean,
         date: Dayjs

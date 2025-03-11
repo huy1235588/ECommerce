@@ -17,7 +17,7 @@ function GameDetails({ game }: GameDetailsProps) {
         >
             {/* Tên game */}
             <Typography
-                variant="h5"
+                variant="h4"
                 sx={{
                     color: '#10161b',
                     overflow: 'hidden',
@@ -54,7 +54,7 @@ function GameDetails({ game }: GameDetailsProps) {
                     overflow: 'hidden',
                 }}
             >
-                {/* {game.tags?.map((tag, index) => (
+                {game.tags?.map((tag, index) => (
                     <Typography
                         key={index}
                         variant="body2"
@@ -69,9 +69,9 @@ function GameDetails({ game }: GameDetailsProps) {
                             whiteSpace: 'nowrap',
                         }}
                     >
-                        {tag}
+                        {tag.name}
                     </Typography>
-                ))} */}
+                ))}
             </Box>
 
             {/* Hình ảnh */}

@@ -28,7 +28,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
             <nav className="home-nav">
                 <ul className="home-menu">
                     <li>
-                        <a href="/shop/home" className="logo">
+                        <a href="/" className="logo">
                             <Image
                                 src="/logo/logo.png"
                                 width={64}
@@ -40,7 +40,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
                     </li>
 
                     <li>
-                        <a href="/shop/home" className={`default ${active === "home" ? "active" : ""}`}>
+                        <a href="/" className={`default ${active === "home" ? "active" : ""}`}>
                             <span>STORE</span>
                             <FaAngleDown />
                         </a>
