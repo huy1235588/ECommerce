@@ -3,17 +3,13 @@ import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import './style.css';
 import dayjs from 'dayjs';
 import Image from 'next/image';
-import 'swiper/css';
-import 'swiper/css/free-mode';
-import 'swiper/css/navigation';
-import 'swiper/css/scrollbar';
-import 'swiper/css/thumbs';
 import { convertCurrency } from '@/utils/currencyConverter';
 import HighlightPlayer from '@/components/app/hightlighPlayer';
 import axios from "@/config/axios";
 import axiosLib from "axios";
 import { headers } from 'next/headers';
 import AreaDescription from '@/components/app/areaDescription';
+import { use } from 'react';
 
 // Khởi tạo product ban đầu
 const initialProduct: Product = {
@@ -54,176 +50,180 @@ interface Language {
     subtitles: boolean;
 }
 
-async function ProductDetailPage() {
-    const headersList = await headers();
-    const pathname = headersList.get('referer');
+// Hàm lấy thông tin sản phẩm
+const getProduct = async () => {
+    try {
+        // Lấy headers
+        const headersList = await headers();
+        const pathname = headersList.get('referer');
 
-    // Lấy id sản phẩm từ url
-    const id = pathname?.split('/').pop();
+        // Lấy id sản phẩm từ url
+        const id = pathname?.split('/').pop();
 
-    // Khai báo state
-    let product: Product = initialProduct;
-
-    // Hàm lấy thông tin sản phẩm
-    const getProduct = async () => {
-        try {
-            // Các field cần lấy
-            const fieldProduct = `
-                     _id
+        // Các field cần lấy
+        const fieldProduct = `
+                 _id
+                name
+                short_description
+                detailed_description
+                about_the_game
+                price_overview {
+                    initial
+                    final
+                    discount_percent
+                    currency
+                }
+                release_date {
+                    date
+                }
+                developers
+                publishers
+                header_image
+                screenshots {
+                    path_thumbnail
+                }
+                movies {
+                    thumbnail
+                    mp4 {
+                        _480
+                        max
+                    }
+                    webm {
+                        _480
+                        max
+                    }
+                }
+                platform {
+                    windows
+                    mac
+                    linux
+                }
+                 tags {
+                    id
                     name
-                    short_description
-                    detailed_description
-                    about_the_game
-                    price_overview {
-                        initial
-                        final
-                        discount_percent
-                        currency
-                    }
-                    release_date {
-                        date
-                    }
-                    developers
-                    publishers
-                    header_image
-                    screenshots {
-                        path_thumbnail
-                    }
-                    movies {
-                        thumbnail
-                        mp4 {
-                            _480
-                            max
-                        }
-                        webm {
-                            _480
-                            max
-                        }
-                    }
-                    platform {
-                        windows
-                        mac
-                        linux
-                    }
-                     tags {
-                        id
-                        name
-                    }
-                    categories {
-                        id
-                        description
-                    }
-                    pc_requirements {
-                        type
-                        minimum
-                        recommended
-                    }
-                    mac_requirements {
-                        type
-                        minimum
-                        recommended
-                    }
-                    linux_requirements {
-                        type
-                        minimum
-                        recommended
-                    }
-                    supported_languages
-                        achievements {
-                        total
-                        highlighted {
-                            name
-                            path
-                        }
-                    }
-                    package_groups {
-                        name
-                        title
-                        description
-                        selection_text
-                        save_text
-                        display_type
-                        is_recurring_subscription
-                        subs {
-                            packageId
-                            percent_savings_text
-                            percent_savings
-                            option_text
-                            option_description
-                            can_get_free_license
-                            is_free_license
-                            price_in_cents_with_discount
-                        }
-                    }
+                }
+                categories {
+                    id
+                    description
+                }
+                pc_requirements {
+                    type
+                    minimum
+                    recommended
+                }
+                mac_requirements {
+                    type
+                    minimum
+                    recommended
+                }
+                linux_requirements {
+                    type
+                    minimum
+                    recommended
+                }
+                supported_languages
                     achievements {
-                        total
-                        highlighted {
-                            name
-                            path
-                        }
-                    }
-                `;
-
-            // Lấy tối đa 5 achievements highlighted
-            const slice = {
-                achievements: {
-                    highlighted: {
-                        limit: 4
+                    total
+                    highlighted {
+                        name
+                        path
                     }
                 }
-            }
-
-            // Gửi request lên server
-            const response = await axios.post(
-                '/graphql',
-                {
-                    query: `query GetProductById($id: Int!, $slice: String) {
-                                   product(id: $id, slice: $slice) {
-                                       ${fieldProduct}
-                                   }
-                               }`,
-                    variables: {
-                        id: parseInt(id as string),
-                        slice: JSON.stringify(slice),
+                package_groups {
+                    name
+                    title
+                    description
+                    selection_text
+                    save_text
+                    display_type
+                    is_recurring_subscription
+                    subs {
+                        packageId
+                        percent_savings_text
+                        percent_savings
+                        option_text
+                        option_description
+                        can_get_free_license
+                        is_free_license
+                        price_in_cents_with_discount
                     }
                 }
-            );
+                achievements {
+                    total
+                    highlighted {
+                        name
+                        path
+                    }
+                }
+            `;
 
-            // Lấy sản phẩm từ kết quả
-            const fetchedProduct = response.data.data.product;
-
-            // Chuyển đổi giá tiền cuối cùng sang USD
-            fetchedProduct.price_overview.final = convertCurrency(
-                fetchedProduct.price_overview.final / 100,
-                fetchedProduct.price_overview.currency,
-                'USD'
-            );
-
-            // Chuyển đổi giá tiền gốc sang USD
-            fetchedProduct.price_overview.initial = convertCurrency(
-                fetchedProduct.price_overview.initial / 100,
-                fetchedProduct.price_overview.currency,
-                'USD'
-            );
-
-            // Cập nhật state
-            product = fetchedProduct;
-
-        } catch (error) {
-            if (axiosLib.isAxiosError(error) && error.response) {
-                // Xử lý lỗi GraphQL
-                if (error.response?.data?.errors) {
-                    console.log({
-                        message: error.response.data.message,
-                        errors: error.response.data.errors
-                    });
+        // Lấy tối đa 5 achievements highlighted
+        const slice = {
+            achievements: {
+                highlighted: {
+                    limit: 4
                 }
             }
         }
-    };
+
+        // Gửi request lên server
+        const response = await axios.post(
+            '/graphql',
+            {
+                query: `query GetProductById($id: Int!, $slice: String) {
+                               product(id: $id, slice: $slice) {
+                                   ${fieldProduct}
+                               }
+                           }`,
+                variables: {
+                    id: parseInt(id as string),
+                    slice: JSON.stringify(slice),
+                }
+            }
+        );
+
+        // Lấy sản phẩm từ kết quả
+        const fetchedProducts = await response.data.data.product;
+
+        if (fetchedProducts.price_overview && fetchedProducts.price_overview.currency) {
+            if (fetchedProducts.price_overview.final !== null) {
+                // Chuyển đổi giá tiền cuối cùng sang USD
+                fetchedProducts.price_overview.final = convertCurrency(
+                    fetchedProducts.price_overview.final / 100,
+                    fetchedProducts.price_overview.currency,
+                    'USD'
+                );
+            }
+
+            // Chuyển đổi giá tiền gốc sang USD
+            fetchedProducts.price_overview.initial = convertCurrency(
+                fetchedProducts.price_overview.initial / 100,
+                fetchedProducts.price_overview.currency,
+                'USD'
+            );
+        }
+
+        return fetchedProducts;
+
+    } catch (error) {
+        if (axiosLib.isAxiosError(error) && error.response) {
+            // Xử lý lỗi GraphQL
+            if (error.response?.data?.errors) {
+                console.log({
+                    message: error.response.data.message,
+                    errors: error.response.data.errors
+                });
+            }
+        }
+    }
+};
+
+function ProductDetailPage() {
+    // Khai báo state
+    let product: Product = initialProduct;
 
     // Gọi hàm lấy thông tin sản phẩm
-    await getProduct();
+    product = use(getProduct());
 
     // Parse ngôn ngữ hỗ trợ
     const parseSupportedLanguages = (supportedLanguages: string): Language[] => {
@@ -414,13 +414,76 @@ async function ProductDetailPage() {
                                 height: '36px',
                                 verticalAlign: 'bottom',
                             }}>
-                                {/* Giá tiền */}
-                                <Typography variant="body1" sx={{
-                                    color: '#fff',
-                                    padding: '8px 12px',
-                                }}>
-                                    ${product.price_overview.initial.toFixed(2)}
-                                </Typography>
+                                {product.price_overview.discount_percent ? (
+                                    <>
+                                        {/* Nhãn giảm giá */}
+                                        <Typography
+                                            variant="body2"
+                                            sx={{
+                                                backgroundColor: '#4c6b22', // Nền vàng cho nhãn giảm giá
+                                                color: '#BEEE11', // Chữ đen
+                                                height: '36px',
+                                                padding: '0 6px',
+                                                borderRadius: '4px',
+                                                display: 'inline-block',
+                                                marginRight: '8px',
+                                                fontWeight: 'bold',
+                                                fontSize: '25px',
+                                            }}
+                                        >
+                                            -{product.price_overview.discount_percent}%
+                                        </Typography>
+
+                                        {/* Giá tiền */}
+                                        <Box
+                                            sx={{
+                                                position: 'relative',
+                                            }}
+                                        >
+                                            {/* Giá gốc */}
+                                            <span
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: '2px',
+                                                    left: 'auto',
+                                                    right: '4px',
+                                                    textDecoration: 'line-through',
+                                                    color: '#A0A0A0',
+                                                    marginRight: '8px',
+                                                    fontSize: '12px',
+                                                }}
+                                            >
+                                                {product.price_overview.initial != null
+                                                    ? `$${product.price_overview.initial.toFixed(2)}`
+                                                    : 'Free'
+                                                }
+                                            </span>
+
+                                            {/* Giá bán */}
+                                            <Typography variant="body1" sx={{
+                                                padding: '16px 10px 4px 6px',
+                                                lineHeight: '18px',
+                                                fontSize: '16px',
+                                                color: '#BEEE11',
+                                            }}>
+                                                {product.price_overview.final != null
+                                                    ? `$${product.price_overview.final.toFixed(2)}`
+                                                    : 'Free'
+                                                }
+                                            </Typography>
+                                        </Box>
+                                    </>
+                                ) : (
+                                    < Typography variant="body1" sx={{
+                                        color: '#fff',
+                                        padding: '8px 12px',
+                                    }}>
+                                        {product.price_overview.final != null
+                                            ? `$${product.price_overview.final.toFixed(2)}`
+                                            : 'Free'
+                                        }
+                                    </Typography>
+                                )}
 
                                 {/* Nút thêm vào giỏ hàng */}
                                 <Button variant="contained" color="success">

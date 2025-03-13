@@ -8,7 +8,7 @@ function HomeAside() {
     return (
         <div className="video-container">
             <video
-                src={videoUrl}
+                src={videoUrl || "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"}
                 loop
                 muted
                 playsInline

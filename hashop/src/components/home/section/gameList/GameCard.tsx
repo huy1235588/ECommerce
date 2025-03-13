@@ -111,7 +111,7 @@ function GameCard({
                 }
 
                 {/* Giá tiền */}
-                <Typography variant="body1"
+                <Box
                     sx={{
                         marginTop: '8px',
                         color: isHovered ? '#263645' : '#BEEE11'
@@ -159,7 +159,7 @@ function GameCard({
                             : 'Free'
                         }
                     </span>
-                </Typography>
+                </Box>
 
                 {/* Tags */}
                 <Box

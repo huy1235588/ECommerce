@@ -8,7 +8,11 @@ import { GridCheckIcon } from "@mui/x-data-grid";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from 'swiper';
 import { FreeMode, Navigation, Scrollbar, Thumbs } from 'swiper/modules';
-
+import 'swiper/css';
+import 'swiper/css/free-mode';
+import 'swiper/css/navigation';
+import 'swiper/css/scrollbar';
+import 'swiper/css/thumbs';
 interface HighlightPlayerProps {
     screenshots: ProductScreenshot[];
     movies: ProductMovie[];
