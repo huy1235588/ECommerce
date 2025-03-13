@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+'use client'
+
+import React, { useEffect, useState } from 'react';
 import { Grid2 } from '@mui/material';
 import { Product } from '@/types/product';
 import GameCard from './GameCard';
@@ -10,6 +12,10 @@ interface GameListProps {
 
 function GameList({ games }: GameListProps) {
     const [hoveredGame, setHoveredGame] = useState<Product | null>(games[0]);
+
+    useEffect(() => {
+        setHoveredGame(games[0]);
+    }, [games]);
 
     return (
         <section

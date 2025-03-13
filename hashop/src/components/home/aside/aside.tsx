@@ -1,28 +1,18 @@
-import { useEffect, useRef } from "react";
+// import { useRef } from "react";
 
 function HomeAside() {
-
-    const videoRef = useRef<HTMLVideoElement | null>(null);
+    // const videoRef = useRef<HTMLVideoElement | null>(null);
 
     const videoUrl = "/video/aside/aside.mp4";
-
-    useEffect(() => {
-        const video = videoRef.current;
-        if (video) {
-            // Đảm bảo video tự động phát khi trang tải
-            video.play().catch((error) => {
-                console.error("Autoplay bị chặn:", error);
-            });
-        }
-    }, []);
 
     return (
         <div className="video-container">
             <video
-                ref={videoRef}
+                src={videoUrl}
                 loop
                 muted
                 playsInline
+                autoPlay
                 preload="none"
                 className="bg-video"
             >

@@ -1,115 +1,143 @@
-'use client'
-
 import HomeAside from "@/components/home/aside/aside";
 import HomeHeader from "@/components/home/header";
 import NavigationBar from "@/components/home/navigation/navigationBar";
-import DiscoverSection from "@/components/home/section/discover/discoverSection";
 import GameList from "@/components/home/section/gameList/GameListSession";
-import ReleasesSection from "@/components/home/section/release/releaseSection";
-import { checkAuthUser } from "@/store/auth";
-import { paginatedProducts } from "@/store/product";
-import { AppDispatch } from "@/store/store";
 import "@/styles/home.css?v=1";
 import { Product } from "@/types/product";
 import { convertCurrency } from "@/utils/currencyConverter";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import axios from "@/config/axios";
+import axiosLib from "axios";
 
 
-export default function Home() {
-    const dispatch = useDispatch<AppDispatch>();
-    const [sampleGames, setSampleGames] = useState<Product[]>([]);
+export default async function Home() {
+    let sampleGames: Product[] = [];
 
-    useEffect(() => {
-        dispatch(checkAuthUser());
-
-        // Hàm lấy danh sách sản phẩm
-        const getProducts = async () => {
-            try {
-                // Các trường cần lấy
-                const field: string = `
-                    _id
+    // Hàm lấy danh sách sản phẩm
+    const getProducts = async () => {
+        try {
+            // Các trường cần lấy
+            const fields: string = `
+                _id
+                name
+                price_overview {
+                    initial
+                    final
+                    discount_percent
+                    currency
+                }
+                release_date {
+                    date
+                }
+                header_image
+                short_description
+                screenshots {
+                    path_thumbnail
+                }
+                platform {
+                    windows
+                    mac
+                    linux
+                }
+                tags {
                     name
-                    price_overview {
-                        initial
-                        final
-                        discount_percent
-                        currency
-                    }
-                    release_date {
-                        date
-                    }
-                    header_image
-                    short_description
-                    screenshots {
-                        path_thumbnail
-                    }
-                    platform {
-                        windows
-                        mac
-                        linux
-                    }
-                    tags {
-                        name
-                    }
-                `
-
-                const slice = {
-                    // Lấy 3 screenshot đầu tiên
-                    screenshots: {
-                        $slice: 6
-                    },
-                    // Lấy 6 tag đầu tiên
-                    tags: {
-                        $slice: 5
-                    }
                 }
+            `
 
-                // Lấy danh sách sản phẩm
-                const resultAction = await dispatch(paginatedProducts({
-                    page: 1,
-                    limit: 7,
-                    fields: field,
-                    slice: JSON.stringify(slice),
-                }));
-
-                // Lấy danh sách sản phẩm thành công
-                if (resultAction.meta.requestStatus === "fulfilled") {
-                    const fetchedProduct = unwrapResult(resultAction).data.paginatedProducts.products;
-
-                    // Chuyển đổi giá tiền cuối cùng sang USD
-                    fetchedProduct.forEach((product) => {
-                        if (product.price_overview && product.price_overview.currency) {
-                            // Chuyển đổi giá tiền cuối cùng sang USD
-                            product.price_overview.final = convertCurrency(
-                                product.price_overview.final / 100,
-                                product.price_overview.currency,
-                                'USD'
-                            );
-
-                            // Chuyển đổi giá tiền gốc sang USD
-                            product.price_overview.initial = convertCurrency(
-                                product.price_overview.initial / 100,
-                                product.price_overview.currency,
-                                'USD'
-                            );
-                        }
-                    });
-
-                    // Lưu danh sách sản phẩm vào state
-                    setSampleGames(fetchedProduct);
+            // Cắt lấy 3 screenshot đầu tiên và 6 tag đầu tiên
+            const slice = {
+                // Lấy 3 screenshot đầu tiên
+                screenshots: {
+                    $slice: 6
+                },
+                // Lấy 6 tag đầu tiên
+                tags: {
+                    $slice: 5
                 }
-
-            } catch (error) {
-                console.log(error);
             }
+
+            const page = 1;
+            const limit = 7;
+            const sortColumn = null;
+            const sortOrder = null;
+            const query = null;
+
+            const response = await axios.post(
+                '/graphql',
+                {
+                    query: `query PaginatedProducts(
+                        $page: Int!
+                        $limit: Int!
+                        $sortColumn: String
+                        $sortOrder: String
+                        $query: String
+                        $slice: String
+                    ) {
+                        paginatedProducts(
+                            page: $page
+                            limit: $limit
+                            sortColumn: $sortColumn
+                            sortOrder: $sortOrder
+                            query: $query
+                            slice: $slice
+                        ) {
+                            products {
+                                ${fields}
+                            }
+                            totalProducts
+                        }
+                    }`,
+                    variables: {
+                        page,
+                        limit,
+                        sortColumn: sortColumn || null,
+                        sortDirection: sortOrder || null,
+                        query: query || null,
+                        slice: JSON.stringify(slice)
+                    }
+                }
+            );
+
+            const fetchedProduct = response.data.data.paginatedProducts.products;
+
+            // Chuyển đổi giá tiền cuối cùng sang USD
+            fetchedProduct.forEach((product: Product) => {
+                if (product.price_overview && product.price_overview.currency) {
+                    // Chuyển đổi giá tiền cuối cùng sang USD
+                    product.price_overview.final = convertCurrency(
+                        product.price_overview.final / 100,
+                        product.price_overview.currency,
+                        'USD'
+                    );
+
+                    // Chuyển đổi giá tiền gốc sang USD
+                    product.price_overview.initial = convertCurrency(
+                        product.price_overview.initial / 100,
+                        product.price_overview.currency,
+                        'USD'
+                    );
+                }
+            });
+
+            // Lưu danh sách sản phẩm
+            sampleGames = fetchedProduct;
+
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                // Xử lý lỗi GraphQL
+                if (error.response?.data?.errors) {
+                    console.log({
+                        message: error.response.data.message,
+                        errors: error.response.data.errors
+                    });
+                }
+            }
+
+            console.log(error);
         }
-        // Lấy danh sách sản phẩm
-        getProducts();
+    }
 
-    }, [dispatch]);
-
+    // Lấy danh sách sản phẩm
+   await getProducts();
 
     return (
         <div className="root">
@@ -126,10 +154,10 @@ export default function Home() {
 
             <main>
                 {/* Discover Section */}
-                <DiscoverSection />
+                {/* <DiscoverSection /> */}
 
                 {/* Release Section */}
-                <ReleasesSection />
+                {/* <ReleasesSection /> */}
 
                 {/* Game list Session */}
                 <GameList
