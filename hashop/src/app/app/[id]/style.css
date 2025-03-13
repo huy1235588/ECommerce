@@ -54,6 +54,7 @@
 .product-detail-auto-collapse {
     max-height: none;
     overflow: hidden;
+    margin-top: 30px;
     transition: max-height 0.3s ease;
 }
 
@@ -72,7 +73,8 @@
     font-weight: normal;
 }
 
-.product-detail-area h2 {
+.product-detail-area h2,
+.product-detail-area h1 {
     background-image: url(https://store.fastly.steamstatic.com/public/images/v6/maincol_gradient_rule.png);
     background-repeat: no-repeat;
     background-position: bottom left;
@@ -80,7 +82,7 @@
 
     text-transform: uppercase;
     color: #fff;
-    margin: 0 0 10px;
+    margin-bottom: 20px;
     letter-spacing: 0.03em;
     font-weight: normal;
     padding-top: 2px;

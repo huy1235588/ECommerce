@@ -1,26 +1,19 @@
-'use client'
-
-import { getProductById } from '@/store/product';
-import { AppDispatch } from '@/store/store';
 import { Product } from '@/types/product';
 import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
-import { unwrapResult } from '@reduxjs/toolkit';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, useMemo, useRef } from 'react';
-import { useDispatch } from 'react-redux';
 import './style.css';
-import { GridCheckIcon } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
 import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import type { Swiper as SwiperType } from 'swiper';
-import { FreeMode, Navigation, Scrollbar, Thumbs } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 import 'swiper/css/thumbs';
 import { convertCurrency } from '@/utils/currencyConverter';
+import HighlightPlayer from '@/components/app/hightlighPlayer';
+import axios from "@/config/axios";
+import axiosLib from "axios";
+import { headers } from 'next/headers';
+import AreaDescription from '@/components/app/areaDescription';
 
 // Khởi tạo product ban đầu
 const initialProduct: Product = {
@@ -61,30 +54,21 @@ interface Language {
     subtitles: boolean;
 }
 
-function ProductDetailPage() {
-    const router = useRouter();
-    const pathname = usePathname()
-    const dispatch = useDispatch<AppDispatch>();
+async function ProductDetailPage() {
+    const headersList = await headers();
+    const pathname = headersList.get('referer');
+
+    // Lấy id sản phẩm từ url
+    const id = pathname?.split('/').pop();
 
     // Khai báo state
-    const [product, setProduct] = useState<Product>(initialProduct); // Sản phẩm
+    let product: Product = initialProduct;
 
-    // Swiper
-    const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null); // Swiper thumbnail
-    const [mainSwiper, setMainSwiper] = useState<SwiperType | null>(null); // Swiper chính
-    const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0); // Index của slide hiện tại
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-    // Lấy thông tin sản phẩm khi component được render
-    useEffect(() => {
-        // Hàm lấy thông tin sản phẩm
-        const getProduct = async () => {
-            try {
-                // Lấy id sản phẩm từ url
-                const id = pathname.split('/').pop();
-
-                // Các field cần lấy
-                const fieldProduct = `
+    // Hàm lấy thông tin sản phẩm
+    const getProduct = async () => {
+        try {
+            // Các field cần lấy
+            const fieldProduct = `
                      _id
                     name
                     short_description
@@ -180,106 +164,66 @@ function ProductDetailPage() {
                     }
                 `;
 
-                // Lấy tối đa 5 achievements highlighted
-                const slice = {
-                    achievements: {
-                        highlighted: {
-                            limit: 4
-                        }
+            // Lấy tối đa 5 achievements highlighted
+            const slice = {
+                achievements: {
+                    highlighted: {
+                        limit: 4
                     }
                 }
-
-                // Gọi action lấy thông tin sản phẩm
-                const resultAction = await dispatch(getProductById({
-                    id: Number(id),
-                    fields: fieldProduct,
-                    slice: JSON.stringify(slice),
-                }));
-
-                // Lấy thông tin sản phẩm thành công
-                if (resultAction.meta.requestStatus === 'fulfilled') {
-                    // Lấy sản phẩm từ kết quả
-                    const fetchedProduct = unwrapResult(resultAction);
-
-                    // Chuyển đổi giá tiền cuối cùng sang USD
-                    fetchedProduct.price_overview.final = convertCurrency(
-                        fetchedProduct.price_overview.final / 100,
-                        fetchedProduct.price_overview.currency,
-                        'USD'
-                    );
-
-                    // Chuyển đổi giá tiền gốc sang USD
-                    fetchedProduct.price_overview.initial = convertCurrency(
-                        fetchedProduct.price_overview.initial / 100,
-                        fetchedProduct.price_overview.currency,
-                        'USD'
-                    );
-
-                    // Cập nhật state
-                    setProduct(fetchedProduct);
-                }
-
-            } catch (error) {
-                console.error('Lỗi lấy thông tin sản phẩm:', error);
             }
-        };
 
-        // Gọi hàm lấy thông tin sản phẩm
-        getProduct();
+            // Gửi request lên server
+            const response = await axios.post(
+                '/graphql',
+                {
+                    query: `query GetProductById($id: Int!, $slice: String) {
+                                   product(id: $id, slice: $slice) {
+                                       ${fieldProduct}
+                                   }
+                               }`,
+                    variables: {
+                        id: parseInt(id as string),
+                        slice: JSON.stringify(slice),
+                    }
+                }
+            );
 
-        // Nếu không có sản phẩm chuyển về trang chủ
-        if (!product) {
-            router.push('/');
-        }
+            // Lấy sản phẩm từ kết quả
+            const fetchedProduct = response.data.data.product;
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+            // Chuyển đổi giá tiền cuối cùng sang USD
+            fetchedProduct.price_overview.final = convertCurrency(
+                fetchedProduct.price_overview.final / 100,
+                fetchedProduct.price_overview.currency,
+                'USD'
+            );
 
-    // Media
-    const mediaItems = useMemo(() => [
-        ...product.movies.map(video => ({ type: 'video', src: video.mp4.max })),
-        ...product.screenshots.map(screenshot => ({ type: 'image', src: screenshot.path_thumbnail }))
-    ], [product.movies, product.screenshots]);
+            // Chuyển đổi giá tiền gốc sang USD
+            fetchedProduct.price_overview.initial = convertCurrency(
+                fetchedProduct.price_overview.initial / 100,
+                fetchedProduct.price_overview.currency,
+                'USD'
+            );
 
-    // Thumbs
-    const thumbItems = [
-        ...product.movies.map(video => ({
-            type: 'video',
-            src: video.mp4,
-            thumbnail: video.thumbnail
-        })),
-        ...product.screenshots.map(screenshot => ({
-            type: 'image',
-            src: screenshot.path_full,
-            thumbnail: screenshot.path_thumbnail
-        }))
-    ];
+            // Cập nhật state
+            product = fetchedProduct;
 
-    // Xử lý khi video kết thúc
-    const handleVideoEnded = () => {
-        if (mainSwiper) {
-            mainSwiper.slideNext();
+        } catch (error) {
+            if (axiosLib.isAxiosError(error) && error.response) {
+                // Xử lý lỗi GraphQL
+                if (error.response?.data?.errors) {
+                    console.log({
+                        message: error.response.data.message,
+                        errors: error.response.data.errors
+                    });
+                }
+            }
         }
     };
 
-    // Xử lý tự động chuyển slide cho hình ảnh (8s) khi slide thay đổi
-    useEffect(() => {
-        // Xóa timer cũ nếu có
-        if (timerRef.current) clearTimeout(timerRef.current);
-
-        // Nếu slide hiện tại là hình ảnh và swiper chính đã sẵn sàng
-        if (mediaItems[currentSlideIndex]?.type === 'image' && mainSwiper) {
-            // Tạo timer mới
-            timerRef.current = setTimeout(() => {
-                mainSwiper.slideNext();
-            }, 8000);
-        }
-
-        // Dọn dẹp timer khi component unmount hoặc currentSlideIndex thay đổi
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
-    }, [currentSlideIndex, mainSwiper, mediaItems]);
+    // Gọi hàm lấy thông tin sản phẩm
+    await getProduct();
 
     // Parse ngôn ngữ hỗ trợ
     const parseSupportedLanguages = (supportedLanguages: string): Language[] => {
@@ -322,151 +266,10 @@ function ProductDetailPage() {
             {/* Nội dung trang */}
             <Grid2 container spacing={2}>
                 {/* Cột trái */}
-                <Grid2
-                    size={{
-                        xs: 12,
-                        md: 8,
-                    }}
-                    sx={{
-                        position: 'relative',
-                    }}
-                >
-                    {/* Player chính */}
-                    <Swiper
-                        onSwiper={(swiper) => {
-                            setMainSwiper(swiper);
-                        }}
-                        onSlideChange={(swiper) => {
-                            setCurrentSlideIndex(swiper.activeIndex);
-                        }}
-                        freeMode={false}
-                        navigation
-                        rewind={true}
-                        thumbs={{ swiper: thumbsSwiper }}
-                        className="main-player-swiper"
-                        style={{
-                            position: 'unset',
-                            width: '747px',
-                            height: '395px',
-                            backgroundColor: '#000'
-                        }}
-                        modules={[Navigation, Thumbs]}
-                    >
-                        {mediaItems.map((media, index) => (
-                            <SwiperSlide key={index}>
-                                {media.type === 'image' ? (
-                                    <Image
-                                        src={media.src || 'https://placehold.co/747x395/000/000/png'}
-                                        alt="Screenshot"
-                                        width={747}
-                                        height={395}
-                                        priority
-                                    />
-                                ) : (
-                                    media.src ? (
-                                        <video
-                                            src={media.src}
-                                            controls
-                                            autoPlay
-                                            muted
-                                            onEnded={handleVideoEnded}
-                                            style={{
-                                                width: '747px',
-                                                height: '395px',
-                                            }}
-                                        />
-                                    ) : (
-                                        <Image
-                                            src={'https://placehold.co/747x395/000/000/png'}
-                                            alt="Video"
-                                            width={747}
-                                            height={395}
-                                            priority
-                                        />
-                                    )
-                                )}
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-
-                    {/* Thumbnail */}
-                    <Swiper
-                        onSwiper={(swiper) => {
-                            setThumbsSwiper(swiper);
-                        }}
-                        spaceBetween={10}
-                        slidesPerView={4}
-                        freeMode={true}
-                        watchSlidesProgress={true}
-                        className="thumb-swiper"
-                        style={{ marginTop: '16px' }}
-                        scrollbar={{ draggable: true }}
-                        rewind={true}
-                        autoplay={{ delay: 5000 }}
-                        modules={[FreeMode, Scrollbar]}
-                    >
-                        {/* Hiển thị video nhỏ */}
-                        {thumbItems.map((media, index) => (
-                            <SwiperSlide key={index}>
-                                <Image
-                                    src={media.thumbnail.toString() || 'https://placehold.co/175x98/000/000/png'}
-                                    alt={`Video ${index + 1}`}
-                                    width={175}
-                                    height={98}
-                                    style={{
-                                        userSelect: 'none',
-                                        cursor: 'pointer',
-                                        border: currentSlideIndex === index ? '3px solid #fff' : 'none',
-                                    }}
-                                    priority
-                                />
-
-                                {/* Highlight movie marker */}
-                                {media.type === 'video' && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '50%',
-                                        left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        width: '32px',
-                                        height: '32px',
-                                        backgroundImage: 'url(/image/play_video_button.png)',
-                                    }}
-                                    />
-                                )}
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-
-                    {/* Nút hành động */}
-                    <Grid2 container spacing={1} sx={{ marginTop: 3 }}>
-                        <Grid2>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                startIcon={<GridCheckIcon />}
-                                sx={{ borderRadius: 1 }}
-                            >
-                                On Wishlist
-                            </Button>
-                        </Grid2>
-                        <Grid2>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                startIcon={<GridCheckIcon />}
-                                sx={{ borderRadius: 1 }}
-                            >
-                                Following
-                            </Button>
-                        </Grid2>
-                        <Grid2>
-                            <Button variant="contained" color="primary" sx={{ borderRadius: 1 }}>
-                                Ignore
-                            </Button>
-                        </Grid2>
-                    </Grid2>
-                </Grid2>
+                <HighlightPlayer
+                    screenshots={product.screenshots}
+                    movies={product.movies}
+                />
 
                 {/* Cột phải */}
                 <Grid2
@@ -627,29 +430,11 @@ function ProductDetailPage() {
                         </Box>
                     </Box>
 
-                    {/* Chi tiết */}
-                    <div className="product-detail-container collapsed">
-                        <div className="product-detail-auto-collapse">
-                            {/* Chi tiết */}
-                            <div className="product-detail-area"
-                                dangerouslySetInnerHTML={{ __html: product.about_the_game || "" }}
-                            />
-                        </div>
-                        {/* Nút xem thêm */}
-                        <div className="product-detail-toggle">
-                            <div className='product-detail-toggle-button'
-                                onClick={() => {
-                                    const productDetail = document.querySelector('.product-detail-container');
-
-                                    if (productDetail) {
-                                        productDetail.classList.toggle('collapsed');
-                                    }
-                                }}
-                            >
-                                Show More
-                            </div>
-                        </div>
-                    </div>
+                    {/* Mô tả chi tiết */}
+                    <AreaDescription
+                        detailed_description={product.detailed_description || ""}
+                        about_the_game={product.about_the_game || ""}
+                    />
 
                     {/* Bảng cấu hình */}
                     <div className='product-sysReq-container'>

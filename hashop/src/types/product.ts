@@ -143,7 +143,7 @@ type ProductTags = {
     name: string;
 }
 
-type ProductScreenshot = {
+export type ProductScreenshot = {
     productId: number;
     id: number;
     path_thumbnail: string;
