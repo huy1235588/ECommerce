@@ -1,3 +1,5 @@
+'use client';
+
 import { Product } from '@/types/product';
 import { Typography, Button, Chip, Grid2, Box } from '@mui/material';
 import './style.css';
@@ -5,11 +7,13 @@ import dayjs from 'dayjs';
 import Image from 'next/image';
 import { convertCurrency } from '@/utils/currencyConverter';
 import HighlightPlayer from '@/components/app/hightlighPlayer';
-import axios from "@/config/axios";
-import axiosLib from "axios";
-import { headers } from 'next/headers';
 import AreaDescription from '@/components/app/areaDescription';
-import { use } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { usePathname, useRouter } from 'next/navigation';
+import { AppDispatch } from '@/store/store';
+import { getProductById } from '@/store/product';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 // Khởi tạo product ban đầu
 const initialProduct: Product = {
@@ -50,180 +54,177 @@ interface Language {
     subtitles: boolean;
 }
 
-// Hàm lấy thông tin sản phẩm
-const getProduct = async () => {
-    try {
-        // Lấy headers
-        const headersList = await headers();
-        const pathname = headersList.get('referer');
-
-        // Lấy id sản phẩm từ url
-        const id = pathname?.split('/').pop();
-
-        // Các field cần lấy
-        const fieldProduct = `
-                 _id
-                name
-                short_description
-                detailed_description
-                about_the_game
-                price_overview {
-                    initial
-                    final
-                    discount_percent
-                    currency
-                }
-                release_date {
-                    date
-                }
-                developers
-                publishers
-                header_image
-                screenshots {
-                    path_thumbnail
-                }
-                movies {
-                    thumbnail
-                    mp4 {
-                        _480
-                        max
-                    }
-                    webm {
-                        _480
-                        max
-                    }
-                }
-                platform {
-                    windows
-                    mac
-                    linux
-                }
-                 tags {
-                    id
-                    name
-                }
-                categories {
-                    id
-                    description
-                }
-                pc_requirements {
-                    type
-                    minimum
-                    recommended
-                }
-                mac_requirements {
-                    type
-                    minimum
-                    recommended
-                }
-                linux_requirements {
-                    type
-                    minimum
-                    recommended
-                }
-                supported_languages
-                    achievements {
-                    total
-                    highlighted {
-                        name
-                        path
-                    }
-                }
-                package_groups {
-                    name
-                    title
-                    description
-                    selection_text
-                    save_text
-                    display_type
-                    is_recurring_subscription
-                    subs {
-                        packageId
-                        percent_savings_text
-                        percent_savings
-                        option_text
-                        option_description
-                        can_get_free_license
-                        is_free_license
-                        price_in_cents_with_discount
-                    }
-                }
-                achievements {
-                    total
-                    highlighted {
-                        name
-                        path
-                    }
-                }
-            `;
-
-        // Lấy tối đa 5 achievements highlighted
-        const slice = {
-            achievements: {
-                highlighted: {
-                    limit: 4
-                }
-            }
-        }
-
-        // Gửi request lên server
-        const response = await axios.post(
-            '/graphql',
-            {
-                query: `query GetProductById($id: Int!, $slice: String) {
-                               product(id: $id, slice: $slice) {
-                                   ${fieldProduct}
-                               }
-                           }`,
-                variables: {
-                    id: parseInt(id as string),
-                    slice: JSON.stringify(slice),
-                }
-            }
-        );
-
-        // Lấy sản phẩm từ kết quả
-        const fetchedProducts = await response.data.data.product;
-
-        if (fetchedProducts.price_overview && fetchedProducts.price_overview.currency) {
-            if (fetchedProducts.price_overview.final !== null) {
-                // Chuyển đổi giá tiền cuối cùng sang USD
-                fetchedProducts.price_overview.final = convertCurrency(
-                    fetchedProducts.price_overview.final / 100,
-                    fetchedProducts.price_overview.currency,
-                    'USD'
-                );
-            }
-
-            // Chuyển đổi giá tiền gốc sang USD
-            fetchedProducts.price_overview.initial = convertCurrency(
-                fetchedProducts.price_overview.initial / 100,
-                fetchedProducts.price_overview.currency,
-                'USD'
-            );
-        }
-
-        return fetchedProducts;
-
-    } catch (error) {
-        if (axiosLib.isAxiosError(error) && error.response) {
-            // Xử lý lỗi GraphQL
-            if (error.response?.data?.errors) {
-                console.log({
-                    message: error.response.data.message,
-                    errors: error.response.data.errors
-                });
-            }
-        }
-    }
-};
-
 function ProductDetailPage() {
-    // Khai báo state
-    let product: Product = initialProduct;
+    const router = useRouter();
+    const pathname = usePathname()
+    const dispatch = useDispatch<AppDispatch>();
 
-    // Gọi hàm lấy thông tin sản phẩm
-    product = use(getProduct());
+    // Khai báo state
+    const [product, setProduct] = useState<Product>(initialProduct); // Sản phẩm
+
+    // Lấy thông tin sản phẩm khi component được render
+    useEffect(() => {
+        // Hàm lấy thông tin sản phẩm
+        const getProduct = async () => {
+            try {
+                // Lấy id sản phẩm từ url
+                const id = pathname.split('/').pop();
+
+                // Các field cần lấy
+                const fieldProduct = `
+                     _id
+                    name
+                    short_description
+                    detailed_description
+                    about_the_game
+                    price_overview {
+                        initial
+                        final
+                        discount_percent
+                        currency
+                    }
+                    release_date {
+                        date
+                    }
+                    developers
+                    publishers
+                    header_image
+                    screenshots {
+                        path_thumbnail
+                    }
+                    movies {
+                        thumbnail
+                        mp4 {
+                            _480
+                            max
+                        }
+                        webm {
+                            _480
+                            max
+                        }
+                    }
+                    platform {
+                        windows
+                        mac
+                        linux
+                    }
+                     tags {
+                        id
+                        name
+                    }
+                    categories {
+                        id
+                        description
+                    }
+                    pc_requirements {
+                        type
+                        minimum
+                        recommended
+                    }
+                    mac_requirements {
+                        type
+                        minimum
+                        recommended
+                    }
+                    linux_requirements {
+                        type
+                        minimum
+                        recommended
+                    }
+                    supported_languages
+                        achievements {
+                        total
+                        highlighted {
+                            name
+                            path
+                        }
+                    }
+                    package_groups {
+                        name
+                        title
+                        description
+                        selection_text
+                        save_text
+                        display_type
+                        is_recurring_subscription
+                        subs {
+                            packageId
+                            percent_savings_text
+                            percent_savings
+                            option_text
+                            option_description
+                            can_get_free_license
+                            is_free_license
+                            price_in_cents_with_discount
+                        }
+                    }
+                    achievements {
+                        total
+                        highlighted {
+                            name
+                            path
+                        }
+                    }
+                `;
+
+                // Lấy tối đa 5 achievements highlighted
+                const slice = {
+                    achievements: {
+                        highlighted: {
+                            limit: 4
+                        }
+                    }
+                }
+
+                // Gọi action lấy thông tin sản phẩm
+                const resultAction = await dispatch(getProductById({
+                    id: Number(id),
+                    fields: fieldProduct,
+                    slice: JSON.stringify(slice),
+                }));
+
+                // Lấy thông tin sản phẩm thành công
+                if (resultAction.meta.requestStatus === 'fulfilled') {
+                    // Lấy sản phẩm từ kết quả
+                    const fetchedProduct = unwrapResult(resultAction);
+
+                    // Tạo bản sao của product và cập nhật price_overview
+                    const convertedProducts = {
+                        ...fetchedProduct,
+                        price_overview: {
+                            ...fetchedProduct.price_overview,
+                            initial: convertCurrency(
+                                fetchedProduct.price_overview.final / 100,
+                                fetchedProduct.price_overview.currency,
+                                'USD'
+                            ),
+                            final: convertCurrency(
+                                fetchedProduct.price_overview.initial / 100,
+                                fetchedProduct.price_overview.currency,
+                                'USD'
+                            ),
+                        },
+                    };                  
+
+                    // Cập nhật state
+                    setProduct(convertedProducts);
+                }
+
+            } catch (error) {
+                console.error('Lỗi lấy thông tin sản phẩm:', error);
+            }
+        };
+
+        // Gọi hàm lấy thông tin sản phẩm
+        getProduct();
+
+        // Nếu không có sản phẩm chuyển về trang chủ
+        if (!product) {
+            router.push('/');
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Parse ngôn ngữ hỗ trợ
     const parseSupportedLanguages = (supportedLanguages: string): Language[] => {
