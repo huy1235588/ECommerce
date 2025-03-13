@@ -4,10 +4,10 @@ import { Product } from '@/types/product';
 import Image from 'next/image';
 
 interface GameDetailsProps {
-    game: Product;
+    product: Product;
 }
 
-function GameDetails({ game }: GameDetailsProps) {
+function GameDetails({ product }: GameDetailsProps) {
     return (
         <Box
             sx={{
@@ -27,7 +27,7 @@ function GameDetails({ game }: GameDetailsProps) {
                     WebkitBoxOrient: 'vertical',
                 }}
             >
-                {game.name}
+                {product.name}
             </Typography>
 
             {/* Mô tả */}
@@ -41,7 +41,7 @@ function GameDetails({ game }: GameDetailsProps) {
                     WebkitBoxOrient: 'vertical',
                 }}
             >
-                {game.short_description}
+                {product.short_description}
             </Typography>
 
             {/* Thể loại */}
@@ -54,7 +54,7 @@ function GameDetails({ game }: GameDetailsProps) {
                     overflow: 'hidden',
                 }}
             >
-                {game.tags?.map((tag, index) => (
+                {product.tags?.map((tag, index) => (
                     <Typography
                         key={index}
                         variant="body2"
@@ -76,7 +76,7 @@ function GameDetails({ game }: GameDetailsProps) {
 
             {/* Hình ảnh */}
             <Box sx={{ marginTop: 2 }}>
-                {game.screenshots.map((image, index) => (
+                {product.screenshots.map((image, index) => (
                     <Image
                         key={index}
                         src={image.path_thumbnail}

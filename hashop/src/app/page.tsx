@@ -10,7 +10,7 @@ import axiosLib from "axios";
 
 
 export default async function Home() {
-    let sampleGames: Product[] = [];
+    let products: Product[] = [];
 
     // Hàm lấy danh sách sản phẩm
     const getProducts = async () => {
@@ -119,7 +119,7 @@ export default async function Home() {
             });
 
             // Lưu danh sách sản phẩm
-            sampleGames = fetchedProduct;
+            products = fetchedProduct;
 
         } catch (error) {
             if (axiosLib.isAxiosError(error) && error.response) {
@@ -159,7 +159,7 @@ export default async function Home() {
 
                 {/* Game list Session */}
                 <GameList
-                    games={sampleGames}
+                    products={products}
                 />
             </main>
         </div>

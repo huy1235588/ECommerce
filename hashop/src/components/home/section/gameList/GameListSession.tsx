@@ -7,15 +7,15 @@ import GameCard from './GameCard';
 import GameDetails from './GameDetails';
 
 interface GameListProps {
-    games: Product[];
+    products: Product[];
 }
 
-function GameList({ games }: GameListProps) {
-    const [hoveredGame, setHoveredGame] = useState<Product | null>(games[0]);
+function GameList({ products }: GameListProps) {
+    const [hoveredGame, setHoveredGame] = useState<Product | null>(products[0]);
 
     useEffect(() => {
-        setHoveredGame(games[0]);
-    }, [games]);
+        setHoveredGame(products[0]);
+    }, [products]);
 
     return (
         <section
@@ -44,11 +44,11 @@ function GameList({ games }: GameListProps) {
                         md: 8
                     }}
                 >
-                    {games.map((game, index) => (
+                    {products.map((product, index) => (
                         <GameCard
                             key={index}
-                            game={game}
-                            isHovered={game === hoveredGame}
+                            product={product}
+                            isHovered={product === hoveredGame}
                             onHover={setHoveredGame}
                         />
                     ))}
@@ -67,7 +67,7 @@ function GameList({ games }: GameListProps) {
                 >
                     {hoveredGame &&
                         <GameDetails
-                            game={hoveredGame}
+                            product={hoveredGame}
                         />
                     }
                 </Grid2>

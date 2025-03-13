@@ -11,6 +11,7 @@ import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store/store';
 import { paginatedProducts } from '@/store/product';
 import { unwrapResult } from '@reduxjs/toolkit';
+import { convertCurrency } from '@/utils/currencyConverter';
 
 const StyledInput = styled(InputBase)({
     backgroundColor: '#fff',
@@ -41,11 +42,12 @@ const NavigationBar: React.FC = () => {
         const getProducts = async () => {
             try {
                 // Các trường cần lấy
-                const field= `
+                const field = `
                     _id
                     name
                     price_overview {
                         final
+                        currency
                     }
                     header_image
                 `;
@@ -67,8 +69,27 @@ const NavigationBar: React.FC = () => {
 
                 // Lấy danh sách sản phẩm thành công
                 if (resultAction.meta.requestStatus === "fulfilled") {
-                    const products = unwrapResult(resultAction).data.paginatedProducts.products;
-                    return products;
+                    const fetchedProducts = unwrapResult(resultAction).data.paginatedProducts.products;
+
+                    // Chuyển đổi giá tiền cuối cùng sang USD
+                    const convertedProducts = fetchedProducts.map((product: Product) => {
+                        if (!product.price_overview?.currency) return product;
+
+                        // Tạo bản sao của product và cập nhật price_overview
+                        return {
+                            ...product,
+                            price_overview: {
+                                ...product.price_overview,
+                                final: convertCurrency(
+                                    product.price_overview.final / 100,
+                                    product.price_overview.currency,
+                                    'USD'
+                                )
+                            }
+                        };
+                    });
+
+                    return convertedProducts;
                 }
 
                 return [];
@@ -219,8 +240,10 @@ const NavigationBar: React.FC = () => {
                                                     {product.name}
                                                 </span>
                                                 <span className='search-result-price'>
-                                                    $
-                                                    {product.price_overview.final}
+                                                    {product.price_overview.final != null
+                                                        ? `$${product.price_overview.final.toFixed(2)}`
+                                                        : 'Free'
+                                                    }
                                                 </span>
                                             </Box>
                                         </a>

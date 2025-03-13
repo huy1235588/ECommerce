@@ -5,13 +5,13 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 interface GameCardProps {
-    game: Product;
+    product: Product;
     isHovered: boolean;
-    onHover: (game: Product | null) => void;
+    onHover: (product: Product | null) => void;
 }
 
 function GameCard({
-    game,
+    product,
     onHover,
     isHovered,
 }: GameCardProps) {
@@ -20,10 +20,10 @@ function GameCard({
     return (
         <Card
             onMouseEnter={() => {
-                onHover(game);
+                onHover(product);
             }}
             onClick={() => {
-                router.push(`/app/${game._id}`);
+                router.push(`/app/${product._id}`);
             }}
             sx={{
                 display: 'flex',
@@ -44,8 +44,8 @@ function GameCard({
             <CardMedia
                 component="img"
                 height="140"
-                image={game.header_image as string}
-                alt={game.name}
+                image={product.header_image as string}
+                alt={product.name}
                 sx={{
                     maxWidth: '300px',
                 }}
@@ -75,13 +75,13 @@ function GameCard({
                         WebkitBoxOrient: 'vertical',
                     }}
                 >
-                    {game.name}
+                    {product.name}
                 </Typography>
 
                 {/* Platform */}
-                {Object.keys(game.platform || {})
+                {Object.keys(product.platform || {})
                     .map((platform, index) => {
-                        if (!game.platform?.[platform as keyof typeof game.platform]) {
+                        if (!product.platform?.[platform as keyof typeof product.platform]) {
                             return null;
                         }
 
@@ -117,7 +117,7 @@ function GameCard({
                         color: isHovered ? '#263645' : '#BEEE11'
                     }}
                 >
-                    {game.price_overview.discount_percent ? (
+                    {product.price_overview.discount_percent ? (
                         <Typography
                             variant="body2"
                             sx={{
@@ -130,12 +130,12 @@ function GameCard({
                                 fontWeight: 'bold',
                             }}
                         >
-                            -{game.price_overview.discount_percent}%
+                            -{product.price_overview.discount_percent}%
                         </Typography>
                     ) : null}
 
                     {/* Giá gốc */}
-                    {game.price_overview.discount_percent ? (
+                    {product.price_overview.discount_percent ? (
                         <span
                             style={{
                                 textDecoration: 'line-through',
@@ -143,8 +143,8 @@ function GameCard({
                                 marginRight: '8px'
                             }}
                         >
-                            {game.price_overview.initial != null
-                                ? `$${game.price_overview.initial.toFixed(2)}`
+                            {product.price_overview.initial != null
+                                ? `$${product.price_overview.initial.toFixed(2)}`
                                 : 'Free'
                             }
                         </span>
@@ -152,10 +152,10 @@ function GameCard({
 
                     {/* Giá bán */}
                     <span style={{
-                        color: isHovered ? '#263645' : game.price_overview.discount_percent ? '#BEEE11' : '#A0A0A0',
+                        color: isHovered ? '#263645' : product.price_overview.discount_percent ? '#BEEE11' : '#A0A0A0',
                     }}>
-                        {game.price_overview.final != null
-                            ? `$${game.price_overview.final.toFixed(2)}`
+                        {product.price_overview.final != null
+                            ? `$${product.price_overview.final.toFixed(2)}`
                             : 'Free'
                         }
                     </span>
@@ -170,7 +170,7 @@ function GameCard({
                         maxWidth: '100%',
                     }}
                 >
-                    {game.tags && game.tags?.map((tag, index) => (
+                    {product.tags && product.tags?.map((tag, index) => (
                         <Typography
                             key={index}
                             variant="body2"
@@ -185,7 +185,7 @@ function GameCard({
                             }}
                         >
                             {tag.name}
-                            {index < game.tags!.length - 1 && ','}
+                            {index < product.tags!.length - 1 && ','}
                         </Typography>
                     ))}
                 </Box>
