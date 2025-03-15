@@ -315,24 +315,15 @@ function ECommerceAddProductPage() {
                 });
 
                 // Kiểm tra response
-                if (responseAddList.status === 200) {
+                if (responseAddList.status === 201) {
                     const resultAddList = responseAddList.data;
+
+                    console.log(resultAddList);
 
                     // Hiển thị thông báo thành công
                     setButtonDialogState((prevState) => ({
                         ...prevState,
                         success: resultAddList.message,
-                        successLinks: {
-                            title: {
-                                text: "Error IDs: ",
-                                color: "#ff4545"
-                            },
-                            links: resultAddList.errorIds.map((id: string) => ({
-                                href: `https://steamdb.info/app/${id}`,
-                                text: id,
-                                color: "#ff4545"
-                            }))
-                        }
                     }));
                 }
 
@@ -639,7 +630,7 @@ function ECommerceAddProductPage() {
                         name="tags"
                         label="Tags"
                         placeholder="Select Tags"
-                        value={formData.tags}
+                        value={formData.categories?.map((category) => category.description)}
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
