@@ -11,7 +11,7 @@ class FetchApiService {
     urlTags = 'https://steamspy.com/api.php?request=appdetails&appid=';
 
     // Thời gian chờ giữa các lần gọi API
-    delay = 500;
+    delay = 1;
 
     // Hàm gọi API để lấy dữ liệu từ Steam
     fetchApi = async (id) => {

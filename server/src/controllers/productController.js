@@ -71,7 +71,9 @@ class ProductController {
 
             // Trả về kết quả
             res.status(201).json({
+                success: true,
                 message: "Products added successfully",
+                errorIds,
             });
         }
         catch (error) {
