@@ -6,11 +6,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useEffect, useState } from "react";
 import "@/styles/pages/admin/product.css"
-import { GenreData, PlatformData, Product, TypeData } from "@/types/product";
+import { GenreData, initialFormData, Product, TypeData } from "@/types/product";
 import axios from "@/config/axios";
 import axiosLib from "axios";
 import UploadImages from "@/components/ui/uploadImages";
-import { Button, Checkbox, FormControlLabel, Grid2, SelectChangeEvent } from "@mui/material";
+import { Button, Grid2, SelectChangeEvent } from "@mui/material";
 import validateProduct from "@/utils/validate";
 import { v4 as uuidv4 } from "uuid";
 import { useNotification } from "@/context/NotificationContext";
@@ -24,46 +24,6 @@ import QuillEditor from "@/components/ui/quillEditor";
 type ErrorForm = {
     path: string | null;
     msg: string;
-};
-
-// Khởi tạo formData ban đầu
-const initialFormData: Product = {
-    productId: -1,
-    title: '',
-    type: '',
-    description: '',
-    price: 0,
-    discount: 0,
-    discountStartDate: null,
-    discountEndDate: null,
-    releaseDate: null,
-    developer: [],
-    publisher: [],
-    platform: [],
-    rating: 0,
-    isActive: false,
-    genres: [],
-    tags: [],
-    features: [],
-    headerImage: null,
-    screenshots: [],
-    videos: [{
-        thumbnail: '',
-        mp4: '',
-        webm: ''
-    }],
-    systemRequirements: {
-        win: [
-            { title: "OS", minimum: "", recommended: "" },
-            { title: "Processor", minimum: "", recommended: "" },
-            { title: "Memory", minimum: "", recommended: "" },
-            { title: "Graphics", minimum: "", recommended: "" },
-            { title: "DirectX", minimum: "", recommended: "" },
-            { title: "Storage", minimum: "", recommended: "" },
-            { title: "Sound Card", minimum: "", recommended: "" },
-            { title: "Additional Notes", minimum: "", recommended: "" },
-        ],
-    },
 };
 
 function ECommerceProductDetailsPage() {
@@ -160,12 +120,6 @@ function ECommerceProductDetailsPage() {
         setFormData({ ...formData, [name]: value });
     };
 
-    // Xử lý thay đổi checkbox
-    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, checked } = e.target;
-        setFormData({ ...formData, [name]: checked });
-    };
-
     // Xử lý submit form
     const handleSubmit = async () => {
         try {
@@ -259,12 +213,12 @@ function ECommerceProductDetailsPage() {
     // Hàm xóa giá trị khỏi danh sách đã chọn
     const handleDeleteValueSelect = (valueToDelete: string) => {
         // Lọc ra các giá trị khác giá trị cần xóa
-        const newValue = formData.platform.filter((value) => value !== valueToDelete);
+        const newValue = formData.genres.filter((value) => value.description !== valueToDelete);
 
-        // Cập nhật giá trị mới vào form data
+        // Update form data with the new platform state
         setFormData({
             ...formData,
-            platform: newValue
+            genres: newValue
         });
     };
 
@@ -280,7 +234,7 @@ function ECommerceProductDetailsPage() {
     const handleQuillChange = (value: string) => {
         setFormData({
             ...formData,
-            detail: value
+            about_the_game: value
         });
     };
 
@@ -335,7 +289,7 @@ function ECommerceProductDetailsPage() {
                         label="Title"
                         type="text"
                         placeholder="Title"
-                        value={formData.title}
+                        value={formData.name}
                         onChange={handleChange}
                         error={errors.some((error) => error.path === 'title')}
                         setError={handleSetError}
@@ -367,7 +321,7 @@ function ECommerceProductDetailsPage() {
                         labelOptional="(Optional)"
                         type="text"
                         placeholder="Description"
-                        value={formData.description}
+                        value={formData.short_description}
                         onChange={handleChange}
                         error={errors.some((error) => error.path === 'description')}
                         setError={handleSetError}
@@ -375,12 +329,12 @@ function ECommerceProductDetailsPage() {
                     />
 
                     {/* Detail */}
-                    <QuillEditor 
+                    <QuillEditor
                         id="detail"
                         name="detail"
                         label="Detail"
                         placeholder="Type something..."
-                        value={formData.detail}
+                        value={formData.about_the_game}
                         onChange={handleQuillChange}
                         error={errors.some((error) => error.path === 'detail')}
                         setError={handleSetError}
@@ -409,7 +363,7 @@ function ECommerceProductDetailsPage() {
                                 label="Price"
                                 type="number"
                                 placeholder="Price"
-                                value={formData.price}
+                                value={formData.price_overview.initial}
                                 sx={{
                                     margin: "0"
                                 }}
@@ -433,7 +387,7 @@ function ECommerceProductDetailsPage() {
                                 label="Discount"
                                 type="number"
                                 placeholder="Discount"
-                                value={formData.discount}
+                                value={formData.price_overview.discount_percent}
                                 onChange={handleChange}
                                 sx={{
                                     margin: "0"
@@ -449,25 +403,11 @@ function ECommerceProductDetailsPage() {
                         </Grid2>
                     </Grid2>
 
-                    {/* Discount Date */}
-                    {/* Nếu Discount lớn hơn 0 thì hiển thị ngày giảm giá */}
-                    {formData.discount && formData.discount > 0 ? (
-                        <DateTimePickerForm
-                            name="discountEndDate"
-                            label="Discount End Date"
-                            value={formData.discountEndDate}
-                            onChange={handleDateTimeChange}
-                            error={errors.some((error) => error.path === 'discountEndDate')}
-                            setError={handleSetError}
-                            errorText={errors.find((error) => error.path === 'discountEndDate')?.msg}
-                        />
-                    ) : null}
-
                     {/* Release Date */}
                     <DateTimePickerForm
                         name="releaseDate"
                         label="Release Date"
-                        value={dayjs(formData.releaseDate as Dayjs)}
+                        value={dayjs(formData.release_date.date as Dayjs)}
                         onChange={handleDateTimeChange}
                         error={errors.some((error) => error.path === 'releaseDate')}
                         setError={handleSetError}
@@ -497,7 +437,7 @@ function ECommerceProductDetailsPage() {
                                 label="Developer"
                                 type="text"
                                 placeholder="Developer"
-                                value={formData.developer}
+                                value={formData.developers}
                                 onChange={handleChange}
                                 sx={{
                                     margin: "0",
@@ -521,7 +461,7 @@ function ECommerceProductDetailsPage() {
                                 label="Publisher"
                                 type="text"
                                 placeholder="Publisher"
-                                value={formData.publisher}
+                                value={formData.publishers}
                                 onChange={handleChange}
                                 sx={{
                                     margin: "0",
@@ -533,28 +473,13 @@ function ECommerceProductDetailsPage() {
                         </Grid2>
                     </Grid2>
 
-                    {/* Platform */}
-                    <MultipleSelectForm
-                        id="platform"
-                        name="platform"
-                        label="Platform"
-                        placeholder="Select Platform"
-                        value={formData.platform} // Truyền giá trị đã chọn vào
-                        menuItems={PlatformData} // Các mục menu để chọn
-                        onChange={handleSelectChange} // Hàm xử lý thay đổi giá trị
-                        onDelete={handleDeleteValueSelect} // Hàm xử lý xóa giá trị
-                        error={errors.some((error) => error.path === 'platform')}
-                        setError={handleSetError}
-                        errorText={errors.find((error) => error.path === 'platform')?.msg}
-                    />
-
                     {/* Genres */}
                     <MultipleSelectForm
                         id="genres"
                         name="genres"
                         label="Genres"
                         placeholder="Select Genres"
-                        value={formData.genres}
+                        value={formData.genres.map((genre) => genre.description)}
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
@@ -569,7 +494,7 @@ function ECommerceProductDetailsPage() {
                         name="tags"
                         label="Tags"
                         placeholder="Select Tags"
-                        value={formData.tags}
+                        value={formData.tags.map((tag) => tag.name)}
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
@@ -584,7 +509,7 @@ function ECommerceProductDetailsPage() {
                         name="features"
                         label="Features"
                         placeholder="Select Features"
-                        value={formData.features}
+                        value={formData.categories?.map((category) => category.description)}
                         menuItems={GenreData}
                         onChange={handleSelectChange}
                         onDelete={handleDeleteValueSelect}
@@ -597,29 +522,13 @@ function ECommerceProductDetailsPage() {
                     <UploadImages
                         id="header-image"
                         name="headerImage"
-                        value={formData.headerImage}
-                        title={formData.title}
+                        value={formData.header_image}
+                        title={formData.name}
                         label="Header Image"
                         onChange={(url) => setFormData({
                             ...formData,
-                            headerImage: url
+                            header_image: url?.name || ""
                         })}
-                    />
-
-                    {/* Active */}
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                name="isActive"
-                                checked={formData.isActive}
-                                onChange={handleCheckboxChange}
-                            />
-                        }
-                        label="Active"
-                        sx={{
-                            width: "100%",
-                            marginLeft: 0.125
-                        }}
                     />
 
                     {/* Submit */}

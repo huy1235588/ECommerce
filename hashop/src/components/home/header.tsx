@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { FaAngleDown } from "react-icons/fa";
 import { UserMenu } from "./userMenu ";
+import Link from "next/link";
 
 interface HomeHeaderProps {
     active: string | undefined; // Nhận trạng thái active từ props để đánh dấu menu nào đang được chọn
@@ -28,7 +29,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
             <nav className="home-nav">
                 <ul className="home-menu">
                     <li>
-                        <a href="/" className="logo">
+                        <Link href="/" className="logo">
                             <Image
                                 src="/logo/logo.png"
                                 width={64}
@@ -36,35 +37,35 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ active }) => {
                                 alt=""
                                 priority
                             />
-                        </a>
+                        </Link>
                     </li>
 
                     <li>
-                        <a href="/" className={`default ${active === "home" ? "active" : ""}`}>
+                        <Link href="/home" className={`default ${active === "home" ? "active" : ""}`}>
                             <span>STORE</span>
                             <FaAngleDown />
-                        </a>
+                        </Link>
                     </li>
 
                     <li>
-                        <a href="/shop/about" className={`default ${active === "about" ? "active" : ""}`}>
+                        <Link href="/shop/about" className={`default ${active === "about" ? "active" : ""}`}>
                             <span>ABOUT</span>
                             <FaAngleDown />
-                        </a>
+                        </Link>
                     </li>
 
                     <li>
-                        <a href="/shop/home" className="default">
+                        <Link href="/shop/home" className="default">
                             <span>COMMUNITY</span>
                             <FaAngleDown />
-                        </a>
+                        </Link>
                     </li>
 
                     <li>
-                        <a href="/shop/home" className="default">
+                        <Link href="/shop/home" className="default">
                             <span>SUPPORT</span>
                             <FaAngleDown />
-                        </a>
+                        </Link>
                     </li>
                 </ul>
 

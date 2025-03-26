@@ -88,8 +88,8 @@ const DataGrid: React.FC<DataGridProps> = ({
     };
 
     // Handler cho click vào row
-    const handleClickRow = (id: number) => {
-        if (onRowClick) {
+    const handleClickRow = (id: number | undefined) => {
+        if (onRowClick && id !== undefined) {
             onRowClick(id);
         }
     };
@@ -226,10 +226,10 @@ const DataGrid: React.FC<DataGridProps> = ({
                 <tbody>
                     {rows.map((row) => (
                         <tr
-                            key={row.productId}
+                            key={row._id}
                             className="data-grid-row"
-                            data-id={row.productId}
-                            onClick={() => handleClickRow(row.productId)}
+                            data-id={row._id}
+                            onClick={() => handleClickRow(row._id)}
                         >
                             {renderTd(row)}
                         </tr>

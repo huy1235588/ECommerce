@@ -1,6 +1,6 @@
 'use client'
 
-import { GenreData, Product, ProductMovie, TypeData } from "@/types/product";
+import { GenreData, initialFormData, Product, ProductMovie, TypeData } from "@/types/product";
 import { Box, Button, Grid2, SelectChangeEvent } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -25,31 +25,6 @@ import { v4 as uuidv4 } from "uuid";
 type ErrorForm = {
     path: string | null;
     msg: string;
-};
-
-// Khởi tạo formData ban đầu
-const initialFormData: Product = {
-    _id: -1,
-    name: '',
-    type: '',
-    short_description: '',
-    price_overview: {
-        currency: 'USD',
-        initial: 0,
-        final: 0,
-        discount_percent: 0
-    },
-    release_date: {
-        coming_soon: false,
-        date: dayjs()
-    },
-    developers: [],
-    publishers: [],
-    genres: [],
-    tags: [],
-    header_image: "",
-    screenshots: [],
-    movies: [],
 };
 
 function ECommerceAddProductPage() {

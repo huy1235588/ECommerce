@@ -37,7 +37,7 @@ function ECommerceProductsPage() {
     // Các cột của bảng
     const columns: Column[] = [
         {
-            key: 'headerImage',
+            key: 'header_image',
             label: '',
             width: 270,
             style: {
@@ -58,7 +58,7 @@ function ECommerceProductsPage() {
             )
         },
         {
-            key: 'title',
+            key: 'name',
             label: 'TITLE',
             width: 200,
             style: {
@@ -68,7 +68,7 @@ function ECommerceProductsPage() {
         },
         { key: 'type', label: 'TYPE', width: 70 },
         {
-            key: 'price',
+            key: 'price_overview',
             label: 'PRICE',
             width: 70,
             style: {
@@ -84,7 +84,7 @@ function ECommerceProductsPage() {
             }
         },
         {
-            key: 'discount',
+            key: 'price_overview',
             label: 'DISCOUNT',
             width: 90,
             style: {

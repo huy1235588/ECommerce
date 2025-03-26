@@ -1,4 +1,4 @@
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 export const TypeData = [
     'Game',
@@ -175,12 +175,36 @@ type Achievement = {
     }[];
 }
 
-type Requirement = {
+export type Requirement = {
     productId: number;
     type: string;
     minimum: string;
     recommended: string;
 }
+
+export const initialFormData: Product = {
+    _id: -1,
+    name: '',
+    type: '',
+    short_description: '',
+    price_overview: {
+        currency: 'USD',
+        initial: 0,
+        final: 0,
+        discount_percent: 0
+    },
+    release_date: {
+        coming_soon: false,
+        date: dayjs()
+    },
+    developers: [],
+    publishers: [],
+    genres: [],
+    tags: [],
+    header_image: "",
+    screenshots: [],
+    movies: [],
+};
 
 // GraphQL
 interface PaginationInfo {
