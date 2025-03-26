@@ -14,7 +14,6 @@ function GameList({ products }: GameListProps) {
     const [hoveredGame, setHoveredGame] = useState<Product | null>(products[0]);
 
     useEffect(() => {
-        console.log(products)
         setHoveredGame(products[0]);
     }, [products]);
 
