@@ -13,6 +13,7 @@ import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/scrollbar';
 import 'swiper/css/thumbs';
+import VideoPlayer from "../ui/videoPlayer";
 interface HighlightPlayerProps {
     screenshots: ProductScreenshot[];
     movies: ProductMovie[];
@@ -112,14 +113,20 @@ const HighlightPlayer: React.FC<HighlightPlayerProps> = ({
                             />
                         ) : (
                             media.src ? (
-                                <video
-                                    className="highlight-video"
+                                <VideoPlayer 
                                     src={media.src}
-                                    controls
                                     autoPlay
                                     muted
                                     onEnded={handleVideoEnded}
                                 />
+                                // <video
+                                //     className="highlight-video"
+                                //     src={media.src}
+                                //     controls
+                                //     autoPlay
+                                //     muted
+                                //     onEnded={handleVideoEnded}
+                                // />
                             ) : (
                                 <Image
                                     src={'https://placehold.co/747x395/000/000/png'}
