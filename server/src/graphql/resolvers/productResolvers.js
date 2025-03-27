@@ -106,6 +106,52 @@ const productResolver = {
 
             return results;
         },
+
+        // Hàm này trả về các sản phẩm liên quan
+        relatedProducts: async (_, { product_id, limit }) => {
+            // Lấy thông tin sản phẩm hiện tại
+            const product = await Product.findById(product_id)
+                .populate('tags')
+                .exec();
+
+            // Lấy các sản phẩm khác cùng thể loại
+            const productsByGenre = await Product.find({
+                genres: { $in: product.genres }
+
+            })
+                .populate('tags')
+                .populate('screenshots')
+                .populate('movies')
+                .populate('achievements')
+                .populate('package_groups')
+                .populate('pc_requirements')
+                .populate('mac_requirements')
+                .populate('linux_requirements')
+                .lean()
+                .exec();
+
+            // Lấy các sản phẩm khác cùng tag
+            const productsByTags = await Product.find({
+                tags: { $in: product.tags }
+            })
+                .populate('tags')
+                .populate('screenshots')
+                .populate('movies')
+                .populate('achievements')
+                .populate('package_groups')
+                .populate('pc_requirements')
+                .populate('mac_requirements')
+                .populate('linux_requirements')
+                .lean()
+                .exec();
+
+            // Kết hợp các sản phẩm, loại bỏ sản phẩm hiện tại và giới hạn số lượng sản phẩm
+            const combinedProducts = [...productsByGenre, ...productsByTags]
+                .filter(p => p.productId !== product_id)
+                .slice(0, limit);
+
+            return combinedProducts
+        }
     },
     Mutation: {
         // Hàm này dùng để cập nhật thông tin sản phẩm

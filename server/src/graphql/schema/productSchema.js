@@ -110,7 +110,12 @@ type Query {
         features: [String]
         limit: Int
     ): [Product]
+
+    # Phân trang sản phẩm
     paginatedProducts(page: Int!, limit: Int!, sortColumn: String, sortOrder: String, query: String, slice: String): PaginatedProducts  # Phân trang sản phẩm
+
+    # Lấy sản phẩm liên quan
+    relatedProducts(product_id: Int!, limit: Int!): [Product]
 }
 
 # Kết quả phân trang
