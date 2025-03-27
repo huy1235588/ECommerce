@@ -13,6 +13,7 @@ const conversionRates: { [currency: string]: number } = {
     KRW: 1451.73 , // South Korean Wons
     SGD: 1.35,   // Singapore Dollar
     AED:  3.67,  // United Arab Emirates Dirham
+    MXN: 19.07,  // Mexican Peso
 };
 
 /**

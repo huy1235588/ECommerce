@@ -14,6 +14,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AppDispatch } from '@/store/store';
 import { getProductById } from '@/store/product';
 import { unwrapResult } from '@reduxjs/toolkit';
+import RelatedProducts from '@/components/app/relatedProducts';
 
 // Khởi tạo product ban đầu
 const initialProduct: Product = {
@@ -204,7 +205,7 @@ function ProductDetailPage() {
                                 'USD'
                             ),
                         },
-                    };                  
+                    };
 
                     // Cập nhật state
                     setProduct(convertedProducts);
@@ -324,9 +325,9 @@ function ProductDetailPage() {
                             overflow: 'hidden',
                         }}
                     >
-                        {product.tags?.map((tag) => (
+                        {product.tags?.map((tag, index) => (
                             <Grid2
-                                key={tag.id}
+                                key={index}
                             >
                                 <Chip
                                     label={tag.name}
@@ -625,6 +626,9 @@ function ProductDetailPage() {
                     </div>
                 </Grid2>
             </Grid2>
+
+            {/* Related Products */}
+            <RelatedProducts product={product} />
         </Box >
     );
 };
