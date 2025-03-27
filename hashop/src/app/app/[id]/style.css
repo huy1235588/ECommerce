@@ -1,3 +1,34 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.SWIPER HIGHLIGHT
+    02.PRODUCT DETAIL
+    03.SYSTEM REQUIREMENTS
+    04.FEATURE
+    05.LANGUAGE
+    06.ACHIEVEMENTS
+    =============================
+		
+*=============================================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    01.START SWIPER HIGHLIGHT
+*===================================*/
 /* Swiper */
 .swiper.main-player-swiper {
     --swiper-navigation-top-offset: 522px; /* Khoảng cách nút điều hướng với viền trên */
@@ -44,8 +75,24 @@
         #2e5470 100%
     ); /* Màu thanh kéo scrollbar khi hover */
 }
+/*===================================*
+    01.END SWIPER HIGHLIGHT
+*===================================*/
+/*
 
-/* Product details */
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.START PRODUCT DETAIL
+*===================================*/
 .product-detail-container {
     position: relative;
     padding-bottom: 20px;
@@ -134,7 +181,24 @@
 .product-detail-toggle-button:hover {
     color: #fff;
 }
+/*===================================*
+    02.END PRODUCT DETAIL
+*===================================*/
+/*
 
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START SYSTEM REQUIREMENTS
+*===================================*/
 /* System requirements */
 .product-sysReq-container {
     margin-top: 30px;
@@ -201,8 +265,24 @@
     margin-bottom: 2px;
     text-transform: none;
 }
+/*===================================*
+    03.END SYSTEM REQUIREMENTS
+*===================================*/
+/*
 
-/* Feature */
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    04.START FEATURE
+*===================================*/
 .product-achievements-container {
     padding: 16px;
     margin-bottom: 8px;
@@ -259,8 +339,24 @@
     background: #67c1f5;
     background: linear-gradient(135deg, #67c1f5 0%, #417a9b 100%);
 }
+/*===================================*
+    04.END FEATURE
+*===================================*/
+/*
 
-/* Language */
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START LANGUAGE
+*===================================*/
 .product-languages-container {
     padding: 16px;
     margin-bottom: 8px;
@@ -306,7 +402,24 @@
     color: #67c1f5;
 }
 
-/* Achievements */
+/*===================================*
+    05.END LANGUAGE
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    06.START ACHIEVEMENTS
+*===================================*/
 .product-achievements-list {
     padding: 4px 0px 4px 0px;
     overflow: hidden;
@@ -347,4 +460,54 @@ a.product-achievements-view-all {
 a.product-achievements-view-all:hover {
     background: linear-gradient(135deg, #67c1f5 0%, #417a9b 100%);
     color: #ffffff;
+}
+
+/*===================================*
+    06.END ACHIEVEMENTS
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    07.START RELATED GAMES
+*===================================*/
+/* Swiper */
+.swiper.related-products-swiper {
+    position: unset;
+    user-select: none;
+    --swiper-navigation-top-offset: 50%; /* Khoảng cách nút điều hướng với viền trên */
+    --swiper-navigation-sides-offset: -20px; /* Khoảng cách nút điều hướng với viền bên */
+    --swiper-navigation-size: 20px; /* Kích thước nút điều hướng */
+
+    --swiper-scrollbar-size: 5px; /* Kích thước scrollbar */
+    --swiper-scrollbar-top: calc(100% + 10px); /* Khoảng cách scrollbar với viền */
+    --swiper-scrollbar-sides-offset: 32px; /* Khoảng cách scrollbar với viền */
+    --swiper-scrollbar-border-radius: 5px; /* Bo tròn scrollbar */
+}
+
+.related-products-swiper .swiper-button-next,
+.related-products-swiper .swiper-button-prev {
+    border-radius: 50%;
+    transform: translateY(50%);
+    padding: 20px; /* Kích thước nút điều hướng */
+    color: #407899; /* Màu nút điều hướng */
+    background: #233c5166;
+}
+
+.related-products-swiper .swiper-button-next:hover,
+.related-products-swiper .swiper-button-prev:hover {
+    background: linear-gradient(
+        135deg,
+        #8d3d6e 0%,
+        #702e52 100%
+    ); /* Màu nút điều hướng khi hover */
 }

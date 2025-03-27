@@ -7,6 +7,7 @@ import axios from "@/config/axios";
 import axiosLib from "axios";
 import { convertCurrency } from '@/utils/currencyConverter';
 import Link from 'next/link';
+import { Navigation, Scrollbar } from 'swiper/modules';
 
 // Query GraphQL để lấy sản phẩm liên quan
 const GET_RELATED_PRODUCTS = `
@@ -141,7 +142,7 @@ const RelatedProducts = ({ product }: { product: Product }) => {
                 });
 
                 // Lấy danh sách sản phẩm liên quan
-                const fetchedProduct = await response.data.data.relatedProducts;                
+                const fetchedProduct = await response.data.data.relatedProducts;
 
                 // Chuyển đổi giá tiền cuối cùng sang USD
                 fetchedProduct.forEach((product: Product) => {
@@ -152,7 +153,7 @@ const RelatedProducts = ({ product }: { product: Product }) => {
                             product.price_overview.currency,
                             'USD'
                         );
-    
+
                         // Chuyển đổi giá tiền gốc sang USD
                         product.price_overview.initial = convertCurrency(
                             product.price_overview.initial / 100,
@@ -205,7 +206,10 @@ const RelatedProducts = ({ product }: { product: Product }) => {
     return (
         <Box
             sx={{
-                marginTop: 4
+                position: 'relative',
+                marginTop: 4,
+                marginX: -4,
+                paddingX: 4,       
             }}
         >
             <Typography variant="h4" component="h2" gutterBottom>
@@ -213,8 +217,16 @@ const RelatedProducts = ({ product }: { product: Product }) => {
             </Typography>
 
             <Swiper
+                className='related-products-swiper'
                 spaceBetween={10}
                 slidesPerView={3}
+                navigation
+                rewind
+                scrollbar={{ draggable: true }}
+                modules={[
+                    Scrollbar,
+                    Navigation
+                ]}
             >
                 {relatedProducts.map((product: Product) => (
                     <SwiperSlide key={product._id}>
