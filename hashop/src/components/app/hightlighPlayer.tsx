@@ -98,12 +98,6 @@ const HighlightPlayer: React.FC<HighlightPlayerProps> = ({
                 rewind={true}
                 thumbs={{ swiper: thumbsSwiper }}
                 className="main-player-swiper"
-                style={{
-                    position: 'unset',
-                    width: '747px',
-                    height: '395px',
-                    backgroundColor: '#000'
-                }}
                 modules={[Navigation, Thumbs]}
             >
                 {mediaItems.map((media, index) => (
@@ -119,15 +113,12 @@ const HighlightPlayer: React.FC<HighlightPlayerProps> = ({
                         ) : (
                             media.src ? (
                                 <video
+                                    className="highlight-video"
                                     src={media.src}
                                     controls
                                     autoPlay
                                     muted
                                     onEnded={handleVideoEnded}
-                                    style={{
-                                        width: '747px',
-                                        height: '395px',
-                                    }}
                                 />
                             ) : (
                                 <Image

@@ -189,23 +189,29 @@ function ProductDetailPage() {
                     // Lấy sản phẩm từ kết quả
                     const fetchedProduct = unwrapResult(resultAction);
 
-                    // Tạo bản sao của product và cập nhật price_overview
-                    const convertedProducts = {
-                        ...fetchedProduct,
-                        price_overview: {
-                            ...fetchedProduct.price_overview,
-                            initial: convertCurrency(
-                                fetchedProduct.price_overview.final / 100,
-                                fetchedProduct.price_overview.currency,
-                                'USD'
-                            ),
-                            final: convertCurrency(
-                                fetchedProduct.price_overview.initial / 100,
-                                fetchedProduct.price_overview.currency,
-                                'USD'
-                            ),
-                        },
-                    };
+                    let convertedProducts: Product;
+                    // Nếu có giá sản phẩm
+                    if (fetchedProduct.price_overview && fetchedProduct.price_overview.currency) {
+                        // Tạo bản sao của product và cập nhật price_overview
+                        convertedProducts = {
+                            ...fetchedProduct,
+                            price_overview: {
+                                ...fetchedProduct.price_overview,
+                                initial: convertCurrency(
+                                    fetchedProduct.price_overview.final / 100,
+                                    fetchedProduct.price_overview.currency,
+                                    'USD'
+                                ),
+                                final: convertCurrency(
+                                    fetchedProduct.price_overview.initial / 100,
+                                    fetchedProduct.price_overview.currency,
+                                    'USD'
+                                ),
+                            },
+                        };
+                    } else {
+                        convertedProducts = fetchedProduct;
+                    }
 
                     // Cập nhật state
                     setProduct(convertedProducts);

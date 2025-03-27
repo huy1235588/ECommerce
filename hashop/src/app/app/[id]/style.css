@@ -31,7 +31,10 @@ Author       : LeThienHuy.
 *===================================*/
 /* Swiper */
 .swiper.main-player-swiper {
-    --swiper-navigation-top-offset: 522px; /* Khoảng cách nút điều hướng với viền trên */
+    position: unset;
+    width: 100%;
+    background-color: #000;
+    --swiper-navigation-top-offset: 87.2%; /* Khoảng cách nút điều hướng với viền trên */
     --swiper-navigation-sides-offset: 0px; /* Khoảng cách nút điều hướng với viền bên */
     --swiper-navigation-size: 12px; /* Kích thước nút điều hướng */
 }
@@ -74,6 +77,14 @@ Author       : LeThienHuy.
         #3d6c8d 0%,
         #2e5470 100%
     ); /* Màu thanh kéo scrollbar khi hover */
+}
+
+
+/* Video */
+.main-player-swiper .highlight-video {
+    position: relative;
+    width: 100%;
+    background: #000;
 }
 /*===================================*
     01.END SWIPER HIGHLIGHT
