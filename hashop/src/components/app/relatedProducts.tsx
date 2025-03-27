@@ -137,7 +137,7 @@ const RelatedProducts = ({ product }: { product: Product }) => {
                     query: GET_RELATED_PRODUCTS,
                     variables: {
                         productId: Number(product._id),
-                        limit: 6
+                        limit: 12
                     }
                 });
 
