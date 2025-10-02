@@ -18,3 +18,8 @@ python/json
 python/html
 
 python/ai_agent
+
+# Obsidian
+.obsidian/themes
+.obsidian/appearance.json
+.obsidian/workspace.json
