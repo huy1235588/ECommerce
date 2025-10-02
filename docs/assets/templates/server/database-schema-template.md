@@ -15,15 +15,15 @@ Service này quản lý:
 
 ## 🗃️ Database Information
 
-| Property              | Value                         |
-| --------------------- | ----------------------------- |
-| Database Name         | `{{DATABASE_NAME}}`           |
-| Schema Version        | {{SCHEMA_VERSION}}            |
-| Engine                | PostgreSQL 15.x               |
-| Charset               | UTF8                          |
-| Collation             | utf8_unicode_ci               |
-| **Event Integration** | ✅ Kafka/RabbitMQ             |
-| **Security Level**    | {{SECURITY_LEVEL}}            |
+| Property              | Value               |
+| --------------------- | ------------------- |
+| Database Name         | `{{DATABASE_NAME}}` |
+| Schema Version        | {{SCHEMA_VERSION}}  |
+| Engine                | PostgreSQL 15.x     |
+| Charset               | UTF8                |
+| Collation             | utf8_unicode_ci     |
+| **Event Integration** | ✅ Kafka/RabbitMQ   |
+| **Security Level**    | {{SECURITY_LEVEL}}  |
 
 ## 📊 Entity Relationship Diagram
 
@@ -48,14 +48,14 @@ erDiagram
 
 {{TABLE_DESCRIPTION}}
 
-| Column       | Type         | Constraints   | Description      |
-| ------------ | ------------ | ------------- | ---------------- |
-| id           | UUID         | PRIMARY KEY   | Unique identifier|
-| {{COLUMN_1}} | {{TYPE_1}}   | {{CONSTRAINT_1}} | {{DESC_1}}   |
-| {{COLUMN_2}} | {{TYPE_2}}   | {{CONSTRAINT_2}} | {{DESC_2}}   |
-| {{COLUMN_3}} | {{TYPE_3}}   | {{CONSTRAINT_3}} | {{DESC_3}}   |
-| created_at   | TIMESTAMP    | NOT NULL      | Thời gian tạo    |
-| updated_at   | TIMESTAMP    | NULLABLE      | Thời gian cập nhật |
+| Column       | Type       | Constraints      | Description        |
+| ------------ | ---------- | ---------------- | ------------------ |
+| id           | UUID       | PRIMARY KEY      | Unique identifier  |
+| {{COLUMN_1}} | {{TYPE_1}} | {{CONSTRAINT_1}} | {{DESC_1}}         |
+| {{COLUMN_2}} | {{TYPE_2}} | {{CONSTRAINT_2}} | {{DESC_2}}         |
+| {{COLUMN_3}} | {{TYPE_3}} | {{CONSTRAINT_3}} | {{DESC_3}}         |
+| created_at   | TIMESTAMP  | NOT NULL         | Thời gian tạo      |
+| updated_at   | TIMESTAMP  | NULLABLE         | Thời gian cập nhật |
 
 #### {{CUSTOM_SECTION_NAME}} Schema
 
@@ -82,15 +82,16 @@ erDiagram
 
 {{SECONDARY_TABLE_DESCRIPTION}}
 
-| Column        | Type         | Constraints   | Description      |
-| ------------- | ------------ | ------------- | ---------------- |
-| id            | UUID         | PRIMARY KEY   | Unique identifier|
-| {{FK_COLUMN}} | UUID         | FOREIGN KEY   | {{FK_DESCRIPTION}}|
-| {{COLUMN_A}}  | {{TYPE_A}}   | {{CONSTRAINT_A}} | {{DESC_A}}   |
-| {{COLUMN_B}}  | {{TYPE_B}}   | {{CONSTRAINT_B}} | {{DESC_B}}   |
-| created_at    | TIMESTAMP    | NOT NULL      | Thời gian tạo    |
+| Column        | Type       | Constraints      | Description        |
+| ------------- | ---------- | ---------------- | ------------------ |
+| id            | UUID       | PRIMARY KEY      | Unique identifier  |
+| {{FK_COLUMN}} | UUID       | FOREIGN KEY      | {{FK_DESCRIPTION}} |
+| {{COLUMN_A}}  | {{TYPE_A}} | {{CONSTRAINT_A}} | {{DESC_A}}         |
+| {{COLUMN_B}}  | {{TYPE_B}} | {{CONSTRAINT_B}} | {{DESC_B}}         |
+| created_at    | TIMESTAMP  | NOT NULL         | Thời gian tạo      |
 
 #### Business Rules
+
 -   {{SECONDARY_RULE_1}}
 -   {{SECONDARY_RULE_2}}
 
@@ -145,45 +146,6 @@ ALTER TABLE {{table_name}} ADD CONSTRAINT chk_{{table_name}}_{{field_name_2}}
     CHECK ({{validation_condition_2}});
 ```
 
-## 📊 Sample Data
-
-### Default {{ENTITY_TYPE}}
-
-```sql
--- {{SAMPLE_DATA_DESCRIPTION}}
-INSERT INTO {{table_name}} ({{columns}}) VALUES
-({{sample_values_1}}),
-({{sample_values_2}}),
-({{sample_values_3}});
-```
-
-## 📈 Performance Considerations
-
-### Query Optimization
-
--   Use prepared statements để tránh SQL injection
--   Implement connection pooling với HikariCP
--   Cache frequently accessed data với Redis
--   Use batch operations cho bulk operations
--   Implement pagination cho large result sets
-
-### Monitoring Queries
-
-```sql
--- {{MONITORING_QUERY_DESCRIPTION_1}}
-SELECT {{columns}}
-FROM {{table_name}}
-WHERE {{conditions}}
-ORDER BY {{order_by}}
-LIMIT 10;
-
--- {{MONITORING_QUERY_DESCRIPTION_2}}
-SELECT {{aggregate_functions}}
-FROM {{table_name}}
-GROUP BY {{group_by_fields}}
-ORDER BY {{order_by}};
-```
-
 ## 🚨 Business Rules
 
 ### {{BUSINESS_DOMAIN_1}}
@@ -222,49 +184,6 @@ ORDER BY {{order_by}};
     - {{VALIDATION_RULE_2}}
     - {{VALIDATION_RULE_3}}
 
-## 🔧 Database Functions & Triggers
-
-### {{FUNCTION_CATEGORY_1}}
-
-```sql
--- Function to {{function_description}}
-CREATE OR REPLACE FUNCTION {{function_name}}()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- {{function_logic_description}}
-    IF TG_OP = 'INSERT' THEN
-        {{insert_logic}}
-        RETURN NEW;
-    ELSIF TG_OP = 'DELETE' THEN
-        {{delete_logic}}
-        RETURN OLD;
-    END IF;
-    RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
--- Trigger for {{trigger_description}}
-CREATE TRIGGER {{trigger_name}}
-    AFTER INSERT OR DELETE ON {{table_name}}
-    FOR EACH ROW
-    EXECUTE FUNCTION {{function_name}}();
-```
-
-### {{FUNCTION_CATEGORY_2}}
-
-```sql
--- Function to {{cleanup_function_description}}
-CREATE OR REPLACE FUNCTION {{cleanup_function_name}}()
-RETURNS void AS $$
-BEGIN
-    -- {{cleanup_logic_description}}
-    {{cleanup_sql_statements}}
-
-    RAISE NOTICE '{{completion_message}}';
-END;
-$$ LANGUAGE plpgsql;
-```
-
 ## 🔐 Enhanced Security Features
 
 ### Data Privacy Views
@@ -292,7 +211,7 @@ DECLARE
 BEGIN
     -- {{access_logic_description}}
     {{access_check_logic}}
-    
+
     RETURN {{return_condition}};
 END;
 $$ LANGUAGE plpgsql;
@@ -316,20 +235,21 @@ $$ LANGUAGE plpgsql;
 
 ## 🔄 Migration History
 
-| Version | Date       | Description                              | Migration File                          |
-| ------- | ---------- | ---------------------------------------- | --------------------------------------- |
-| 1.0.0   | {{DATE_1}} | {{MIGRATION_DESC_1}}                     | {{MIGRATION_FILE_1}}                    |
-| 1.0.1   | {{DATE_2}} | {{MIGRATION_DESC_2}}                     | {{MIGRATION_FILE_2}}                    |
-| {{VER}} | {{DATE_N}} | {{MIGRATION_DESC_N}}                     | {{MIGRATION_FILE_N}}                    |
+| Version | Date       | Description          | Migration File       |
+| ------- | ---------- | -------------------- | -------------------- |
+| 1.0.0   | {{DATE_1}} | {{MIGRATION_DESC_1}} | {{MIGRATION_FILE_1}} |
+| 1.0.1   | {{DATE_2}} | {{MIGRATION_DESC_2}} | {{MIGRATION_FILE_2}} |
+| {{VER}} | {{DATE_N}} | {{MIGRATION_DESC_N}} | {{MIGRATION_FILE_N}} |
 
 ## 🚀 Migration Benefits ({{LATEST_VERSION}})
 
 ### **Advantages of {{LATEST_FEATURE}}**
 
 1. **{{BENEFIT_CATEGORY_1}}**
-   - {{BENEFIT_1_DETAIL_1}}
-   - {{BENEFIT_1_DETAIL_2}}
+
+    - {{BENEFIT_1_DETAIL_1}}
+    - {{BENEFIT_1_DETAIL_2}}
 
 2. **{{BENEFIT_CATEGORY_2}}**
-   - {{BENEFIT_2_DETAIL_1}}
-   - {{BENEFIT_2_DETAIL_2}}
+    - {{BENEFIT_2_DETAIL_1}}
+    - {{BENEFIT_2_DETAIL_2}}

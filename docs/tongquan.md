@@ -77,11 +77,20 @@ Xây dựng một nền tảng thương mại điện tử về game sử dụng
 
 ### 5.6 External APIs
 
--   **Movies**: TMDB (The Movie Database)
--   **Books**: Google Books API, Open Library
--   **Games**: IGDB (Internet Game Database)
--   **Music**: Spotify API, Last.fm
--   **Images**: Cloudinary, Unsplash
+#### 5.6.1 Gaming APIs
+
+-   **IGDB**: Game metadata, covers, information
+-   **Steam Web API**: Reference data (nếu cần)
+
+#### 5.6.2 Payment Gateways
+
+-   **Stripe**: Primary payment processing
+-   **PayPal**: Alternative payment method
+
+#### 5.6.3 File Storage
+
+-   **AWS S3**: Game file storage
+-   **CDN**: Global content delivery
 
 ## 6. Chiến Lược Triển Khai Git
 
