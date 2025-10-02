@@ -1,0 +1,1614 @@
+openapi: 3.0.3
+info:
+  title: User Service API
+  description: |
+    User Service API for My Digital Collection platform.
+    
+    This service handles:
+    - User profile management and personal information
+    - User preferences and settings
+    - Avatar and profile customization
+    - Social connections and friend relationships
+    - User activity history and statistics
+    - Privacy settings and data consent
+    
+    ## Features
+    - Comprehensive profile management
+    - Granular privacy controls
+    - Social networking features (friends, blocking)
+    - Multi-language and timezone support
+    - Activity tracking and analytics
+    - GDPR-compliant data management
+    
+    ## Privacy & Security
+    - Privacy-first design with granular controls
+    - GDPR compliance with data export/deletion
+    - Activity logging with privacy protection
+    - Secure friend relationship management
+  version: 1.0.0
+  contact:
+    name: Backend Development Team
+    email: backend@mydigitalcollection.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.mydigitalcollection.com/users/v1
+    description: Production server
+  - url: https://staging-api.mydigitalcollection.com/users/v1
+    description: Staging server
+  - url: http://localhost:8082/users/v1
+    description: Development server
+
+paths:
+  # Profile Management Endpoints
+  /profiles:
+    post:
+      tags:
+        - Profiles
+      summary: Create user profile
+      description: Create a new user profile (usually called during registration)
+      operationId: createProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileRequest'
+      responses:
+        '201':
+          description: Profile created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /profiles/{userId}:
+    get:
+      tags:
+        - Profiles
+      summary: Get user profile
+      description: Get user profile by ID (respects privacy settings)
+      operationId: getProfile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Profiles
+      summary: Update user profile
+      description: Update user profile information
+      operationId: updateProfile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Profiles
+      summary: Delete user profile
+      description: Soft delete user profile (GDPR compliance)
+      operationId: deleteProfile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: Profile deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /profiles/search:
+    get:
+      tags:
+        - Profiles
+      summary: Search user profiles
+      description: Search for user profiles by username, display name, or email
+      operationId: searchProfiles
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 3
+          description: Search query
+          example: "john"
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+          description: Maximum number of results
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Offset for pagination
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /profiles/{userId}/avatar:
+    post:
+      tags:
+        - Profiles
+      summary: Upload profile avatar
+      description: Upload a new profile avatar image
+      operationId: uploadAvatar
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                avatar:
+                  type: string
+                  format: binary
+                  description: Avatar image file (JPEG, PNG, WebP)
+      responses:
+        '200':
+          description: Avatar uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  avatar_url:
+                    type: string
+                    format: uri
+                    description: New avatar URL
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          description: File too large
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # Preferences Management
+  /preferences/{userId}:
+    get:
+      tags:
+        - Preferences
+      summary: Get user preferences
+      description: Get all user preferences by category
+      operationId: getPreferences
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [ui_preferences, notification_preferences, privacy_preferences, gaming_preferences]
+          description: Filter by preference category
+      responses:
+        '200':
+          description: User preferences retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferencesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags:
+        - Preferences
+      summary: Update user preferences
+      description: Update specific user preferences
+      operationId: updatePreferences
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePreferencesRequest'
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPreferencesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # Address Management
+  /addresses/{userId}:
+    get:
+      tags:
+        - Addresses
+      summary: Get user addresses
+      description: Get all addresses for a user
+      operationId: getAddresses
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: User addresses retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Addresses
+      summary: Add user address
+      description: Add a new address for the user
+      operationId: addAddress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddressRequest'
+      responses:
+        '201':
+          description: Address added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAddress'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /addresses/{userId}/{addressId}:
+    put:
+      tags:
+        - Addresses
+      summary: Update user address
+      description: Update an existing address
+      operationId: updateAddress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - name: addressId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Address ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAddressRequest'
+      responses:
+        '200':
+          description: Address updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAddress'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Addresses
+      summary: Delete user address
+      description: Delete an address
+      operationId: deleteAddress
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - name: addressId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Address ID
+      responses:
+        '200':
+          description: Address deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Friends Management
+  /friends/{userId}:
+    get:
+      tags:
+        - Friends
+      summary: Get user friends
+      description: Get all friends for a user
+      operationId: getFriends
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, accepted, blocked]
+          description: Filter by friendship status
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Maximum number of results
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Offset for pagination
+      responses:
+        '200':
+          description: Friends list retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendsListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /friends/{userId}/request:
+    post:
+      tags:
+        - Friends
+      summary: Send friend request
+      description: Send a friend request to another user
+      operationId: sendFriendRequest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID (sender)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - friend_user_id
+              properties:
+                friend_user_id:
+                  type: string
+                  format: uuid
+                  description: Target user ID
+                message:
+                  type: string
+                  maxLength: 500
+                  description: Optional message with friend request
+      responses:
+        '201':
+          description: Friend request sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendRelationship'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /friends/{userId}/{friendshipId}/accept:
+    post:
+      tags:
+        - Friends
+      summary: Accept friend request
+      description: Accept a pending friend request
+      operationId: acceptFriendRequest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID (recipient)
+        - name: friendshipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Friendship ID
+      responses:
+        '200':
+          description: Friend request accepted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendRelationship'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /friends/{userId}/{friendshipId}/decline:
+    post:
+      tags:
+        - Friends
+      summary: Decline friend request
+      description: Decline a pending friend request
+      operationId: declineFriendRequest
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID (recipient)
+        - name: friendshipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Friendship ID
+      responses:
+        '200':
+          description: Friend request declined successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /friends/{userId}/{friendshipId}/block:
+    post:
+      tags:
+        - Friends
+      summary: Block user
+      description: Block a user (prevents all interactions)
+      operationId: blockUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID (blocker)
+        - name: friendshipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Friendship ID
+      responses:
+        '200':
+          description: User blocked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FriendRelationship'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /friends/{userId}/{friendshipId}/unblock:
+    post:
+      tags:
+        - Friends
+      summary: Unblock user
+      description: Unblock a previously blocked user
+      operationId: unblockUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID (unblocker)
+        - name: friendshipId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Friendship ID
+      responses:
+        '200':
+          description: User unblocked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Privacy Settings
+  /privacy/{userId}:
+    get:
+      tags:
+        - Privacy
+      summary: Get privacy settings
+      description: Get all privacy settings for a user
+      operationId: getPrivacySettings
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      responses:
+        '200':
+          description: Privacy settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivacySettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    patch:
+      tags:
+        - Privacy
+      summary: Update privacy settings
+      description: Update user privacy settings
+      operationId: updatePrivacySettings
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePrivacySettingsRequest'
+      responses:
+        '200':
+          description: Privacy settings updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrivacySettingsResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # Activity & Analytics
+  /activity/{userId}:
+    get:
+      tags:
+        - Activity
+      summary: Get user activity
+      description: Get user activity history (respects privacy settings)
+      operationId: getUserActivity
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+        - name: activity_type
+          in: query
+          schema:
+            type: string
+            enum: [profile_update, preference_change, friend_request, privacy_change, game_interaction]
+          description: Filter by activity type
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Start date for activity range
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: End date for activity range
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          description: Maximum number of results
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Offset for pagination
+      responses:
+        '200':
+          description: User activity retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserActivityResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # GDPR & Data Management
+  /data/{userId}/export:
+    post:
+      tags:
+        - Data Management
+      summary: Export user data
+      description: Request export of all user data (GDPR compliance)
+      operationId: exportUserData
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                format:
+                  type: string
+                  enum: [json, csv]
+                  default: json
+                  description: Export format
+                include_activity:
+                  type: boolean
+                  default: true
+                  description: Include activity history
+                delivery_method:
+                  type: string
+                  enum: [email, download_link]
+                  default: email
+                  description: How to deliver the export
+      responses:
+        '202':
+          description: Data export request accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                    format: uuid
+                    description: Export request ID
+                  estimated_completion:
+                    type: string
+                    format: date-time
+                    description: Estimated completion time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Request Schemas
+    CreateProfileRequest:
+      type: object
+      required:
+        - email
+        - username
+        - display_name
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "user@example.com"
+        username:
+          type: string
+          pattern: '^[a-zA-Z0-9_]{3,50}$'
+          description: Unique username
+          example: "gamer123"
+        display_name:
+          type: string
+          maxLength: 100
+          description: Public display name
+          example: "John Doe"
+        first_name:
+          type: string
+          maxLength: 50
+          description: First name
+          example: "John"
+        last_name:
+          type: string
+          maxLength: 50
+          description: Last name
+          example: "Doe"
+        date_of_birth:
+          type: string
+          format: date
+          description: Birth date (optional)
+          example: "1990-05-15"
+        country_code:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          description: ISO country code
+          example: "US"
+        language_preference:
+          type: string
+          pattern: '^[a-z]{2}$'
+          description: Preferred language (ISO code)
+          example: "en"
+        timezone:
+          type: string
+          description: User timezone
+          example: "America/New_York"
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          maxLength: 100
+          description: Public display name
+        first_name:
+          type: string
+          maxLength: 50
+          description: First name
+        last_name:
+          type: string
+          maxLength: 50
+          description: Last name
+        bio:
+          type: string
+          maxLength: 1000
+          description: User biography
+        country_code:
+          type: string
+          pattern: '^[A-Z]{2}$'
+          description: ISO country code
+        language_preference:
+          type: string
+          pattern: '^[a-z]{2}$'
+          description: Preferred language
+        timezone:
+          type: string
+          description: User timezone
+        social_links:
+          $ref: '#/components/schemas/SocialLinks'
+
+    UpdatePreferencesRequest:
+      type: object
+      required:
+        - preferences
+      properties:
+        preferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/PreferenceUpdate'
+
+    PreferenceUpdate:
+      type: object
+      required:
+        - category
+        - preference_key
+        - preference_value
+      properties:
+        category:
+          type: string
+          enum: [ui_preferences, notification_preferences, privacy_preferences, gaming_preferences]
+        preference_key:
+          type: string
+          maxLength: 100
+        preference_value:
+          type: object
+          description: Preference value (flexible JSON)
+        is_public:
+          type: boolean
+          default: false
+
+    CreateAddressRequest:
+      type: object
+      required:
+        - address_type
+        - street_address
+        - city
+        - country_code
+      properties:
+        address_type:
+          type: string
+          enum: [shipping, billing, both]
+        street_address:
+          type: string
+          maxLength: 500
+        city:
+          type: string
+          maxLength: 100
+        state_province:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          maxLength: 20
+        country_code:
+          type: string
+          pattern: '^[A-Z]{2}$'
+        is_default:
+          type: boolean
+          default: false
+        is_billing:
+          type: boolean
+          default: false
+
+    UpdateAddressRequest:
+      type: object
+      properties:
+        address_type:
+          type: string
+          enum: [shipping, billing, both]
+        street_address:
+          type: string
+          maxLength: 500
+        city:
+          type: string
+          maxLength: 100
+        state_province:
+          type: string
+          maxLength: 100
+        postal_code:
+          type: string
+          maxLength: 20
+        country_code:
+          type: string
+          pattern: '^[A-Z]{2}$'
+        is_default:
+          type: boolean
+        is_billing:
+          type: boolean
+
+    UpdatePrivacySettingsRequest:
+      type: object
+      required:
+        - settings
+      properties:
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrivacySettingUpdate'
+
+    PrivacySettingUpdate:
+      type: object
+      required:
+        - privacy_category
+        - visibility_level
+      properties:
+        privacy_category:
+          type: string
+          enum: [profile_information, game_library, activity_feed, contact_information]
+        visibility_level:
+          type: string
+          enum: [public, friends, private]
+        custom_settings:
+          type: object
+          description: Custom privacy rules
+
+    # Response Schemas
+    UserProfile:
+      type: object
+      required:
+        - id
+        - email
+        - username
+        - display_name
+        - status
+        - is_verified
+        - is_active
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User identifier
+        email:
+          type: string
+          format: email
+          description: User email address
+        username:
+          type: string
+          description: Unique username
+        display_name:
+          type: string
+          description: Public display name
+        first_name:
+          type: string
+          description: First name
+        last_name:
+          type: string
+          description: Last name
+        date_of_birth:
+          type: string
+          format: date
+          description: Birth date (privacy protected)
+        country_code:
+          type: string
+          description: ISO country code
+        language_preference:
+          type: string
+          description: Preferred language
+        timezone:
+          type: string
+          description: User timezone
+        avatar_url:
+          type: string
+          format: uri
+          description: Profile avatar URL
+        bio:
+          type: string
+          description: User biography
+        social_links:
+          $ref: '#/components/schemas/SocialLinks'
+        status:
+          type: string
+          enum: [active, inactive, suspended, deleted]
+          description: Account status
+        is_verified:
+          type: boolean
+          description: Email verification status
+        is_active:
+          type: boolean
+          description: Account active status
+        last_login_at:
+          type: string
+          format: date-time
+          description: Last login timestamp
+        created_at:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+
+    SocialLinks:
+      type: object
+      properties:
+        steam:
+          type: string
+          format: uri
+          description: Steam profile URL
+        discord:
+          type: string
+          description: Discord username
+        twitter:
+          type: string
+          format: uri
+          description: Twitter profile URL
+        youtube:
+          type: string
+          format: uri
+          description: YouTube channel URL
+        twitch:
+          type: string
+          format: uri
+          description: Twitch channel URL
+        custom_links:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomLink'
+
+    CustomLink:
+      type: object
+      required:
+        - name
+        - url
+      properties:
+        name:
+          type: string
+          maxLength: 50
+          description: Link name
+        url:
+          type: string
+          format: uri
+          description: Link URL
+        icon:
+          type: string
+          description: Icon identifier
+
+    ProfileSearchResponse:
+      type: object
+      required:
+        - profiles
+        - total_count
+        - limit
+        - offset
+      properties:
+        profiles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileSearchResult'
+        total_count:
+          type: integer
+          description: Total number of matching profiles
+        limit:
+          type: integer
+          description: Results limit
+        offset:
+          type: integer
+          description: Results offset
+
+    ProfileSearchResult:
+      type: object
+      required:
+        - id
+        - username
+        - display_name
+        - avatar_url
+        - is_verified
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        display_name:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+        country_code:
+          type: string
+        is_verified:
+          type: boolean
+        mutual_friends_count:
+          type: integer
+          description: Number of mutual friends
+
+    UserPreferencesResponse:
+      type: object
+      required:
+        - preferences
+      properties:
+        preferences:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPreference'
+
+    UserPreference:
+      type: object
+      required:
+        - id
+        - category
+        - preference_key
+        - preference_value
+        - is_public
+      properties:
+        id:
+          type: string
+          format: uuid
+        category:
+          type: string
+        preference_key:
+          type: string
+        preference_value:
+          type: object
+        is_public:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    AddressListResponse:
+      type: object
+      required:
+        - addresses
+      properties:
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserAddress'
+
+    UserAddress:
+      type: object
+      required:
+        - id
+        - address_type
+        - street_address
+        - city
+        - country_code
+        - is_default
+        - is_billing
+      properties:
+        id:
+          type: string
+          format: uuid
+        address_type:
+          type: string
+          enum: [shipping, billing, both]
+        street_address:
+          type: string
+        city:
+          type: string
+        state_province:
+          type: string
+        postal_code:
+          type: string
+        country_code:
+          type: string
+        is_default:
+          type: boolean
+        is_billing:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    FriendsListResponse:
+      type: object
+      required:
+        - friends
+        - total_count
+        - limit
+        - offset
+      properties:
+        friends:
+          type: array
+          items:
+            $ref: '#/components/schemas/FriendRelationship'
+        total_count:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    FriendRelationship:
+      type: object
+      required:
+        - id
+        - user_id
+        - friend_user_id
+        - friendship_status
+        - requested_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        friend_user_id:
+          type: string
+          format: uuid
+        friend_profile:
+          $ref: '#/components/schemas/ProfileSearchResult'
+        friendship_status:
+          type: string
+          enum: [pending, accepted, blocked, declined]
+        requested_at:
+          type: string
+          format: date-time
+        accepted_at:
+          type: string
+          format: date-time
+        blocked_at:
+          type: string
+          format: date-time
+        relationship_metadata:
+          type: object
+          description: Additional relationship data
+
+    PrivacySettingsResponse:
+      type: object
+      required:
+        - settings
+      properties:
+        settings:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrivacySetting'
+
+    PrivacySetting:
+      type: object
+      required:
+        - id
+        - privacy_category
+        - visibility_level
+      properties:
+        id:
+          type: string
+          format: uuid
+        privacy_category:
+          type: string
+        visibility_level:
+          type: string
+          enum: [public, friends, private]
+        custom_settings:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserActivityResponse:
+      type: object
+      required:
+        - activities
+        - total_count
+        - limit
+        - offset
+      properties:
+        activities:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserActivity'
+        total_count:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    UserActivity:
+      type: object
+      required:
+        - id
+        - activity_type
+        - activity_description
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        activity_type:
+          type: string
+        activity_description:
+          type: string
+        activity_metadata:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+
+    SuccessMessage:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          description: Success message
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Conflict:
+      description: Resource conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+tags:
+  - name: Profiles
+    description: User profile management operations
+  - name: Preferences
+    description: User preferences and settings
+  - name: Addresses
+    description: User address management
+  - name: Friends
+    description: Social connections and friend management
+  - name: Privacy
+    description: Privacy settings and controls
+  - name: Activity
+    description: User activity tracking and analytics
+  - name: Data Management
+    description: GDPR compliance and data export

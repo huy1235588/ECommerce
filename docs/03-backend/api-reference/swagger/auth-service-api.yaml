@@ -1,0 +1,814 @@
+openapi: 3.0.3
+info:
+  title: Authentication Service API
+  description: |
+    Authentication Service API for My Digital Collection platform.
+    
+    This service handles:
+    - JWT token management and refresh
+    - OAuth2 integrations (Google, Steam, Discord)
+    - Session management and security tracking
+    - Two-factor authentication (2FA)
+    - Password reset and account recovery
+    - Role-based access control (RBAC)
+    
+    ## Authentication Flow
+    1. Login with credentials or OAuth
+    2. Receive JWT access token + refresh token
+    3. Use access token for API calls (Bearer authentication)
+    4. Refresh tokens when expired
+    5. Logout to revoke tokens
+    
+    ## Security Features
+    - JWT tokens with short expiry (15 minutes)
+    - Refresh token rotation
+    - Device fingerprinting
+    - Multi-session support (max 5 concurrent)
+    - 2FA support with TOTP
+    - Rate limiting on sensitive endpoints
+  version: 1.0.0
+  contact:
+    name: Backend Development Team
+    email: backend@mydigitalcollection.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.mydigitalcollection.com/auth/v1
+    description: Production server
+  - url: https://staging-api.mydigitalcollection.com/auth/v1
+    description: Staging server
+  - url: http://localhost:8081/auth/v1
+    description: Development server
+
+paths:
+  # Authentication Endpoints
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login with email/password
+      description: Authenticate user with email and password credentials
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              basic_login:
+                summary: Basic login
+                value:
+                  email: "user@example.com"
+                  password: "SecurePassword123!"
+                  remember_me: false
+                  device_info:
+                    device_type: "desktop"
+                    user_agent: "Mozilla/5.0..."
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Revoke current session and tokens
+      operationId: logout
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                revoke_all_sessions:
+                  type: boolean
+                  description: Revoke all user sessions
+                  default: false
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Generate new access token using refresh token
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # OAuth Endpoints
+  /auth/oauth/{provider}/authorize:
+    get:
+      tags:
+        - OAuth
+      summary: OAuth authorization redirect
+      description: Redirect to OAuth provider for authorization
+      operationId: oauthAuthorize
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, steam, discord, github]
+          description: OAuth provider name
+        - name: redirect_uri
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uri
+          description: Callback URI after authorization
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+          description: State parameter for CSRF protection
+      responses:
+        '302':
+          description: Redirect to OAuth provider
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/oauth/{provider}/callback:
+    post:
+      tags:
+        - OAuth
+      summary: OAuth callback handler
+      description: Handle OAuth provider callback and create session
+      operationId: oauthCallback
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, steam, discord, github]
+          description: OAuth provider name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OAuthCallbackRequest'
+      responses:
+        '200':
+          description: OAuth authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Password Reset Endpoints
+  /auth/password/reset-request:
+    post:
+      tags:
+        - Password Reset
+      summary: Request password reset
+      description: Send password reset email to user
+      operationId: requestPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '200':
+          description: Password reset email sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /auth/password/reset-confirm:
+    post:
+      tags:
+        - Password Reset
+      summary: Confirm password reset
+      description: Reset password using reset token
+      operationId: confirmPasswordReset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Two-Factor Authentication Endpoints
+  /auth/2fa/setup:
+    post:
+      tags:
+        - Two-Factor Authentication
+      summary: Setup 2FA
+      description: Initialize 2FA setup and generate QR code
+      operationId: setup2FA
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 2FA setup data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorSetupResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: 2FA already enabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/2fa/verify:
+    post:
+      tags:
+        - Two-Factor Authentication
+      summary: Verify 2FA code
+      description: Verify TOTP code to complete 2FA setup or authentication
+      operationId: verify2FA
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TwoFactorVerifyRequest'
+      responses:
+        '200':
+          description: 2FA verification successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TwoFactorVerifyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/2fa/disable:
+    post:
+      tags:
+        - Two-Factor Authentication
+      summary: Disable 2FA
+      description: Disable two-factor authentication for user
+      operationId: disable2FA
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - verification_code
+              properties:
+                verification_code:
+                  type: string
+                  description: Current TOTP code for verification
+                  pattern: '^[0-9]{6}$'
+      responses:
+        '200':
+          description: 2FA disabled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Session Management Endpoints
+  /auth/sessions:
+    get:
+      tags:
+        - Session Management
+      summary: List user sessions
+      description: Get all active sessions for current user
+      operationId: listSessions
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of user sessions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/sessions/{sessionId}:
+    delete:
+      tags:
+        - Session Management
+      summary: Revoke session
+      description: Revoke a specific session
+      operationId: revokeSession
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: Session ID to revoke
+      responses:
+        '200':
+          description: Session revoked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Token Validation Endpoints
+  /auth/validate:
+    post:
+      tags:
+        - Token Validation
+      summary: Validate token
+      description: Validate JWT token and return user context
+      operationId: validateToken
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenValidationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Request Schemas
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "user@example.com"
+        password:
+          type: string
+          format: password
+          description: User password
+          minLength: 8
+          example: "SecurePassword123!"
+        remember_me:
+          type: boolean
+          description: Extended session duration
+          default: false
+        device_info:
+          $ref: '#/components/schemas/DeviceInfo'
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          description: JWT refresh token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    OAuthCallbackRequest:
+      type: object
+      required:
+        - authorization_code
+      properties:
+        authorization_code:
+          type: string
+          description: OAuth authorization code
+        state:
+          type: string
+          description: State parameter for CSRF protection
+        redirect_uri:
+          type: string
+          format: uri
+          description: Callback URI
+
+    PasswordResetRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          format: email
+          description: Email address for password reset
+          example: "user@example.com"
+
+    PasswordResetConfirmRequest:
+      type: object
+      required:
+        - reset_token
+        - new_password
+      properties:
+        reset_token:
+          type: string
+          description: Password reset token from email
+        new_password:
+          type: string
+          format: password
+          minLength: 8
+          description: New password
+          example: "NewSecurePassword123!"
+
+    TwoFactorVerifyRequest:
+      type: object
+      required:
+        - verification_code
+      properties:
+        verification_code:
+          type: string
+          pattern: '^[0-9]{6}$'
+          description: 6-digit TOTP code
+          example: "123456"
+        backup_code:
+          type: string
+          description: Backup recovery code (alternative to TOTP)
+
+    DeviceInfo:
+      type: object
+      properties:
+        device_type:
+          type: string
+          enum: [desktop, mobile, tablet]
+          description: Device type
+          example: "desktop"
+        user_agent:
+          type: string
+          description: Browser user agent string
+          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        device_fingerprint:
+          type: string
+          description: Device fingerprint hash
+        ip_address:
+          type: string
+          format: ipv4
+          description: Client IP address
+          example: "192.168.1.1"
+
+    # Response Schemas
+    AuthResponse:
+      type: object
+      required:
+        - access_token
+        - refresh_token
+        - token_type
+        - expires_in
+        - user_id
+      properties:
+        access_token:
+          type: string
+          description: JWT access token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        refresh_token:
+          type: string
+          description: JWT refresh token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        token_type:
+          type: string
+          example: "Bearer"
+        expires_in:
+          type: integer
+          description: Access token expiry in seconds
+          example: 900
+        refresh_expires_in:
+          type: integer
+          description: Refresh token expiry in seconds
+          example: 2592000
+        user_id:
+          type: string
+          format: uuid
+          description: User identifier
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        scope:
+          type: string
+          description: Token scope
+          example: "read write"
+        requires_2fa:
+          type: boolean
+          description: Whether 2FA verification is required
+          default: false
+
+    TwoFactorSetupResponse:
+      type: object
+      required:
+        - secret_key
+        - qr_code_url
+        - backup_codes
+      properties:
+        secret_key:
+          type: string
+          description: Base32-encoded secret key for TOTP
+          example: "JBSWY3DPEHPK3PXP"
+        qr_code_url:
+          type: string
+          format: uri
+          description: QR code image URL
+          example: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA..."
+        backup_codes:
+          type: array
+          items:
+            type: string
+          description: One-time backup recovery codes
+          example: ["12345678", "87654321", "11223344"]
+
+    TwoFactorVerifyResponse:
+      type: object
+      required:
+        - verified
+        - enabled
+      properties:
+        verified:
+          type: boolean
+          description: Whether the code was verified successfully
+        enabled:
+          type: boolean
+          description: Whether 2FA is now enabled
+        remaining_backup_codes:
+          type: integer
+          description: Number of unused backup codes remaining
+
+    SessionListResponse:
+      type: object
+      required:
+        - sessions
+      properties:
+        sessions:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSession'
+
+    UserSession:
+      type: object
+      required:
+        - id
+        - ip_address
+        - created_at
+        - last_activity
+        - is_current
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Session identifier
+        ip_address:
+          type: string
+          format: ipv4
+          description: Session IP address
+        user_agent:
+          type: string
+          description: Browser/device information
+        device_type:
+          type: string
+          enum: [desktop, mobile, tablet]
+        location:
+          type: string
+          description: Approximate location
+          example: "Ho Chi Minh City, Vietnam"
+        created_at:
+          type: string
+          format: date-time
+          description: Session creation time
+        last_activity:
+          type: string
+          format: date-time
+          description: Last activity time
+        expires_at:
+          type: string
+          format: date-time
+          description: Session expiration time
+        is_current:
+          type: boolean
+          description: Whether this is the current session
+
+    TokenValidationResponse:
+      type: object
+      required:
+        - valid
+        - user_id
+        - expires_at
+      properties:
+        valid:
+          type: boolean
+          description: Whether token is valid
+        user_id:
+          type: string
+          format: uuid
+          description: User identifier
+        username:
+          type: string
+          description: Username
+        email:
+          type: string
+          format: email
+          description: User email
+        roles:
+          type: array
+          items:
+            type: string
+          description: User roles
+          example: ["user", "moderator"]
+        permissions:
+          type: array
+          items:
+            type: string
+          description: User permissions
+          example: ["read:profile", "write:profile"]
+        expires_at:
+          type: string
+          format: date-time
+          description: Token expiration time
+        requires_2fa:
+          type: boolean
+          description: Whether user requires 2FA verification
+
+    SuccessMessage:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          description: Success message
+          example: "Operation completed successfully"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: "INVALID_CREDENTIALS"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Invalid email or password"
+        details:
+          type: object
+          description: Additional error details
+        timestamp:
+          type: string
+          format: date-time
+          description: Error timestamp
+        request_id:
+          type: string
+          description: Request ID for tracking
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            validation_error:
+              summary: Validation error
+              value:
+                error: "VALIDATION_ERROR"
+                message: "Request validation failed"
+                details:
+                  email: "Invalid email format"
+                  password: "Password must be at least 8 characters"
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid_token:
+              summary: Invalid token
+              value:
+                error: "INVALID_TOKEN"
+                message: "Access token is invalid or expired"
+            invalid_credentials:
+              summary: Invalid credentials
+              value:
+                error: "INVALID_CREDENTIALS"
+                message: "Invalid email or password"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    TooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "RATE_LIMIT_EXCEEDED"
+            message: "Too many requests. Please try again later."
+
+tags:
+  - name: Authentication
+    description: Core authentication operations
+  - name: OAuth
+    description: OAuth2 integration endpoints
+  - name: Password Reset
+    description: Password reset functionality
+  - name: Two-Factor Authentication
+    description: 2FA setup and verification
+  - name: Session Management
+    description: Session management operations
+  - name: Token Validation
+    description: Token validation and introspection

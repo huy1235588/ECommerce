@@ -204,7 +204,6 @@ docs/
 │   ├── api-reference/             # Thiết kế API
 │   │   ├── README.md                 # Nguyên tắc thiết kế API
 │   │   ├── api-standards.md          # Chuẩn API và conventions
-│   │   ├── authentication-api.md     # Thiết kế API xác thực
 │   │   ├── error-handling.md         # Xử lý lỗi và response codes
 │   │   └── swagger/                  # OpenAPI specifications theo service
 │   │       ├── README.md                # API documentation overview
