@@ -1,0 +1,948 @@
+openapi: 3.0.3
+info:
+  title: Notification Service API
+  description: |
+    API cho việc quản lý notifications trong hệ thống ECommerce. Hỗ trợ email notifications, in-app notifications, và real-time push notifications.
+    
+    ## Features
+    - Email notifications (transactional & marketing)
+    - In-app notifications
+    - Real-time push notifications via SSE (Server-Sent Events)
+    - Browser push notifications via Web Push API
+    - Notification preferences management
+    - Notification templates
+    - Notification history & read status
+    
+    ## Authentication
+    Các endpoints yêu cầu JWT token trong Authorization header:
+    ```
+    Authorization: Bearer <token>
+    ```
+    
+    ## Notification Types
+    - **EMAIL**: Email notifications
+    - **IN_APP**: In-app notifications (hiển thị trong UI)
+    - **PUSH**: Browser push notifications
+    - **SMS**: SMS notifications (future)
+    
+    ## Event-Driven Architecture
+    Service lắng nghe events từ Kafka và tự động gửi notifications:
+    - UserCreatedEvent → Welcome email
+    - OrderPlacedEvent → Order confirmation
+    - PaymentSuccessEvent → Payment receipt
+    - GamePurchasedEvent → Purchase confirmation
+  version: 1.0.0
+  contact:
+    name: Backend Team
+    email: backend@ecommerce.com
+
+servers:
+  - url: http://localhost:8084/v1
+    description: Local development
+  - url: https://api-dev.ecommerce.com/v1
+    description: Development environment
+  - url: https://api.ecommerce.com/v1
+    description: Production
+
+tags:
+  - name: Notifications
+    description: User notification operations
+  - name: Templates
+    description: Notification template management (Admin only)
+  - name: Preferences
+    description: User notification preferences
+
+security:
+  - BearerAuth: []
+
+paths:
+  /notifications/stream:
+    get:
+      tags:
+        - Notifications
+      summary: Real-time notification stream (SSE)
+      description: |
+        Establish Server-Sent Events connection để nhận real-time notifications.
+        
+        SSE được chọn thay vì WebSocket vì:
+        - Chỉ cần one-way communication (server → client)
+        - Tự động reconnect khi mất connection
+        - Đơn giản hơn, ít overhead hơn
+        - Firewall friendly (HTTP standard)
+        
+        ## Connection
+        ```javascript
+        const eventSource = new EventSource('/v1/notifications/stream', {
+          headers: { 'Authorization': 'Bearer <token>' }
+        });
+        ```
+        
+        ## Event Types
+        - `initial`: Sent once on connection with unread notifications
+        - `notification`: New notification event
+        - `heartbeat`: Keep-alive ping every 30 seconds
+      responses:
+        '200':
+          description: SSE stream established
+          content:
+            text/event-stream:
+              schema:
+                type: string
+              examples:
+                initial:
+                  value: |
+                    event: initial
+                    data: {"unread_count": 5, "notifications": [...]}
+                    
+                notification:
+                  value: |
+                    event: notification
+                    data: {"id": "uuid", "title": "Order Confirmed", "message": "...", "category": "ORDER"}
+                    
+                heartbeat:
+                  value: |
+                    event: heartbeat
+                    data: {"timestamp": "2025-10-03T12:00:00Z"}
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications:
+    get:
+      tags:
+        - Notifications
+      summary: Get user notifications
+      description: Lấy danh sách notifications của user hiện tại
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [EMAIL, IN_APP, PUSH, SMS]
+          description: Filter by notification type
+        - name: is_read
+          in: query
+          schema:
+            type: boolean
+          description: Filter by read status
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [ORDER, PAYMENT, GAME, ACCOUNT, PROMOTION, SYSTEM]
+          description: Filter by category
+      responses:
+        '200':
+          description: Notifications retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationsListResponse'
+              example:
+                success: true
+                data:
+                  - id: "550e8400-e29b-41d4-a716-446655440001"
+                    user_id: "550e8400-e29b-41d4-a716-446655440000"
+                    type: IN_APP
+                    category: ORDER
+                    title: "Order Confirmed"
+                    message: "Your order #12345 has been confirmed"
+                    data:
+                      order_id: "order-uuid-123"
+                      amount: 59.99
+                    is_read: false
+                    read_at: null
+                    created_at: "2025-10-03T12:00:00.000Z"
+                pagination:
+                  current_page: 1
+                  per_page: 20
+                  total_pages: 3
+                  total_items: 45
+                  has_next: true
+                  has_prev: false
+                timestamp: "2025-10-03T12:30:00.000Z"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /notifications/unread-count:
+    get:
+      tags:
+        - Notifications
+      summary: Get unread notification count
+      description: Lấy số lượng notifications chưa đọc
+      responses:
+        '200':
+          description: Unread count retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      total_unread:
+                        type: integer
+                        example: 5
+                      by_category:
+                        type: object
+                        properties:
+                          ORDER:
+                            type: integer
+                            example: 2
+                          PAYMENT:
+                            type: integer
+                            example: 1
+                          GAME:
+                            type: integer
+                            example: 2
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /notifications/{notificationId}:
+    get:
+      tags:
+        - Notifications
+      summary: Get notification by ID
+      description: Lấy chi tiết một notification
+      parameters:
+        - $ref: '#/components/parameters/NotificationIdParam'
+      responses:
+        '200':
+          description: Notification retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Notifications
+      summary: Delete notification
+      description: Xóa một notification
+      parameters:
+        - $ref: '#/components/parameters/NotificationIdParam'
+      responses:
+        '204':
+          description: Notification deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notifications/{notificationId}/read:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark notification as read
+      description: Đánh dấu notification đã đọc
+      parameters:
+        - $ref: '#/components/parameters/NotificationIdParam'
+      responses:
+        '200':
+          description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /notifications/mark-all-read:
+    patch:
+      tags:
+        - Notifications
+      summary: Mark all notifications as read
+      description: Đánh dấu tất cả notifications đã đọc
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                category:
+                  type: string
+                  enum: [ORDER, PAYMENT, GAME, ACCOUNT, PROMOTION, SYSTEM]
+                  description: Optional - only mark specific category as read
+      responses:
+        '200':
+          description: All notifications marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      marked_count:
+                        type: integer
+                        description: Number of notifications marked as read
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /notifications/clear-all:
+    delete:
+      tags:
+        - Notifications
+      summary: Clear all read notifications
+      description: Xóa tất cả notifications đã đọc
+      responses:
+        '200':
+          description: Read notifications cleared
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      deleted_count:
+                        type: integer
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /notifications/send:
+    post:
+      tags:
+        - Notifications
+      summary: Send notification (Admin only)
+      description: Gửi notification thủ công (admin function)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendNotificationRequest'
+            examples:
+              singleUser:
+                summary: Send to single user
+                value:
+                  user_id: "550e8400-e29b-41d4-a716-446655440000"
+                  type: IN_APP
+                  category: PROMOTION
+                  title: "Special Offer!"
+                  message: "Get 50% off on all games this weekend"
+                  data:
+                    discount_code: "WEEKEND50"
+              broadcast:
+                summary: Broadcast to all users
+                value:
+                  broadcast: true
+                  type: EMAIL
+                  category: SYSTEM
+                  title: "System Maintenance"
+                  message: "Scheduled maintenance on Oct 5, 2025"
+                  template_id: "sys-maintenance-001"
+      responses:
+        '201':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /notifications/preferences:
+    get:
+      tags:
+        - Preferences
+      summary: Get notification preferences
+      description: Lấy notification preferences của user hiện tại
+      responses:
+        '200':
+          description: Preferences retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencesResponse'
+              example:
+                success: true
+                data:
+                  user_id: "550e8400-e29b-41d4-a716-446655440000"
+                  email_enabled: true
+                  in_app_enabled: true
+                  push_enabled: false
+                  categories:
+                    ORDER:
+                      email: true
+                      in_app: true
+                      push: false
+                    PAYMENT:
+                      email: true
+                      in_app: true
+                      push: false
+                    GAME:
+                      email: true
+                      in_app: true
+                      push: false
+                    PROMOTION:
+                      email: false
+                      in_app: true
+                      push: false
+                  updated_at: "2025-10-03T12:00:00.000Z"
+                timestamp: "2025-10-03T12:30:00.000Z"
+
+    put:
+      tags:
+        - Preferences
+      summary: Update notification preferences
+      description: Cập nhật notification preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePreferencesRequest'
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencesResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /notifications/templates:
+    get:
+      tags:
+        - Templates
+      summary: Get notification templates (Admin only)
+      description: Lấy danh sách notification templates
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [EMAIL, IN_APP, PUSH, SMS]
+        - name: category
+          in: query
+          schema:
+            type: string
+            enum: [ORDER, PAYMENT, GAME, ACCOUNT, PROMOTION, SYSTEM]
+      responses:
+        '200':
+          description: Templates retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesListResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags:
+        - Templates
+      summary: Create notification template (Admin only)
+      description: Tạo notification template mới
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+      responses:
+        '201':
+          description: Template created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /notifications/templates/{templateId}:
+    get:
+      tags:
+        - Templates
+      summary: Get template by ID (Admin only)
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Templates
+      summary: Update template (Admin only)
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: Template updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Templates
+      summary: Delete template (Admin only)
+      parameters:
+        - name: templateId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Template deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    NotificationIdParam:
+      name: notificationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Notification ID
+
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Items per page
+
+  schemas:
+    SendNotificationRequest:
+      type: object
+      required:
+        - type
+        - category
+        - title
+        - message
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: Target user ID (nếu không có broadcast = true)
+        broadcast:
+          type: boolean
+          description: Send to all users
+          default: false
+        type:
+          type: string
+          enum: [EMAIL, IN_APP, PUSH, SMS]
+          description: Notification type
+        category:
+          type: string
+          enum: [ORDER, PAYMENT, GAME, ACCOUNT, PROMOTION, SYSTEM]
+          description: Notification category
+        title:
+          type: string
+          maxLength: 200
+          description: Notification title
+        message:
+          type: string
+          maxLength: 1000
+          description: Notification message/body
+        data:
+          type: object
+          description: Additional JSON data
+        template_id:
+          type: string
+          description: Template ID to use (optional)
+        scheduled_at:
+          type: string
+          format: date-time
+          description: Schedule notification for later (optional)
+
+    CreateTemplateRequest:
+      type: object
+      required:
+        - name
+        - type
+        - category
+        - subject
+        - body
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Template name
+        type:
+          type: string
+          enum: [EMAIL, IN_APP, PUSH, SMS]
+        category:
+          type: string
+          enum: [ORDER, PAYMENT, GAME, ACCOUNT, PROMOTION, SYSTEM]
+        subject:
+          type: string
+          maxLength: 200
+          description: Email subject or notification title template
+        body:
+          type: string
+          description: Template body with placeholders (e.g., {{username}})
+        variables:
+          type: array
+          items:
+            type: string
+          description: List of template variables
+          example: ["username", "order_id", "amount"]
+        is_active:
+          type: boolean
+          default: true
+
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        subject:
+          type: string
+          maxLength: 200
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+
+    UpdatePreferencesRequest:
+      type: object
+      properties:
+        email_enabled:
+          type: boolean
+          description: Enable/disable all email notifications
+        in_app_enabled:
+          type: boolean
+          description: Enable/disable all in-app notifications
+        push_enabled:
+          type: boolean
+          description: Enable/disable all push notifications
+        categories:
+          type: object
+          description: Per-category preferences
+          properties:
+            ORDER:
+              $ref: '#/components/schemas/CategoryPreference'
+            PAYMENT:
+              $ref: '#/components/schemas/CategoryPreference'
+            GAME:
+              $ref: '#/components/schemas/CategoryPreference'
+            ACCOUNT:
+              $ref: '#/components/schemas/CategoryPreference'
+            PROMOTION:
+              $ref: '#/components/schemas/CategoryPreference'
+            SYSTEM:
+              $ref: '#/components/schemas/CategoryPreference'
+
+    CategoryPreference:
+      type: object
+      properties:
+        email:
+          type: boolean
+        in_app:
+          type: boolean
+        push:
+          type: boolean
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [EMAIL, IN_APP, PUSH, SMS]
+        category:
+          type: string
+          enum: [ORDER, PAYMENT, GAME, ACCOUNT, PROMOTION, SYSTEM]
+        title:
+          type: string
+        message:
+          type: string
+        data:
+          type: object
+          description: Additional JSON data
+        is_read:
+          type: boolean
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        sent_at:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    NotificationTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [EMAIL, IN_APP, PUSH, SMS]
+        category:
+          type: string
+          enum: [ORDER, PAYMENT, GAME, ACCOUNT, PROMOTION, SYSTEM]
+        subject:
+          type: string
+        body:
+          type: string
+        variables:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    NotificationPreferences:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        email_enabled:
+          type: boolean
+        in_app_enabled:
+          type: boolean
+        push_enabled:
+          type: boolean
+        categories:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CategoryPreference'
+        updated_at:
+          type: string
+          format: date-time
+
+    NotificationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/Notification'
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    NotificationsListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        timestamp:
+          type: string
+          format: date-time
+
+    TemplateResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/NotificationTemplate'
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    TemplatesListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationTemplate'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        timestamp:
+          type: string
+          format: date-time
+
+    PreferencesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/NotificationPreferences'
+        timestamp:
+          type: string
+          format: date-time
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+        timestamp:
+          type: string
+          format: date-time
+        trace_id:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+        per_page:
+          type: integer
+        total_pages:
+          type: integer
+        total_items:
+          type: integer
+        has_next:
+          type: boolean
+        has_prev:
+          type: boolean
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    ValidationError:
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
