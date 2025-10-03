@@ -3,6 +3,8 @@ package org.ha.userservice.dto.response;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Builder
 public class UserResponse {
@@ -13,7 +15,7 @@ public class UserResponse {
     private String lastName;
     private String avatarUrl;
     private String status;
-    private String role;
+    private List<String> roles;
     private Boolean emailVerified;
     private String birthDate;
     private String country;

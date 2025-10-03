@@ -1,5 +1,6 @@
 package org.ha.userservice.security;
 
+import org.ha.userservice.model.entity.Role;
 import org.ha.userservice.model.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,9 +13,18 @@ public record CustomUserDetails(User user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        String role = user.getRole() == null ? "USER" : user.getRole();
+        List<String> roles = user.getRoles() == null ? List.of() :
+                user.getRoles().stream().map(Role::getName).toList();
+        if (roles.isEmpty()) {
+            roles = List.of("CUSTOMER"); // default role
+        }
+
         // Normalize and prefix with ROLE_ to fit Spring Security conventions
-        String authority = role.startsWith("ROLE_") ? role : "ROLE_" + role.toUpperCase();
+        String authority = roles.stream()
+                .map(String::toUpperCase)
+                .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
+                .reduce((a, b) -> a + "," + b) // Join roles with comma
+                .orElse("ROLE_USER");
         return List.of(new SimpleGrantedAuthority(authority));
     }
 
