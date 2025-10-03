@@ -1,0 +1,953 @@
+openapi: 3.0.3
+info:
+  title: User Service API
+  description: |
+    API cho việc quản lý người dùng, authentication, và user profiles trong hệ thống ECommerce.
+    
+    ## Features
+    - User registration và authentication
+    - Profile management
+    - Password reset
+    - Email verification
+    - Avatar upload
+    
+    ## Authentication
+    Hầu hết các endpoints yêu cầu JWT token trong Authorization header:
+    ```
+    Authorization: Bearer <token>
+    ```
+  version: 1.0.0
+  contact:
+    name: Backend Team
+    email: backend@ecommerce.com
+
+servers:
+  - url: http://localhost:8081/v1
+    description: Local development
+  - url: https://api-dev.ecommerce.com/v1
+    description: Development environment
+  - url: https://api.ecommerce.com/v1
+    description: Production
+
+tags:
+  - name: Authentication
+    description: User authentication operations
+  - name: Users
+    description: User management operations
+  - name: Profile
+    description: User profile operations
+
+security:
+  - BearerAuth: []
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user
+      description: Tạo tài khoản người dùng mới
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              basicUser:
+                summary: Basic user registration
+                value:
+                  email: john.doe@example.com
+                  username: john_doe
+                  password: SecurePass123!
+                  first_name: John
+                  last_name: Doe
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+              examples:
+                success:
+                  $ref: '#/components/examples/UserCreatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error:
+                  code: RESOURCE_ALREADY_EXISTS
+                  message: Email already registered
+                timestamp: '2025-10-03T12:00:00.000Z'
+                trace_id: abc-123-def-456
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user và nhận JWT token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              emailLogin:
+                summary: Login with email
+                value:
+                  email: john.doe@example.com
+                  password: SecurePass123!
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              example:
+                success: true
+                data:
+                  access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IlJlZnJlc2gifQ...
+                  token_type: Bearer
+                  expires_in: 3600
+                  user:
+                    id: 550e8400-e29b-41d4-a716-446655440000
+                    email: john.doe@example.com
+                    username: john_doe
+                message: Login successful
+                timestamp: '2025-10-03T12:00:00.000Z'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error:
+                  code: AUTH_INVALID_CREDENTIALS
+                  message: Invalid email or password
+                timestamp: '2025-10-03T12:00:00.000Z'
+                trace_id: xyz-789-uvw-012
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: Lấy access token mới bằng refresh token
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refresh_token
+              properties:
+                refresh_token:
+                  type: string
+                  description: Refresh token từ login response
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: User logout
+      description: Invalidate user session và tokens
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: Logged out successfully
+                timestamp: '2025-10-03T12:00:00.000Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Request password reset
+      description: Gửi email chứa link reset password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email của tài khoản cần reset
+      responses:
+        '200':
+          description: Reset email sent (luôn trả về 200 để tránh enumerate users)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: If an account exists with this email, a password reset link has been sent
+                timestamp: '2025-10-03T12:00:00.000Z'
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: Reset password bằng token từ email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+                - new_password
+              properties:
+                token:
+                  type: string
+                  description: Token từ email reset
+                new_password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: Password mới
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get list of users
+      description: Lấy danh sách users (chỉ admin)
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, suspended]
+          description: Filter by user status
+        - name: role
+          in: query
+          schema:
+            type: string
+            enum: [customer, admin]
+          description: Filter by user role
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search by username or email
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get user by ID
+      description: Lấy thông tin chi tiết user
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags:
+        - Users
+      summary: Update user
+      description: Cập nhật thông tin user (chỉ owner hoặc admin)
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete user
+      description: Xóa user (chỉ admin hoặc owner)
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '204':
+          description: User deleted successfully
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /users/me:
+    get:
+      tags:
+        - Profile
+      summary: Get current user profile
+      description: Lấy profile của user đang login
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /users/me/profile:
+    patch:
+      tags:
+        - Profile
+      summary: Update profile
+      description: Cập nhật profile của user hiện tại
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /users/me/change-password:
+    post:
+      tags:
+        - Profile
+      summary: Change password
+      description: Đổi password của user hiện tại
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - current_password
+                - new_password
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                  description: Password hiện tại
+                new_password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: Password mới
+      responses:
+        '200':
+          description: Password changed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          description: Current password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/me/avatar:
+    post:
+      tags:
+        - Profile
+      summary: Upload avatar
+      description: Upload avatar cho user hiện tại
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Image file (JPEG, PNG, max 5MB)
+      responses:
+        '200':
+          description: Avatar uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      avatar_url:
+                        type: string
+                        format: uri
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
+        '400':
+          description: Invalid file format or size
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token từ /auth/login endpoint
+
+  parameters:
+    UserIdParam:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: User ID
+      example: 550e8400-e29b-41d4-a716-446655440000
+
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Items per page
+
+    SortParam:
+      name: sort
+      in: query
+      schema:
+        type: string
+        example: created_at:desc
+      description: 'Sort format: field:order (e.g., created_at:desc)'
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+        - first_name
+        - last_name
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email
+          example: john.doe@example.com
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: '^[a-zA-Z0-9_]+$'
+          description: Unique username
+          example: john_doe
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: Password (min 8 characters)
+          example: SecurePass123!
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: First name
+          example: John
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: Last name
+          example: Doe
+        birth_date:
+          type: string
+          format: date
+          description: Date of birth (YYYY-MM-DD)
+          example: '1990-01-15'
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email
+          example: john.doe@example.com
+        password:
+          type: string
+          format: password
+          description: User password
+          example: SecurePass123!
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+        email:
+          type: string
+          format: email
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+        role:
+          type: string
+          enum: [customer, admin]
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        birth_date:
+          type: string
+          format: date
+        bio:
+          type: string
+          maxLength: 500
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code
+          example: US
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: User unique identifier
+          example: 550e8400-e29b-41d4-a716-446655440000
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        username:
+          type: string
+          example: john_doe
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+          example: https://cdn.ecommerce.com/avatars/john_doe.jpg
+        status:
+          type: string
+          enum: [active, inactive, suspended]
+          example: active
+        role:
+          type: string
+          enum: [customer, admin]
+          example: customer
+        email_verified:
+          type: boolean
+          example: true
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+          example: '1990-01-15'
+        bio:
+          type: string
+          nullable: true
+          example: Game enthusiast
+        country:
+          type: string
+          nullable: true
+          example: US
+        created_at:
+          type: string
+          format: date-time
+          example: '2025-01-15T10:30:00.000Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2025-10-03T12:00:00.000Z'
+        last_login_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2025-10-03T11:00:00.000Z'
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: JWT access token
+            refresh_token:
+              type: string
+              description: JWT refresh token
+            token_type:
+              type: string
+              example: Bearer
+            expires_in:
+              type: integer
+              description: Token expiration in seconds
+              example: 3600
+            user:
+              $ref: '#/components/schemas/User'
+        message:
+          type: string
+          example: Login successful
+        timestamp:
+          type: string
+          format: date-time
+
+    UserResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/User'
+        message:
+          type: string
+          example: User retrieved successfully
+        timestamp:
+          type: string
+          format: date-time
+
+    UsersListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        timestamp:
+          type: string
+          format: date-time
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid input data
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/ErrorDetail'
+        timestamp:
+          type: string
+          format: date-time
+        trace_id:
+          type: string
+          description: Request trace ID for debugging
+          example: abc-123-def-456
+        path:
+          type: string
+          description: API path that caused error
+          example: /v1/users
+
+    ErrorDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field name that caused error
+          example: email
+        code:
+          type: string
+          description: Specific error code for this field
+          example: VALIDATION_REQUIRED_FIELD
+        message:
+          type: string
+          description: Error message for this field
+          example: Email is required
+
+    Pagination:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          example: 1
+        per_page:
+          type: integer
+          example: 20
+        total_pages:
+          type: integer
+          example: 5
+        total_items:
+          type: integer
+          example: 100
+        has_next:
+          type: boolean
+          example: true
+        has_prev:
+          type: boolean
+          example: false
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: BAD_REQUEST
+              message: Invalid request format
+            timestamp: '2025-10-03T12:00:00.000Z'
+            trace_id: bad-request-123
+
+    Unauthorized:
+      description: Unauthorized - Missing or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: AUTH_INVALID_TOKEN
+              message: Invalid authentication token
+            timestamp: '2025-10-03T12:00:00.000Z'
+            trace_id: auth-error-456
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: AUTHZ_FORBIDDEN
+              message: You don't have permission to access this resource
+            timestamp: '2025-10-03T12:00:00.000Z'
+            trace_id: authz-error-789
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: RESOURCE_NOT_FOUND
+              message: User not found
+            timestamp: '2025-10-03T12:00:00.000Z'
+            trace_id: not-found-012
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+                - field: email
+                  code: VALIDATION_REQUIRED_FIELD
+                  message: Email is required
+                - field: password
+                  code: VALIDATION_MIN_LENGTH
+                  message: Password must be at least 8 characters
+            timestamp: '2025-10-03T12:00:00.000Z'
+            trace_id: validation-error-345
+
+  examples:
+    UserCreatedResponse:
+      summary: Successful user creation
+      value:
+        success: true
+        data:
+          id: 550e8400-e29b-41d4-a716-446655440000
+          email: john.doe@example.com
+          username: john_doe
+          first_name: John
+          last_name: Doe
+          avatar_url: null
+          status: active
+          role: customer
+          email_verified: false
+          birth_date: '1990-01-15'
+          bio: null
+          country: null
+          created_at: '2025-10-03T12:00:00.000Z'
+          updated_at: '2025-10-03T12:00:00.000Z'
+          last_login_at: null
+        message: User registered successfully
+        timestamp: '2025-10-03T12:00:00.000Z'
