@@ -35,11 +35,27 @@ erDiagram
         varchar username UK
         varchar password
         varchar status
-        varchar role
         boolean email_verified
         timestamp created_at
         timestamp updated_at
         timestamp last_login_at
+    }
+
+    roles {
+        uuid id PK
+        varchar name UK
+        varchar description
+        boolean is_default
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    user_roles {
+        uuid id PK
+        uuid user_id FK
+        uuid role_id FK
+        timestamp assigned_at
+        timestamp revoked_at
     }
 
     user_profiles {
@@ -97,6 +113,8 @@ erDiagram
     }
 
     users ||--|| user_profiles : "has"
+    users ||--o{ user_roles : "assigned to"
+    roles ||--o{ user_roles : "has"
     users ||--o{ refresh_tokens : "has many"
     users ||--o{ password_reset_tokens : "has many"
     users ||--o{ email_verification_tokens : "has many"
@@ -116,7 +134,6 @@ Bảng chính lưu trữ thông tin authentication của users.
 | username        | VARCHAR(50)  | UNIQUE, NOT NULL            | Unique username                |
 | password   | VARCHAR(255) | NOT NULL                    | Bcrypt hashed password         |
 | status          | VARCHAR(20)  | NOT NULL, DEFAULT 'active'  | User status                    |
-| role            | VARCHAR(20)  | NOT NULL, DEFAULT 'customer'| User role                      |
 | email_verified  | BOOLEAN      | NOT NULL, DEFAULT false     | Email verification status      |
 | created_at      | TIMESTAMP    | NOT NULL                    | Account creation time          |
 | updated_at      | TIMESTAMP    | NULLABLE                    | Last update time               |
@@ -130,10 +147,7 @@ Bảng chính lưu trữ thông tin authentication của users.
 -   `inactive`: User tự deactivate account (có thể reactivate)
 -   `suspended`: Admin suspend account (cần admin approval để unlock)
 
-**role**: `customer`, `admin`
-
--   `customer`: Regular user, có thể mua game và interact
--   `admin`: Full system access, có thể manage users và content
+Note: Roles are modelled in a separate `roles` table. See the `roles` and `user_roles` tables below for details.
 
 #### Business Rules
 
@@ -275,6 +289,46 @@ Bảng tracking active user sessions (optional, để monitor và security).
 -   Expired sessions tự động cleanup
 -   Admin có thể force logout user bằng cách revoke sessions
 
+### 7. roles
+
+Bảng lưu các role hệ thống (separate RBAC table). Có thể mở rộng bằng permissions sau này.
+
+| Column       | Type         | Constraints         | Description                         |
+| ------------ | ------------ | ------------------- | ----------------------------------- |
+| id           | UUID         | PRIMARY KEY         | Unique identifier                   |
+| name         | VARCHAR(50)  | UNIQUE, NOT NULL    | Role name (e.g. customer, admin)    |
+| description  | VARCHAR(255) | NULLABLE            | Human-readable description          |
+| is_default   | BOOLEAN      | NOT NULL, DEFAULT false | Whether this role is assigned by default on registration |
+| created_at   | TIMESTAMP    | NOT NULL            | Creation time                       |
+| updated_at   | TIMESTAMP    | NULLABLE            | Last update time                    |
+
+#### Business Rules
+
+- Roles managed by system administrators
+- New roles can be created without code changes
+- Exactly one or more roles can be marked as `is_default` (application chooses which to assign on register)
+ - Role names MUST be stored in UPPERCASE (e.g., `CUSTOMER`, `ADMIN`). The database enforces/normalizes uppercase names to avoid case-sensitivity issues.
+
+### 8. user_roles
+
+Bảng mapping many-to-many giữa users và roles. Cho phép user có multiple roles.
+
+| Column      | Type         | Constraints         | Description                         |
+| ----------- | ------------ | ------------------- | ----------------------------------- |
+| id          | UUID         | PRIMARY KEY         | Unique identifier                   |
+| user_id     | UUID         | FOREIGN KEY          | Reference to users.id               |
+| role_id     | UUID         | FOREIGN KEY          | Reference to roles.id               |
+| assigned_at | TIMESTAMP    | NOT NULL             | When role was assigned              |
+| revoked_at  | TIMESTAMP    | NULLABLE             | When role was revoked (soft remove) |
+
+#### Business Rules
+
+- A user can have multiple roles (e.g., customer + moderator)
+- Role assignment is done via `user_roles` table; do not store role directly on users
+- When a role is revoked, `revoked_at` is set; queries should consider only active assignments where revoked_at IS NULL
+- Default roles are assigned on registration by creating a `user_roles` row with the default role
+
+
 ## 🔍 Indexes
 
 ### Primary Indexes
@@ -287,6 +341,9 @@ CREATE UNIQUE INDEX pk_refresh_tokens ON refresh_tokens(id);
 CREATE UNIQUE INDEX pk_password_reset_tokens ON password_reset_tokens(id);
 CREATE UNIQUE INDEX pk_email_verification_tokens ON email_verification_tokens(id);
 CREATE UNIQUE INDEX pk_user_sessions ON user_sessions(id);
+
+CREATE UNIQUE INDEX pk_roles ON roles(id);
+CREATE UNIQUE INDEX pk_user_roles ON user_roles(id);
 ```
 
 ### Unique Indexes
@@ -300,6 +357,8 @@ CREATE UNIQUE INDEX uk_refresh_tokens_token_hash ON refresh_tokens(token_hash);
 CREATE UNIQUE INDEX uk_password_reset_tokens_token_hash ON password_reset_tokens(token_hash);
 CREATE UNIQUE INDEX uk_email_verification_tokens_token_hash ON email_verification_tokens(token_hash);
 CREATE UNIQUE INDEX uk_user_sessions_session_token ON user_sessions(session_token);
+CREATE UNIQUE INDEX uk_roles_name ON roles(name);
+CREATE UNIQUE INDEX uk_user_roles_user_role ON user_roles(user_id, role_id);
 ```
 
 ### Foreign Key Indexes
@@ -311,13 +370,15 @@ CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id);
 CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens(user_id);
 CREATE INDEX idx_email_verification_tokens_user_id ON email_verification_tokens(user_id);
 CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
+CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
 ```
 
 ### Composite Indexes
 
 ```sql
 -- For common query patterns
-CREATE INDEX idx_users_status_role ON users(status, role);
+-- NOTE: removed composite index on (status, role) because role is stored in roles/user_roles
 CREATE INDEX idx_users_email_status ON users(email, status);
 
 -- For token validation queries
@@ -355,8 +416,8 @@ ALTER TABLE users ADD CONSTRAINT chk_users_status
     CHECK (status IN ('active', 'inactive', 'suspended'));
 
 -- Role enum validation
-ALTER TABLE users ADD CONSTRAINT chk_users_role
-    CHECK (role IN ('customer', 'admin'));
+-- Role is modelled in a separate roles table. Remove direct role enum constraint from users.
+-- Roles are enforced by foreign key through user_roles table.
 
 -- Password hash length (bcrypt produces 60 characters)
 ALTER TABLE users ADD CONSTRAINT chk_users_password_length
@@ -393,6 +454,14 @@ ALTER TABLE user_profiles ADD CONSTRAINT chk_user_profiles_birth_date
     - Update last_login_at mỗi lần login
     - Generate access token (expire 1h) và refresh token (expire 7d)
     - Track session với IP, user_agent và device_info
+
+    - Role & Authorization checks
+
+            - Roles are stored in `roles` and assigned via `user_roles`.
+            - On authentication/authorization, derive user's active roles with a join:
+                SELECT r.name FROM roles r JOIN user_roles ur ON ur.role_id = r.id WHERE ur.user_id = $1 AND ur.revoked_at IS NULL
+            - Access checks (e.g., admin-only) should verify the presence of the required role in the returned list.
+            - Default role(s) are assigned at registration by creating a `user_roles` row for each default role where `roles.is_default = true`.
 
 3. **Password Reset Flow**
 
@@ -453,7 +522,6 @@ SELECT
     u.email,
     u.username,
     u.status,
-    u.role,
     u.email_verified,
     u.created_at,
     u.updated_at,
@@ -461,11 +529,14 @@ SELECT
     p.first_name,
     p.last_name,
     p.country,
+    array_remove(array_agg(DISTINCT r.name), NULL) as roles,
     COUNT(DISTINCT s.id) as active_sessions
 FROM users u
 LEFT JOIN user_profiles p ON u.id = p.user_id
 LEFT JOIN user_sessions s ON u.id = s.user_id AND s.expires_at > NOW()
-GROUP BY u.id, p.id
+LEFT JOIN user_roles ur ON u.id = ur.user_id AND ur.revoked_at IS NULL
+LEFT JOIN roles r ON r.id = ur.role_id
+GROUP BY u.id, u.email, u.username, u.status, u.email_verified, u.created_at, u.updated_at, u.last_login_at, p.first_name, p.last_name, p.country, p.id
 ORDER BY u.created_at DESC;
 ```
 
@@ -481,11 +552,15 @@ RETURNS boolean AS $$
 DECLARE
     v_user_role VARCHAR(20);
 BEGIN
-    -- Get user role
-    SELECT role INTO v_user_role FROM users WHERE id = p_user_id;
+    -- Check if user has admin role via roles/user_roles
+    SELECT EXISTS(
+        SELECT 1 FROM roles r
+        JOIN user_roles ur ON ur.role_id = r.id
+        WHERE ur.user_id = p_user_id AND ur.revoked_at IS NULL AND r.name = 'admin'
+    ) INTO v_user_role;
 
     -- Admin can access all profiles
-    IF v_user_role = 'admin' THEN
+    IF v_user_role THEN
         RETURN TRUE;
     END IF;
 

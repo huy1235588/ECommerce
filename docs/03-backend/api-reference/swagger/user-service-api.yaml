@@ -284,12 +284,14 @@ paths:
             type: string
             enum: [active, inactive, suspended]
           description: Filter by user status
-        - name: role
+        - name: roles
           in: query
           schema:
-            type: string
-            enum: [customer, admin]
-          description: Filter by user role
+            type: array
+            items:
+              type: string
+              enum: [customer, admin]
+          description: Filter by user role(s). Returns users that have any of the supplied roles. Support multiple values (e.g., roles=admin&roles=customer).
         - name: search
           in: query
           schema:
@@ -612,9 +614,12 @@ components:
         status:
           type: string
           enum: [active, inactive, suspended]
-        role:
-          type: string
-          enum: [customer, admin]
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [customer, admin]
+          description: List of roles assigned to the user
 
     UpdateProfileRequest:
       type: object
@@ -670,10 +675,12 @@ components:
           type: string
           enum: [active, inactive, suspended]
           example: active
-        role:
-          type: string
-          enum: [customer, admin]
-          example: customer
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [customer, admin]
+          example: [customer]
         emailVerified:
           type: boolean
           example: true
@@ -940,7 +947,8 @@ components:
           lastName: Doe
           avatarUrl: null
           status: active
-          role: customer
+          roles:
+            - customer
           emailVerified: false
           birthDate: '1990-01-15'
           bio: null

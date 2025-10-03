@@ -20,39 +20,27 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
-public class User {
+@Table(name = "roles")
+public class Role {
     @Id
+    @ColumnDefault("gen_random_uuid()")
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Size(max = 255)
-    @NotNull
-    @Column(name = "email", nullable = false)
-    private String email;
-
     @Size(max = 50)
     @NotNull
-    @Column(name = "username", nullable = false, length = 50)
-    private String username;
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
 
     @Size(max = 255)
-    @NotNull
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    @Builder.Default
-    @Size(max = 20)
-    @NotNull
-    @ColumnDefault("'active'")
-    @Column(name = "status", nullable = false, length = 20)
-    private String status = "active";
+    @Column(name = "description")
+    private String description;
 
     @Builder.Default
     @NotNull
     @ColumnDefault("false")
-    @Column(name = "email_verified", nullable = false)
-    private Boolean emailVerified = false;
+    @Column(name = "is_default", nullable = false)
+    private Boolean isDefault = false;
 
     @Builder.Default
     @NotNull
@@ -63,9 +51,6 @@ public class User {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    @Column(name = "last_login_at")
-    private Instant lastLoginAt;
-    
     @PrePersist
     public void prePersist() {
         if (this.createdAt == null) {
@@ -81,18 +66,4 @@ public class User {
         this.updatedAt = Instant.now();
     }
 
-    /**
-     * Convenience method to set last login time to now.
-     * Call this from your authentication/login flow when the user successfully logs in.
-     */
-    public void markLastLogin() {
-        this.lastLoginAt = Instant.now();
-    }
-
-    /**
-     * Convenience method to set last login time to a specific instant.
-     */
-    public void markLastLogin(Instant at) {
-        this.lastLoginAt = at;
-    }
 }

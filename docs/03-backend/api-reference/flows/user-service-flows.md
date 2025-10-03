@@ -44,11 +44,13 @@ sequenceDiagram
         UserService->>UserService: Hash password (BCrypt cost 12)
         UserService->>UserService: Generate user ID (UUID)
         
-        UserService->>Database: BEGIN TRANSACTION
-        UserService->>Database: INSERT INTO users
-        UserService->>Database: INSERT INTO user_profiles
-        UserService->>Database: INSERT INTO email_verification_tokens
-        UserService->>Database: COMMIT TRANSACTION
+    UserService->>Database: BEGIN TRANSACTION
+    UserService->>Database: INSERT INTO users
+    UserService->>Database: INSERT INTO user_profiles
+    UserService->>Database: INSERT INTO email_verification_tokens
+    UserService->>Database: -- Assign default role(s) by inserting into user_roles for roles where roles.is_default = true
+    UserService->>Database: INSERT INTO user_roles(user_id, role_id, assigned_at)
+    UserService->>Database: COMMIT TRANSACTION
         
         Database-->>UserService: Success
         
@@ -88,6 +90,7 @@ sequenceDiagram
     - Create transaction để đảm bảo consistency
     - Insert vào `users` table
     - Insert vào `user_profiles` table
+    - Assign default role(s): lookup `roles` where `is_default = true` and create `user_roles` rows for the new user
     - Generate email verification token
 
 4. **Post-Registration**

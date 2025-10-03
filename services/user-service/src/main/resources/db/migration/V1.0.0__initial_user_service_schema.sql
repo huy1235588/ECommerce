@@ -20,9 +20,8 @@ CREATE TABLE users
     id             UUID PRIMARY KEY,
     email          VARCHAR(255) NOT NULL,
     username       VARCHAR(50)  NOT NULL,
-    password  VARCHAR(255) NOT NULL,
+    password       VARCHAR(255) NOT NULL,
     status         VARCHAR(20)  NOT NULL DEFAULT 'active',
-    role           VARCHAR(20)  NOT NULL DEFAULT 'customer',
     email_verified BOOLEAN      NOT NULL DEFAULT false,
     created_at     TIMESTAMP    NOT NULL DEFAULT NOW(),
     updated_at     TIMESTAMP,
@@ -122,7 +121,6 @@ CREATE INDEX idx_email_verification_tokens_user_id ON email_verification_tokens 
 CREATE INDEX idx_user_sessions_user_id ON user_sessions (user_id);
 
 -- Composite and helper indexes
-CREATE INDEX idx_users_status_role ON users (status, role);
 CREATE INDEX idx_users_email_status ON users (email, status);
 CREATE INDEX idx_refresh_tokens_user_expires ON refresh_tokens (user_id, expires_at, is_revoked);
 CREATE INDEX idx_password_reset_tokens_expires_used ON password_reset_tokens (expires_at, is_used);
@@ -155,11 +153,6 @@ ALTER TABLE users
 ALTER TABLE users
     ADD CONSTRAINT chk_users_status
         CHECK (status IN ('active', 'inactive', 'suspended'));
-
--- Role enum validation
-ALTER TABLE users
-    ADD CONSTRAINT chk_users_role
-        CHECK (role IN ('customer', 'admin'));
 
 -- Password hash length (bcrypt produces 60 characters)
 ALTER TABLE users
@@ -217,39 +210,6 @@ BEGIN
     NEW.last_activity_at
 = COALESCE(NEW.last_activity_at, NOW());
 RETURN NEW;
-END;
-$$
-LANGUAGE plpgsql;
-
--- Business logic functions
-CREATE
-OR REPLACE FUNCTION can_user_access_profile(
-    p_user_id UUID,
-    p_target_user_id UUID
-)
-RETURNS boolean AS $$
-DECLARE
-v_user_role VARCHAR(20);
-BEGIN
-    -- Get user role
-SELECT role
-INTO v_user_role
-FROM users
-WHERE id = p_user_id;
-
--- Admin can access all profiles
-IF
-v_user_role = 'admin' THEN
-        RETURN TRUE;
-END IF;
-
-    -- User can access own profile
-    IF
-p_user_id = p_target_user_id THEN
-        RETURN TRUE;
-END IF;
-
-RETURN FALSE;
 END;
 $$
 LANGUAGE plpgsql;
@@ -356,44 +316,6 @@ CREATE TRIGGER trigger_user_sessions_last_activity
 -- =============================================================================
 -- VIEWS (if needed)
 -- =============================================================================
-
--- Active records / public view
-CREATE VIEW v_users_public AS
-SELECT u.id,
-       u.username,
-       u.status,
-       u.email_verified,
-       u.created_at,
-       p.first_name,
-       p.last_name,
-       p.avatar_url,
-       p.bio,
-       p.country
-FROM users u
-         LEFT JOIN user_profiles p ON u.id = p.user_id
-WHERE u.status = 'active'
-ORDER BY u.created_at DESC;
-
--- Admin view
-CREATE VIEW v_users_admin AS
-SELECT u.id,
-       u.email,
-       u.username,
-       u.status,
-       u.role,
-       u.email_verified,
-       u.created_at,
-       u.updated_at,
-       u.last_login_at,
-       p.first_name,
-       p.last_name,
-       p.country,
-       COUNT(DISTINCT s.id) as active_sessions
-FROM users u
-         LEFT JOIN user_profiles p ON u.id = p.user_id
-         LEFT JOIN user_sessions s ON u.id = s.user_id AND s.expires_at > NOW()
-GROUP BY u.id, p.id
-ORDER BY u.created_at DESC;
 
 -- =============================================================================
 -- INITIAL DATA (if needed)
