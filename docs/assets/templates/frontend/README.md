@@ -2,7 +2,7 @@
 
 > **Mục đích**: Tập hợp các templates chuẩn cho việc tạo tài liệu frontend trong Obsidian  
 > **Ngôn ngữ**: Tiếng Việt  
-> **Dự án**: My Digital Collection
+> **Dự án**: ECommerce
 
 ## 🎯 Tổng Quan Templates
 

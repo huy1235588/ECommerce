@@ -1,4 +1,4 @@
-# Tổng Quan Dự Án: Bộ Sưu Tập Số Của Tôi (My Digital Collection)
+# Tổng Quan Dự Án: Bộ Sưu Tập Số Của Tôi (ECommerce)
 
 ## 1. Mục Tiêu Dự Án
 
@@ -8,7 +8,7 @@ Xây dựng một nền tảng thương mại điện tử về game sử dụng
 
 -   **Trải Nghiệm Người Dùng Cá Nhân Hóa**: Platform mua bán game, thư viện cá nhân, achievement system, và cộng đồng game thủ.
 -   **Phát Triển Kỹ Năng Kỹ Thuật**: Áp dụng kiến trúc microservices phức tạp, xử lý thanh toán, và hệ thống real-time.
--   **Giá Trị Sản Phẩm**: Mô hình thương mại điện tử hoàn chỉnh cho game digital distribution.
+-   **Giá Trị Sản Phẩm**: Mô hình thương mại điện tử hoàn chỉnh cho game.
 
 ## 3. Quy Trình Phát Triển ("Documentation-First")
 
@@ -144,14 +144,14 @@ Vì đây là dự án cá nhân, chiến lược Git cần đơn giản, hiệu
 -   **Backup**: Push thường xuyên lên GitHub để tránh mất dữ liệu.
 -   **Documentation**: Ghi chú trong commit messages về các thay đổi lớn, đặc biệt liên quan đến kiến trúc microservices hoặc tích hợp API.
 
-Chiến lược này giúp duy trì trật tự trong dự án phức tạp như My Digital Collection, đồng thời linh hoạt cho phát triển cá nhân.
+Chiến lược này giúp duy trì trật tự trong dự án phức tạp như ECommerce, đồng thời linh hoạt cho phát triển cá nhân.
 
 ## 7. Cấu Trúc Thư Mục Dự Án
 
 ### 7.1 Cấu Trúc Tổng Quan
 
 ```
-MyDigitalCollection/
+ECommerce/
 ├── README.md
 ├── docker-compose.yml
 ├── .gitignore

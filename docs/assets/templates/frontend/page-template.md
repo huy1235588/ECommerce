@@ -286,7 +286,7 @@ describe('{{PageName}} Page', () => {
 ### Meta Tags
 ```typescript
 export const metadata: Metadata = {
-  title: '{{Page Title}} | My Digital Collection',
+  title: '{{Page Title}} | ECommerce',
   description: '{{Page Description}}',
   keywords: ['{{keyword1}}', '{{keyword2}}', '{{keyword3}}'],
   openGraph: {

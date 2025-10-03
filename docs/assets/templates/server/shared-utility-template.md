@@ -22,7 +22,7 @@ maintainer: "Backend Team"
 | Field | Giá Trị |
 |-------|---------|
 | **Utility Name** | `{{utility_name}}` |
-| **Package** | `com.mydigitalcollection.commons.util` |
+| **Package** | `com.ECommerce.commons.util` |
 | **Purpose** | `{{utility_purpose}}` |
 | **Author** | `{{author}}` |
 | **Created Date** | `{{date}}` |
@@ -41,7 +41,7 @@ shared-commons/
     └── main/
         └── java/
             └── com/
-                └── mydigitalcollection/
+                └── ECommerce/
                     └── commons/
                         └── util/
                             └── {{UtilityName}}.java
@@ -50,7 +50,7 @@ shared-commons/
 ### 💻 Code Implementation
 
 ```java
-package com.mydigitalcollection.commons.util;
+package com.ecommerce.commons.util;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -104,7 +104,7 @@ public class {{UtilityName}} {
 ### 🧪 Test Implementation
 
 ```java
-package com.mydigitalcollection.commons.util;
+package com.ecommerce.commons.util;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -218,7 +218,7 @@ Utility này sẽ có sẵn khi thêm shared-commons dependency:
 
 ```xml
 <dependency>
-    <groupId>com.mydigitalcollection</groupId>
+    <groupId>com.ecommerce</groupId>
     <artifactId>shared-commons</artifactId>
     <version>${project.version}</version>
 </dependency>

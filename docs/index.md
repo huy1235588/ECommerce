@@ -1,6 +1,6 @@
-# 📚 Tài Liệu Dự Án My Digital Collection
+# 📚 Tài Liệu Dự Án ECommerce
 
-Chào mừng bạn đến với tài liệu của dự án **My Digital Collection** - một ứng dụng web full-stack sử dụng kiến trúc microservices để quản lý bộ sưu tập ảo cá nhân.
+Chào mừng bạn đến với tài liệu của dự án **ECommerce** - một ứng dụng web full-stack sử dụng kiến trúc microservices để quản lý bộ sưu tập ảo cá nhân.
 
 ## 🚀 Bắt Đầu Nhanh
 

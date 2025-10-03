@@ -1,6 +1,6 @@
 # Database Migration Template
 
-Đây là template chuẩn cho việc tạo file migration trong dự án MyDigitalCollection. Template này dựa trên best practices từ các migration hiện có của user service.
+Đây là template chuẩn cho việc tạo file migration trong dự án ECommerce. Template này dựa trên best practices từ các migration hiện có của user service.
 
 ## 1. Template File Migration SQL
 
@@ -385,4 +385,4 @@ CREATE TABLE {entity}_settings (
 CREATE INDEX idx_{entity}_settings_gin ON {entity}_settings USING GIN (settings);
 ```
 
-Đây là template đầy đủ dựa trên best practices từ các file migration của user service trong dự án MyDigitalCollection!
+Đây là template đầy đủ dựa trên best practices từ các file migration của user service trong dự án ECommerce!
