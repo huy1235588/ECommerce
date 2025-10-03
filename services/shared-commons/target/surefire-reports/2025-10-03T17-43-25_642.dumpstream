@@ -1,0 +1,5 @@
+# Created at 2025-10-03T17:43:25.891
+Boot Manifest-JAR contains absolute paths in classpath 'E:\Project\Node.js\ECommerce\services\shared-commons\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+
