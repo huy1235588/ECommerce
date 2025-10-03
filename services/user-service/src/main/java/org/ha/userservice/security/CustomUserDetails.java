@@ -20,12 +20,11 @@ public record CustomUserDetails(User user) implements UserDetails {
         }
 
         // Normalize and prefix with ROLE_ to fit Spring Security conventions
-        String authority = roles.stream()
+        return roles.stream()
                 .map(String::toUpperCase)
                 .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
-                .reduce((a, b) -> a + "," + b) // Join roles with comma
-                .orElse("ROLE_USER");
-        return List.of(new SimpleGrantedAuthority(authority));
+                .map(SimpleGrantedAuthority::new)
+                .toList();
     }
 
     @Override

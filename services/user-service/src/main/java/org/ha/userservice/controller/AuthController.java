@@ -53,6 +53,9 @@ public class AuthController {
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", resp.getRefreshToken())
                 .path("/")
                 .maxAge(loginRequest.getRememberMe() ? 7 * 24 * 60 * 60 : jwtRefreshExpiration / 1000) // 7 days or default
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());

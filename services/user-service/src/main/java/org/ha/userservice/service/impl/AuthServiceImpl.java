@@ -125,11 +125,10 @@ public class AuthServiceImpl implements AuthService {
                     .map(grantedAuthority -> grantedAuthority.getAuthority().replace("ROLE_", ""))
                     .toList();
 
-            // get user
-            User user = userRepository.findById(userDetails.user().getId())
-                    .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "User not found"));
+            // use user from authenticated principal to avoid extra DB query
+            User user = userDetails.user();
 
-            // update last login and save
+            // update last login; save ensures updated timestamp persisted
             user.markLastLogin();
             userRepository.save(user);
 
