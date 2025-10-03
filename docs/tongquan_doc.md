@@ -196,7 +196,6 @@ docs/
 │   │   ├── service-template.md       # Template thiết kế service
 │   │   ├── api-gateway-design.md     # Thiết kế API Gateway
 │   │   ├── user-service-design.md    # Thiết kế User Service
-│   │   ├── auth-service-design.md    # Thiết kế Authentication Service
 │   │   ├── game-catalog-design.md    # Thiết kế Game Catalog Service
 │   │   ├── order-service-design.md   # Thiết kế Order Service
 │   │   ├── payment-service-design.md # Thiết kế Payment Service
@@ -209,7 +208,6 @@ docs/
 │   │       ├── README.md                # API documentation overview
 │   │       ├── api-gateway.yaml         # API Gateway endpoints
 │   │       ├── user-service-api.yaml    # User Service API spec
-│   │       ├── auth-service-api.yaml    # Auth Service API spec
 │   │       ├── game-catalog-api.yaml    # Game Catalog API spec
 │   │       ├── order-service-api.yaml   # Order Service API spec
 │   │       ├── payment-service-api.yaml # Payment Service API spec
@@ -225,7 +223,6 @@ docs/
 │   │   ├── schemas/                  # Database schemas theo service
 │   │   │   ├── README.md                # Database schemas overview
 │   │   │   ├── user-service-db.md       # User Service database schema
-│   │   │   ├── auth-service-db.md       # Auth Service database schema
 │   │   │   ├── game-catalog-db.md       # Game Catalog database schema
 │   │   │   ├── order-service-db.md      # Order Service database schema
 │   │   │   ├── payment-service-db.md    # Payment Service database schema
@@ -306,70 +303,6 @@ docs/
 │       ├── grid-system.md            # Grid system design
 │       ├── responsive-layouts.md     # Responsive layout patterns
 │       └── layout-components.md      # Layout component specs
-├── 05-deployment/              # 🚀 Deployment Strategy
-│   ├── README.md                  # Deployment overview
-│   ├── infrastructure-design.md   # Infrastructure architecture
-│   ├── containerization.md        # Docker strategy
-│   ├── orchestration.md           # Kubernetes deployment
-│   ├── ci-cd-pipeline.md          # CI/CD pipeline design
-│   ├── monitoring-design.md       # Monitoring và observability
-│   ├── security-deployment.md     # Security trong deployment
-│   └── environments/              # Environment specifications
-│       ├── README.md                 # Environment strategy
-│       ├── development.md            # Development environment
-│       ├── staging.md                # Staging environment
-│       └── production.md             # Production environment
-├── 06-development/             # 👨‍💻 Development Guidelines
-│   ├── README.md                  # Development approach overview
-│   ├── development-methodology.md # Methodology và workflow
-│   ├── coding-standards.md        # Coding standards và conventions
-│   ├── git-strategy.md            # Git workflow và branching
-│   ├── code-review-process.md     # Code review guidelines
-│   ├── testing-strategy.md        # Testing approach
-│   └── documentation-standards.md # Documentation standards
-├── 07-testing/                 # 🧪 Testing Strategy
-│   ├── README.md                  # Testing strategy overview
-│   ├── test-pyramid.md            # Test pyramid approach
-│   ├── unit-testing-strategy.md   # Unit testing guidelines
-│   ├── integration-testing.md     # Integration testing approach
-│   ├── e2e-testing-strategy.md    # End-to-end testing
-│   ├── api-testing-design.md      # API testing strategy
-│   ├── performance-testing.md     # Performance testing approach
-│   └── test-data-strategy.md      # Test data management
-├── 08-guides/                  # 📝 Implementation Guides
-│   ├── README.md                  # Implementation guides overview
-│   ├── service-implementation.md  # Service implementation guide
-│   ├── database-implementation.md # Database setup guide
-│   ├── frontend-implementation.md # Frontend setup guide
-│   ├── api-integration-guide.md   # API integration patterns
-│   ├── security-implementation.md # Security implementation
-│   └── performance-optimization.md # Performance guidelines
-├── 09-troubleshooting/         # 🔧 Troubleshooting Strategy
-│   ├── README.md                  # Troubleshooting approach
-│   ├── error-handling-strategy.md # Error handling design
-│   ├── logging-strategy.md        # Logging và monitoring design
-│   ├── debugging-guidelines.md    # Debugging approaches
-│   ├── performance-debugging.md   # Performance troubleshooting
-│   └── common-patterns.md         # Common issues patterns
-├── 10-references/              # 📚 Technical References
-│   ├── README.md                  # References overview
-│   ├── technology-decisions.md    # Technology stack decisions
-│   ├── external-apis.md           # External API specifications
-│   ├── dependencies-strategy.md   # Dependencies management
-│   ├── architectural-patterns.md  # Architectural patterns used
-│   ├── glossary.md                # Technical glossary
-│   └── learning-resources.md      # Learning resources
-├── changelog/                  # 📋 Documentation Changelog
-│   ├── README.md                  # Changelog overview
-│   ├── documentation-v1.0.md      # Documentation version 1.0
-│   ├── architecture-changes.md    # Architecture evolution
-│   └── decision-log.md            # Architecture decision records
-├── contributing/               # 🤝 Contribution Guidelines
-│   ├── README.md                  # Contribution overview
-│   ├── documentation-guidelines.md # Documentation contribution
-│   ├── review-process.md          # Documentation review process
-│   ├── template-usage.md          # How to use templates
-│   └── style-guide.md             # Documentation style guide
 └── assets/                     # 📁 Documentation Assets
     ├── README.md                  # Assets overview
     ├── images/                    # Documentation images
@@ -411,7 +344,6 @@ docs/
 -   **API Gateway**: Điểm vào duy nhất, định tuyến, giới hạn lưu lượng
 -   **Service Discovery**: Eureka server để đăng ký và phát hiện dịch vụ
 -   **User Service**: Hồ sơ người dùng, quản lý tài khoản
--   **Auth Service**: Xác thực bằng JWT, phân quyền
 -   **Game Catalog Service**: Siêu dữ liệu game, tìm kiếm, phân loại theo danh mục
 -   **Order Service**: Giỏ hàng, quản lý đơn hàng
 -   **Inventory Service**: Quản lý key game và xác thực giấy phép

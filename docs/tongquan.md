@@ -348,7 +348,6 @@ microservices/
 ├── service-discovery/             # Eureka Server
 ├── config-service/                # Spring Cloud Config
 ├── user-service/                  # User management & auth
-├── auth-service/                  # Authentication & JWT
 ├── game-catalog-service/          # Game information & metadata
 ├── inventory-service/             # Game keys & licenses
 ├── order-service/                 # Orders & payments
@@ -505,7 +504,6 @@ ci-cd/                         # CI/CD configurations
 -   **API Gateway**: Điểm vào duy nhất, định tuyến, giới hạn lưu lượng
 -   **Service Discovery**: Eureka server để đăng ký và phát hiện dịch vụ
 -   **User Service**: Hồ sơ người dùng, quản lý tài khoản
--   **Auth Service**: Xác thực bằng JWT, phân quyền
 -   **Game Catalog Service**: Siêu dữ liệu game, tìm kiếm, phân loại theo danh mục
 -   **Order Service**: Giỏ hàng, quản lý đơn hàng
 -   **Inventory Service**: Quản lý key game và xác thực giấy phép
