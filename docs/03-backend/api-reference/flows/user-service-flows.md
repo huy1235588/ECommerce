@@ -125,11 +125,11 @@ sequenceDiagram
     participant Redis
     participant EventBus as Event Bus (Kafka)
 
-    User->>Frontend: Nhập email & password
-    Frontend->>APIGateway: POST /v1/auth/login<br/>{email, password}
+    User->>Frontend: Nhập usernameOrEmail & password
+    Frontend->>APIGateway: POST /v1/auth/login<br/>{usernameOrEmail, password}
     APIGateway->>UserService: Forward request + IP + User-Agent
     
-    UserService->>Database: SELECT user by email
+    UserService->>Database: SELECT user by username or email
     
     alt User not found
         Database-->>UserService: No user
@@ -182,7 +182,7 @@ sequenceDiagram
 
 1. **Credential Validation**
 
-    - Get user by email
+    - Get user by `usernameOrEmail` (lookup by username OR email)
     - Check user exists
     - Verify account status (active/suspended)
     - Compare password hash
