@@ -33,7 +33,7 @@ erDiagram
         uuid id PK
         varchar email UK
         varchar username UK
-        varchar password_hash
+        varchar password
         varchar status
         varchar role
         boolean email_verified
@@ -114,7 +114,7 @@ Bảng chính lưu trữ thông tin authentication của users.
 | id              | UUID         | PRIMARY KEY                 | Unique identifier              |
 | email           | VARCHAR(255) | UNIQUE, NOT NULL            | User email address             |
 | username        | VARCHAR(50)  | UNIQUE, NOT NULL            | Unique username                |
-| password_hash   | VARCHAR(255) | NOT NULL                    | Bcrypt hashed password         |
+| password   | VARCHAR(255) | NOT NULL                    | Bcrypt hashed password         |
 | status          | VARCHAR(20)  | NOT NULL, DEFAULT 'active'  | User status                    |
 | role            | VARCHAR(20)  | NOT NULL, DEFAULT 'customer'| User role                      |
 | email_verified  | BOOLEAN      | NOT NULL, DEFAULT false     | Email verification status      |
@@ -359,8 +359,8 @@ ALTER TABLE users ADD CONSTRAINT chk_users_role
     CHECK (role IN ('customer', 'admin'));
 
 -- Password hash length (bcrypt produces 60 characters)
-ALTER TABLE users ADD CONSTRAINT chk_users_password_hash_length
-    CHECK (LENGTH(password_hash) = 60);
+ALTER TABLE users ADD CONSTRAINT chk_users_password_length
+    CHECK (LENGTH(password) = 60);
 
 -- Country code validation (ISO 3166-1 alpha-2)
 ALTER TABLE user_profiles ADD CONSTRAINT chk_user_profiles_country_format

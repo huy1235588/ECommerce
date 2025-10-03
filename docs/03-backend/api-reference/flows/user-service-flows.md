@@ -513,7 +513,7 @@ sequenceDiagram
         UserService->>UserService: Hash new password (BCrypt)
         
         UserService->>Database: BEGIN TRANSACTION
-        UserService->>Database: UPDATE users<br/>SET password_hash = ?<br/>WHERE id = ?
+        UserService->>Database: UPDATE users<br/>SET password = ?<br/>WHERE id = ?
         UserService->>Database: UPDATE password_reset_tokens<br/>SET is_used = true
         UserService->>Database: UPDATE refresh_tokens<br/>SET is_revoked = true<br/>WHERE user_id = ?
         UserService->>Database: DELETE FROM user_sessions<br/>WHERE user_id = ?
