@@ -1,7 +1,5 @@
 package org.ha.userservice.model.entity;
 
-package org.ha.userservice.model.entity;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

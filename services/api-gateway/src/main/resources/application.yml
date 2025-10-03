@@ -5,6 +5,7 @@ spring:
   application:
     name: api-gateway
 
+  # Spring Cloud Gateway configuration
   cloud:
     gateway:
       server:
@@ -16,6 +17,10 @@ spring:
                 - Path=/api/users/**
               filters:
                 - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: userServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/users
 
 # eureka client configuration
 eureka:
