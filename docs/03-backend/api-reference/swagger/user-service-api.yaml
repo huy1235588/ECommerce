@@ -61,8 +61,8 @@ paths:
                   email: john.doe@example.com
                   username: john_doe
                   password: SecurePass123!
-                  first_name: John
-                  last_name: Doe
+                  firstName: John
+                  lastName: Doe
       responses:
         '201':
           description: User registered successfully
@@ -120,10 +120,10 @@ paths:
               example:
                 success: true
                 data:
-                  access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IlJlZnJlc2gifQ...
-                  token_type: Bearer
-                  expires_in: 3600
+                  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IlJlZnJlc2gifQ...
+                  tokenType: Bearer
+                  expiresIn: 3600
                   user:
                     id: 550e8400-e29b-41d4-a716-446655440000
                     email: john.doe@example.com
@@ -158,9 +158,9 @@ paths:
             schema:
               type: object
               required:
-                - refresh_token
+                - refreshToken
               properties:
-                refresh_token:
+                refreshToken:
                   type: string
                   description: Refresh token từ login response
       responses:
@@ -244,12 +244,12 @@ paths:
               type: object
               required:
                 - token
-                - new_password
+                - newPassword
               properties:
                 token:
                   type: string
                   description: Token từ email reset
-                new_password:
+                newPassword:
                   type: string
                   format: password
                   minLength: 8
@@ -418,14 +418,14 @@ paths:
             schema:
               type: object
               required:
-                - current_password
-                - new_password
+                - currentPassword
+                - newPassword
               properties:
-                current_password:
+                currentPassword:
                   type: string
                   format: password
                   description: Password hiện tại
-                new_password:
+                newPassword:
                   type: string
                   format: password
                   minLength: 8
@@ -470,20 +470,20 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  success:
-                    type: boolean
-                  data:
-                    type: object
-                    properties:
-                      avatar_url:
-                        type: string
-                        format: uri
-                  message:
-                    type: string
-                  timestamp:
-                    type: string
-                    format: date-time
+                  properties:
+                    success:
+                      type: boolean
+                    data:
+                      type: object
+                      properties:
+                        avatarUrl:
+                          type: string
+                          format: uri
+                    message:
+                      type: string
+                    timestamp:
+                      type: string
+                      format: date-time
         '400':
           description: Invalid file format or size
           content:
@@ -532,10 +532,10 @@ components:
     SortParam:
       name: sort
       in: query
-      schema:
-        type: string
-        example: created_at:desc
-      description: 'Sort format: field:order (e.g., created_at:desc)'
+        schema:
+          type: string
+          example: createdAt:desc
+      description: 'Sort format: field:order (e.g., createdAt:desc)'
 
   schemas:
     RegisterRequest:
@@ -544,8 +544,8 @@ components:
         - email
         - username
         - password
-        - first_name
-        - last_name
+        - firstName
+        - lastName
       properties:
         email:
           type: string
@@ -565,19 +565,19 @@ components:
           minLength: 8
           description: Password (min 8 characters)
           example: SecurePass123!
-        first_name:
+        firstName:
           type: string
           minLength: 1
           maxLength: 50
           description: First name
           example: John
-        last_name:
+        lastName:
           type: string
           minLength: 1
           maxLength: 50
           description: Last name
           example: Doe
-        birth_date:
+        birthDate:
           type: string
           format: date
           description: Date of birth (YYYY-MM-DD)
@@ -620,15 +620,15 @@ components:
     UpdateProfileRequest:
       type: object
       properties:
-        first_name:
+        firstName:
           type: string
           minLength: 1
           maxLength: 50
-        last_name:
+        lastName:
           type: string
           minLength: 1
           maxLength: 50
-        birth_date:
+        birthDate:
           type: string
           format: date
         bio:
@@ -656,13 +656,13 @@ components:
         username:
           type: string
           example: john_doe
-        first_name:
+        firstName:
           type: string
           example: John
-        last_name:
+        lastName:
           type: string
           example: Doe
-        avatar_url:
+        avatarUrl:
           type: string
           format: uri
           nullable: true
@@ -675,10 +675,10 @@ components:
           type: string
           enum: [customer, admin]
           example: customer
-        email_verified:
+        emailVerified:
           type: boolean
           example: true
-        birth_date:
+        birthDate:
           type: string
           format: date
           nullable: true
@@ -691,15 +691,15 @@ components:
           type: string
           nullable: true
           example: US
-        created_at:
+        createdAt:
           type: string
           format: date-time
           example: '2025-01-15T10:30:00.000Z'
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           example: '2025-10-03T12:00:00.000Z'
-        last_login_at:
+        lastLoginAt:
           type: string
           format: date-time
           nullable: true
@@ -714,16 +714,16 @@ components:
         data:
           type: object
           properties:
-            access_token:
+            accessToken:
               type: string
               description: JWT access token
-            refresh_token:
+            refreshToken:
               type: string
               description: JWT refresh token
-            token_type:
+            tokenType:
               type: string
               example: Bearer
-            expires_in:
+            expiresIn:
               type: integer
               description: Token expiration in seconds
               example: 3600
@@ -831,22 +831,22 @@ components:
     Pagination:
       type: object
       properties:
-        current_page:
+        currentPage:
           type: integer
           example: 1
-        per_page:
+        perPage:
           type: integer
           example: 20
-        total_pages:
+        totalPages:
           type: integer
           example: 5
-        total_items:
+        totalItems:
           type: integer
           example: 100
-        has_next:
+        hasNext:
           type: boolean
           example: true
-        has_prev:
+        hasPrev:
           type: boolean
           example: false
 
@@ -937,17 +937,17 @@ components:
           id: 550e8400-e29b-41d4-a716-446655440000
           email: john.doe@example.com
           username: john_doe
-          first_name: John
-          last_name: Doe
-          avatar_url: null
+          firstName: John
+          lastName: Doe
+          avatarUrl: null
           status: active
           role: customer
-          email_verified: false
-          birth_date: '1990-01-15'
+          emailVerified: false
+          birthDate: '1990-01-15'
           bio: null
           country: null
-          created_at: '2025-10-03T12:00:00.000Z'
-          updated_at: '2025-10-03T12:00:00.000Z'
-          last_login_at: null
+          createdAt: '2025-10-03T12:00:00.000Z'
+          updatedAt: '2025-10-03T12:00:00.000Z'
+          lastLoginAt: null
         message: User registered successfully
         timestamp: '2025-10-03T12:00:00.000Z'

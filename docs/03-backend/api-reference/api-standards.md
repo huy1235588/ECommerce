@@ -86,12 +86,12 @@ GET /v1/games?page=1&limit=20
 {
     "data": [...],
     "pagination": {
-        "current_page": 1,
-        "per_page": 20,
-        "total_pages": 5,
-        "total_items": 100,
-        "has_next": true,
-        "has_prev": false
+		"currentPage": 1,
+		"perPage": 20,
+		"totalPages": 5,
+		"totalItems": 100,
+		"hasNext": true,
+		"hasPrev": false
     }
 }
 ```
@@ -112,16 +112,16 @@ GET /v1/games?page=1&limit=20
 	"email": "user@example.com",
 	"username": "john_doe",
 	"profile": {
-		"first_name": "John",
-		"last_name": "Doe",
-		"birth_date": "1990-01-15"
+		"firstName": "John",
+		"lastName": "Doe",
+		"birthDate": "1990-01-15"
 	}
 }
 ```
 
 **Quy tắc:**
 
--   Sử dụng `snake_case` cho field names
+ -   Sử dụng `camelCase` cho field names
 -   Dates theo ISO 8601 format: `YYYY-MM-DD` hoặc `YYYY-MM-DDTHH:mm:ss.sssZ`
 -   Booleans: `true` hoặc `false` (lowercase)
 -   Null values: `null`
@@ -137,7 +137,7 @@ GET /v1/games?page=1&limit=20
 		"id": "550e8400-e29b-41d4-a716-446655440000",
 		"email": "user@example.com",
 		"username": "john_doe",
-		"created_at": "2025-01-15T10:30:00.000Z"
+		"createdAt": "2025-01-15T10:30:00.000Z"
 	},
 	"message": "User created successfully",
 	"timestamp": "2025-10-03T12:00:00.000Z"
@@ -154,10 +154,10 @@ GET /v1/games?page=1&limit=20
 		{ "id": "uuid-2", "name": "Game 2" }
 	],
 	"pagination": {
-		"current_page": 1,
-		"per_page": 20,
-		"total_pages": 5,
-		"total_items": 100
+ 		"currentPage": 1,
+ 		"perPage": 20,
+ 		"totalPages": 5,
+ 		"totalItems": 100
 	},
 	"timestamp": "2025-10-03T12:00:00.000Z"
 }
@@ -181,7 +181,7 @@ Xem chi tiết tại [[error-handling]]
 		]
 	},
 	"timestamp": "2025-10-03T12:00:00.000Z",
-	"trace_id": "550e8400-e29b-41d4-a716-446655440000"
+	"traceId": "550e8400-e29b-41d4-a716-446655440000"
 }
 ```
 
@@ -265,8 +265,8 @@ GET /v1/users?status=active&role=customer
 
 ```
 GET /v1/games?price[gte]=10&price[lte]=50     # Price between 10 and 50
-GET /v1/games?release_date[gt]=2024-01-01     # Released after date
-GET /v1/users?created_at[lt]=2025-01-01       # Created before date
+GET /v1/games?releaseDate[gt]=2024-01-01     # Released after date
+GET /v1/users?createdAt[lt]=2025-01-01       # Created before date
 ```
 
 **Supported operators:**
@@ -309,12 +309,12 @@ GET /v1/games?page=1&limit=20
 {
 	"data": [...],
 	"pagination": {
-		"current_page": 1,
-		"per_page": 20,
-		"total_pages": 10,
-		"total_items": 200,
-		"has_next": true,
-		"has_prev": false
+		"currentPage": 1,
+		"perPage": 20,
+		"totalPages": 10,
+		"totalItems": 200,
+		"hasNext": true,
+		"hasPrev": false
 	}
 }
 ```
@@ -331,8 +331,8 @@ GET /v1/notifications?cursor=eyJpZCI6IjEyMyJ9&limit=20
 {
 	"data": [...],
 	"pagination": {
-		"next_cursor": "eyJpZCI6IjE0MyJ9",
-		"has_more": true
+		"nextCursor": "eyJpZCI6IjE0MyJ9",
+		"hasMore": true
 	}
 }
 ```

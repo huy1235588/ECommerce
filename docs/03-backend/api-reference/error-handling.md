@@ -24,9 +24,9 @@ Tài liệu này định nghĩa chuẩn xử lý lỗi thống nhất cho toàn 
 -   KHÔNG trả về stack traces trong production
 -   KHÔNG leak sensitive information
 
-### 4. Debugging (Dễ debug)
+-### 4. Debugging (Dễ debug)
 
--   Include trace_id cho mỗi request
+-   Include traceId cho mỗi request
 -   Log detailed errors server-side
 -   Provide timestamp
 
@@ -42,8 +42,8 @@ Tài liệu này định nghĩa chuẩn xử lý lỗi thống nhất cho toàn 
 		"message": "Human-readable error message",
 		"details": []
 	},
-	"timestamp": "2025-10-03T12:00:00.000Z",
-	"trace_id": "550e8400-e29b-41d4-a716-446655440000",
+    "timestamp": "2025-10-03T12:00:00.000Z",
+    "traceId": "550e8400-e29b-41d4-a716-446655440000",
 	"path": "/v1/users/123"
 }
 ```
@@ -58,7 +58,7 @@ Tài liệu này định nghĩa chuẩn xử lý lỗi thống nhất cho toàn 
 | error.message | string | Yes      | Human-readable error message                  |
 | error.details | array  | No       | Array of detailed errors (validation, etc.)   |
 | timestamp   | string   | Yes      | ISO 8601 timestamp                            |
-| trace_id    | string   | Yes      | Unique request identifier for tracking        |
+| traceId    | string   | Yes      | Unique request identifier for tracking        |
 | path        | string   | Yes      | API path that caused the error                |
 
 ## 🏷️ Error Categories & Codes
@@ -83,7 +83,7 @@ Tài liệu này định nghĩa chuẩn xử lý lỗi thống nhất cho toàn 
 		"message": "Your session has expired. Please login again."
 	},
 	"timestamp": "2025-10-03T12:00:00.000Z",
-	"trace_id": "abc-123-def-456",
+    "traceId": "abc-123-def-456",
 	"path": "/v1/users/profile"
 }
 ```
@@ -134,7 +134,7 @@ Tài liệu này định nghĩa chuẩn xử lý lỗi thống nhất cho toàn 
 		]
 	},
 	"timestamp": "2025-10-03T12:00:00.000Z",
-	"trace_id": "xyz-789-uvw-012",
+    "traceId": "xyz-789-uvw-012",
 	"path": "/v1/users"
 }
 ```
@@ -174,16 +174,16 @@ Tài liệu này định nghĩa chuẩn xử lý lỗi thống nhất cho toàn 
 		"code": "RATE_LIMIT_EXCEEDED",
 		"message": "Too many requests. Please try again later.",
 		"details": [
-			{
-				"retry_after": 3600,
-				"limit": 1000,
-				"remaining": 0,
-				"reset_at": "2025-10-03T13:00:00.000Z"
-			}
+            {
+                "retryAfter": 3600,
+                "limit": 1000,
+                "remaining": 0,
+                "resetAt": "2025-10-03T13:00:00.000Z"
+            }
 		]
 	},
 	"timestamp": "2025-10-03T12:00:00.000Z",
-	"trace_id": "rate-limit-123"
+    "traceId": "rate-limit-123"
 }
 ```
 
@@ -225,13 +225,13 @@ X-RateLimit-Reset: 1696334400
 		"message": "An unexpected error occurred. Please try again later."
 	},
 	"timestamp": "2025-10-03T12:00:00.000Z",
-	"trace_id": "error-trace-999",
+    "traceId": "error-trace-999",
 	"path": "/v1/orders"
 }
 ```
 
 > [!warning] Production Security
-> NEVER include stack traces or internal system details in production error responses. Log these server-side with trace_id for debugging.
+> NEVER include stack traces or internal system details in production error responses. Log these server-side with traceId for debugging.
 
 ## 🔧 Implementation Guidelines
 
@@ -414,7 +414,7 @@ interface ErrorResponse {
 	success: false;
 	error: ErrorInfo;
 	timestamp: string;
-	trace_id: string;
+    traceId: string;
 	path: string;
 }
 ```
@@ -437,8 +437,8 @@ axios.interceptors.response.use(
 		if (error.response) {
 			const errorData = error.response.data;
 
-			// Log error with trace ID
-			console.error(`[${errorData.trace_id}] API Error:`, errorData.error);
+            // Log error with trace ID
+            console.error(`[${errorData.traceId}] API Error:`, errorData.error);
 
 			// Handle specific error codes
 			switch (errorData.error.code) {
@@ -507,13 +507,13 @@ public class ErrorLogger {
         String traceId = MDC.get("traceId");
         
         Map<String, Object> logData = Map.of(
-            "trace_id", traceId,
+            "traceId", traceId,
             "path", request.getRequestURI(),
             "method", request.getMethod(),
-            "error_type", ex.getClass().getSimpleName(),
-            "error_message", ex.getMessage(),
-            "user_id", getCurrentUserId(),
-            "ip_address", request.getRemoteAddr()
+            "errorType", ex.getClass().getSimpleName(),
+            "errorMessage", ex.getMessage(),
+            "userId", getCurrentUserId(),
+            "ipAddress", request.getRemoteAddr()
         );
 
         log.error("API Error: {}", logData, ex);
