@@ -470,20 +470,20 @@ paths:
             application/json:
               schema:
                 type: object
-                  properties:
-                    success:
-                      type: boolean
-                    data:
-                      type: object
-                      properties:
-                        avatarUrl:
-                          type: string
-                          format: uri
-                    message:
-                      type: string
-                    timestamp:
-                      type: string
-                      format: date-time
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      avatarUrl:
+                        type: string
+                        format: uri
+                  message:
+                    type: string
+                  timestamp:
+                    type: string
+                    format: date-time
         '400':
           description: Invalid file format or size
           content:
@@ -532,9 +532,9 @@ components:
     SortParam:
       name: sort
       in: query
-        schema:
-          type: string
-          example: createdAt:desc
+      schema:
+        type: string
+        example: 'createdAt:desc'
       description: 'Sort format: field:order (e.g., createdAt:desc)'
 
   schemas:
