@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.ha.commons.dto.request.SearchRequest;
 import org.ha.commons.dto.response.PageResponse;
 import org.ha.commons.exception.ResourceNotFoundException;
-import org.ha.userservice.dto.response.UserWithProfileDto;
+import org.ha.userservice.dto.response.UserResponse;
 import org.ha.userservice.model.entity.User;
+import org.ha.userservice.model.view.UserWithProfileView;
 import org.ha.userservice.repository.UserRepository;
+import org.ha.userservice.repository.UserWithProfileViewRepository;
 import org.ha.userservice.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserWithProfileViewRepository userWithProfileViewRepository;
 
     //===============================================================
     //
@@ -35,24 +38,21 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll(pageable);
     }
 
-    // Lấy tất cả user với proffle
-    public Page<UserWithProfileDto> getAllUsersWithProfileInternal(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<UserWithProfileDto> result = userRepository.findAllWithProfile(pageable);
-        log.info("Result of findAllWithProfile: totalElements={}, totalPages={}, currentPage={}, pageSize={}, content={}",
-                result.getTotalElements(), result.getTotalPages(), result.getNumber(), result.getSize(), result.getContent());
-        return result;
-    }
-
     // Lấy user theo id
     public User getUserByIdInternal(String id) {
         return userRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
+    // Lấy tất cả user với proffle
+    public Page<UserWithProfileView> getAllUsersWithProfileInternal(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return userWithProfileViewRepository.findAll(pageable);
+    }
+
     // Lấy user với profile theo id
-    public UserWithProfileDto getUserByIdWithProfileInternal(String id) {
-        return userRepository.findByIdWithProfile(UUID.fromString(id))
+    public UserWithProfileView getUserByIdWithProfileInternal(String id) {
+        return userWithProfileViewRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
@@ -63,21 +63,24 @@ public class UserServiceImpl implements UserService {
     //===============================================================
 
     @Override
-    public PageResponse<UserWithProfileDto> getAllUsers(SearchRequest searchRequest) {
+    public PageResponse<UserResponse> getAllUsers(SearchRequest searchRequest) {
 
-        Page<UserWithProfileDto> page = getAllUsersWithProfileInternal(searchRequest.getPage(), searchRequest.getSize());
+        Page<UserWithProfileView> page = getAllUsersWithProfileInternal(searchRequest.getPage(), searchRequest.getSize());
+
+        Page<UserResponse> responsePage = page.map(this::mapToUserResponse);
 
         return PageResponse.of(
-                page.getContent(),
-                page.getNumber(),
-                page.getSize(),
-                page.getTotalElements()
+                responsePage.getContent(),
+                responsePage.getNumber(),
+                responsePage.getSize(),
+                responsePage.getTotalElements()
         );
     }
 
     @Override
-    public UserWithProfileDto getUserById(String id) {
-        return getUserByIdWithProfileInternal(id);
+    public UserResponse getUserById(String id) {
+        UserWithProfileView userWithProfileView = getUserByIdWithProfileInternal(id);
+        return mapToUserResponse(userWithProfileView);
     }
 
     @Override
@@ -91,4 +94,24 @@ public class UserServiceImpl implements UserService {
     //  Helper methods
     //
     //===============================================================
+
+    // Map UserWithProfileView entity to UserResponse DTO
+    private UserResponse mapToUserResponse(UserWithProfileView userWithProfileView) {
+        return UserResponse.builder()
+                .id(userWithProfileView.getId().toString())
+                .email(userWithProfileView.getEmail())
+                .username(userWithProfileView.getUsername())
+                .firstName(userWithProfileView.getFirstName())
+                .lastName(userWithProfileView.getLastName())
+                .avatarUrl(userWithProfileView.getAvatarUrl())
+                .status(userWithProfileView.getStatus())
+                .roles(userWithProfileView.getRoles())
+                .emailVerified(userWithProfileView.getEmailVerified())
+                .birthDate(userWithProfileView.getBirthDate() != null ? userWithProfileView.getBirthDate().toString() : null)
+                .country(userWithProfileView.getCountry())
+                .createdAt(userWithProfileView.getCreatedAt() != null ? userWithProfileView.getCreatedAt().toString() : null)
+                .updatedAt(userWithProfileView.getUpdatedAt() != null ? userWithProfileView.getUpdatedAt().toString() : null)
+                .lastLoginAt(userWithProfileView.getLastLoginAt() != null ? userWithProfileView.getLastLoginAt().toString() : null)
+                .build();
+    }
 }

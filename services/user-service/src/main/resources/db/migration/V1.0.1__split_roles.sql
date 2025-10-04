@@ -133,6 +133,32 @@ FROM users u
          LEFT JOIN roles r ON r.id = ur.role_id
 GROUP BY u.id, u.email, u.username;
 
+-- Example view: user with profile and active roles
+CREATE
+OR REPLACE VIEW user_with_profile_view AS
+SELECT u.id,
+       u.email,
+       u.username,
+       up.first_name,
+       up.last_name,
+       up.avatar_url,
+       u.status,
+       u.email_verified,
+       up.birth_date,
+       up.country,
+       u.created_at,
+       u.updated_at,
+       u.last_login_at,
+       array_remove(array_agg(DISTINCT r.name) FILTER (WHERE ur.revoked_at IS NULL), NULL) AS roles
+FROM users u
+         LEFT JOIN user_profiles up ON up.user_id = u.id
+         LEFT JOIN user_roles ur ON ur.user_id = u.id
+         LEFT JOIN roles r ON r.id = ur.role_id
+GROUP BY u.id, u.email, u.username, up.first_name, up.last_name,
+         up.avatar_url, u.status, u.email_verified, up.birth_date,
+         up.country, u.created_at, u.updated_at, u.last_login_at;
+
+
 -- =============================================================================
 -- INITIAL DATA / SEED
 -- =============================================================================
