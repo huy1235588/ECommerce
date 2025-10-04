@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
     const isAuthPage = authPages.includes(pathname);
 
     // Define protected routes that require authentication
-    const protectedRoutes = ['/dashboard', '/profile', '/settings'];
+    const protectedRoutes = ['/dashboard', '/settings'];
     const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
     // If user is authenticated and trying to access auth pages, redirect to dashboard

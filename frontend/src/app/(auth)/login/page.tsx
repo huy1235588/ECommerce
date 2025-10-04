@@ -1,7 +1,9 @@
 import { Metadata } from 'next';
+import { LoginPage as LoginPageComponent } from '@/components/features/auth';
 
 export const metadata: Metadata = {
-
+    title: 'Đăng nhập | ECommerce',
+    description: 'Đăng nhập vào tài khoản ECommerce của bạn',
 };
 
 interface LoginPageProps {
@@ -21,9 +23,5 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     const redirectUrl = params.redirect;
     const message = params.message || params.error;
 
-    return (
-        <div>
-            Login
-        </div>
-    );
+    return <LoginPageComponent />;
 }

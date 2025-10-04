@@ -1,7 +1,9 @@
 import { Metadata } from 'next';
+import { RegisterPage as RegisterPageComponent } from '@/components/features/auth';
 
 export const metadata: Metadata = {
-
+    title: 'Đăng ký | ECommerce',
+    description: 'Tạo tài khoản ECommerce để bắt đầu mua sắm',
 };
 
 interface RegisterPageProps {
@@ -15,9 +17,5 @@ export default async function RegisterPage({ searchParams }: RegisterPageProps) 
     const params = await searchParams;
     const message = params.message || params.error;
 
-    return (
-        <div>
-            Register
-        </div>
-    );
+    return <RegisterPageComponent />;
 }

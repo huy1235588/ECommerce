@@ -181,8 +181,7 @@ public class AuthServiceImpl implements AuthService {
     public String refreshToken(String refreshToken) {
         // validate refresh token
         if (!jwtUtil.isTokenValid(refreshToken)) {
-            throw new BusinessException
-                    ("INVALID_TOKEN", "Refresh token is invalid or expired");
+           return null;
         }
 
         // extract details from token

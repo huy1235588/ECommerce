@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.ha.commons.dto.response.ApiResponse;
+import org.ha.commons.dto.response.ErrorResponse;
 import org.ha.commons.dto.response.SuccessResponse;
 import org.ha.userservice.dto.request.RegisterRequest;
 import org.ha.userservice.dto.request.LoginRequest;
@@ -85,6 +86,23 @@ public class AuthController {
     ) {
         String resp = authService.refreshToken(refreshToken);
 
+        // If the response is null or empty, return an error response
+        if (resp == null || resp.isEmpty()) {
+
+            // Delete the invalid refresh token cookie
+            ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                    .path("/")
+                    .maxAge(0)
+                    .httpOnly(true)
+                    .secure(true)
+                    .sameSite("Lax")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+
+            return ErrorResponse.of("INVALID_REFRESH_TOKEN", "Invalid or expired refresh token");
+        }
+
+        // Create a new refresh token cookie
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", resp)
                 .path("/")
                 .maxAge(jwtRefreshExpiration / 1000) // default expiration

@@ -2,11 +2,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AuthState } from '@/types/api/auth';
 import { User } from '@/types/api/user';
 import { authApi } from '@/store/api/auth-api';
+import { TokenService } from '@/lib';
 
 // Khởi tạo trạng thái ban đầu
 const initialState: AuthState = {
     user: null,
-    token: typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null,
+    token: typeof window !== 'undefined' ? TokenService.getAccessToken() : null,
     isAuthenticated: false,
     isLoading: false,
     error: null,
@@ -36,7 +37,7 @@ const authSlice = createSlice({
             state.isLoading = false;
             // Clear localStorage
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('accessToken');
+                TokenService.clearTokens();
             }
         },
 
@@ -45,7 +46,7 @@ const authSlice = createSlice({
             state.token = action.payload;
             state.isAuthenticated = true;
             if (typeof window !== 'undefined') {
-                localStorage.setItem('accessToken', action.payload);
+                TokenService.setTokens(action.payload);
             }
         },
 

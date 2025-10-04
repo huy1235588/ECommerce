@@ -2,6 +2,7 @@ import { ApiResponse } from '@/types';
 import { baseApi } from './base-api';
 import { LoginResponse, LoginFormData, RegisterFormData, UserResponse } from '@/types/api/auth';
 import { User } from '@/types/api/user';
+import { TokenService } from '@/lib';
 
 export const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -16,7 +17,7 @@ export const authApi = baseApi.injectEndpoints({
             transformResponse: (response: LoginResponse) => {
                 // Lưu token vào localStorage
                 if (response.data?.accessToken) {
-                    localStorage.setItem('accessToken', response.data.accessToken);
+                    TokenService.setTokens(response.data.accessToken);
                 }
                 return response;
             },
@@ -42,7 +43,7 @@ export const authApi = baseApi.injectEndpoints({
                 try {
                     await queryFulfilled;
                     // Clear tokens
-                    localStorage.removeItem('accessToken');
+                    TokenService.clearTokens();
                     // Clear all cached data
                     dispatch(baseApi.util.resetApiState());
                 } catch (error) {
@@ -61,7 +62,7 @@ export const authApi = baseApi.injectEndpoints({
             transformResponse: (response: ApiResponse<string>) => {
                 // Lưu token mới
                 if (response.data) {
-                    localStorage.setItem('accessToken', response.data);
+                    TokenService.setTokens(response.data);
                 }
                 return response.data;
             },

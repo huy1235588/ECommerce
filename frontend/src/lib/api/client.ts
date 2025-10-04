@@ -46,7 +46,7 @@ apiClient.interceptors.response.use(
                 const { accessToken: newAccessToken } = refreshResponse.data;
 
                 // Cập nhật access token mới
-                localStorage.setItem('accessToken', newAccessToken);
+                TokenService.setTokens(newAccessToken);
 
                 // Cập nhật header Authorization cho request gốc và thử lại
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -67,7 +67,7 @@ apiClient.interceptors.response.use(
 // Hàm xử lý logout tập trung
 function handleLogout() {
     document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;';
-    localStorage.removeItem('accessToken');
+    TokenService.clearTokens();
     // window.location.href = '/login';
 }
 

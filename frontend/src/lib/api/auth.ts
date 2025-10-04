@@ -2,6 +2,7 @@ import axios from 'axios';
 import { LoginFormData, LoginResponse, RegisterFormData } from '@/types/api/auth';
 import { cookieUtils } from '@/lib/utils';
 import apiClient from '@/lib/api/client';
+import { TokenService } from '@/lib/auth';
 
 // Auth API functions
 export const authAPI = {
@@ -36,7 +37,7 @@ export const authAPI = {
             // Ignore logout errors, just clear local storage
             console.warn('Logout API call failed:', error);
         } finally {
-            localStorage.removeItem('accessToken');
+            TokenService.clearTokens();
             cookieUtils.remove('refreshToken');
         }
     },
