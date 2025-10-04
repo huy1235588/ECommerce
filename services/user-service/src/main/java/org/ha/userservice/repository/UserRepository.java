@@ -18,22 +18,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     @Query("""
-            SELECT new org.ha.userservice.dto.response.UserWithProfileDto(
-                u.id,
-                u.email,
-                u.username,
-                up.firstName,
-                up.lastName,
-                up.avatarUrl,
-                u.status,
-                u.emailVerified,
-                up.birthDate,
-                up.country,
-                u.createdAt,
-                u.updatedAt,
-                u.lastLoginAt
-            )
+            SELECT new org.ha.userservice.dto.response.UserWithProfileDto(u, up)
             FROM User u
+            LEFT JOIN FETCH u.roles
             JOIN UserProfile up ON u.id = up.userId
             """)
     Page<UserWithProfileDto> findAllWithProfile(Pageable pageable);
