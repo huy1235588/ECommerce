@@ -147,7 +147,7 @@ ALTER TABLE users
 -- Username format validation (alphanumeric + underscore only)
 ALTER TABLE users
     ADD CONSTRAINT chk_users_username_format
-        CHECK (username ~* '^[a-zA-Z0-9_]{3,50}$');
+        CHECK (username ~* '^[a-zA-Z0-9_]{2,50}$');
 
 -- Status enum validation
 ALTER TABLE users
