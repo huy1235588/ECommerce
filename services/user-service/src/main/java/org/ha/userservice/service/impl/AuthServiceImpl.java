@@ -40,6 +40,35 @@ public class AuthServiceImpl implements AuthService {
     //
     //===============================================================
 
+    public User findUserByEmailInternal(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public User findUserByUsernameInternal(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    public User saveUserInternal(User user) {
+        return userRepository.save(user);
+    }
+
+    public UserProfile saveUserProfileInternal(UserProfile profile) {
+        return userProfileRepository.save(profile);
+    }
+
+    public UserRole saveUserRoleInternal(UserRole userRole) {
+        return userRoleRepository.save(userRole);
+    }
+
+    public Role findRoleByNameInternal(String name) {
+        return roleRepository.findByName(name).orElseThrow(() -> new RuntimeException("Role not found: " + name));
+    }
+
+    public User updateLastLoginInternal(User user) {
+        user.markLastLogin();
+        return userRepository.save(user);
+    }
+
     //===============================================================
     //
     //  Business logic methods
@@ -50,11 +79,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse register(RegisterRequest userRequest) {
         // check email
-        if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
+        if (findUserByEmailInternal(userRequest.getEmail()) != null) {
             throw ResourceAlreadyExistsException.of("User", "email", userRequest.getEmail());
         }
 
-        if (userRepository.findByUsername(userRequest.getUsername()).isPresent()) {
+        if (findUserByUsernameInternal(userRequest.getUsername()) != null) {
             throw ResourceAlreadyExistsException.of("User", "username", userRequest.getUsername());
         }
 
@@ -74,7 +103,7 @@ public class AuthServiceImpl implements AuthService {
                 .lastName(userRequest.getLastName())
                 .build();
 
-        Role role = roleRepository.findByName("CUSTOMER").orElseThrow();
+        Role role = findRoleByNameInternal("CUSTOMER");
         UserRole userRole = UserRole.builder()
                 .id(UUID.randomUUID())
                 .user(user)
@@ -82,9 +111,9 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         // save user and profile
-        User savedUser = userRepository.save(user);
-        UserProfile savedProfile = userProfileRepository.save(profile);
-        UserRole savedUserRole = userRoleRepository.save(userRole);
+        User savedUser = saveUserInternal(user);
+        UserProfile savedProfile = saveUserProfileInternal(profile);
+        UserRole savedUserRole = saveUserRoleInternal(userRole);
 
         // prepare response
         return UserResponse.builder()
@@ -129,8 +158,7 @@ public class AuthServiceImpl implements AuthService {
             User user = userDetails.user();
 
             // update last login; save ensures updated timestamp persisted
-            user.markLastLogin();
-            userRepository.save(user);
+            user = updateLastLoginInternal(user);
 
             // create user access token
             String accessToken = jwtUtil.generateToken(

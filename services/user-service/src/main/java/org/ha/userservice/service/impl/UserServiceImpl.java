@@ -30,13 +30,13 @@ public class UserServiceImpl implements UserService {
     //===============================================================
 
     // Lấy tất cả user với phân trang
-    public Page<User> getAllUsers(int page, int size) {
+    public Page<User> getAllUsersInternal(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return userRepository.findAll(pageable);
     }
 
     // Lấy tất cả user với proffle
-    public Page<UserWithProfileDto> getAllUsersWithProfile(int page, int size) {
+    public Page<UserWithProfileDto> getAllUsersWithProfileInternal(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserWithProfileDto> result = userRepository.findAllWithProfile(pageable);
         log.info("Result of findAllWithProfile: totalElements={}, totalPages={}, currentPage={}, pageSize={}, content={}",
@@ -45,13 +45,13 @@ public class UserServiceImpl implements UserService {
     }
 
     // Lấy user theo id
-    public User getUserByIdBasic(String id) {
+    public User getUserByIdInternal(String id) {
         return userRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
     // Lấy user với profile theo id
-    public UserWithProfileDto getUserByIdWithProfile(String id) {
+    public UserWithProfileDto getUserByIdWithProfileInternal(String id) {
         return userRepository.findByIdWithProfile(UUID.fromString(id))
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public PageResponse<UserWithProfileDto> getAllUsers(SearchRequest searchRequest) {
 
-        Page<UserWithProfileDto> page = getAllUsersWithProfile(searchRequest.getPage(), searchRequest.getSize());
+        Page<UserWithProfileDto> page = getAllUsersWithProfileInternal(searchRequest.getPage(), searchRequest.getSize());
 
         return PageResponse.of(
                 page.getContent(),
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserWithProfileDto getUserById(String id) {
-        return getUserByIdWithProfile(id);
+        return getUserByIdWithProfileInternal(id);
     }
 
     //===============================================================
