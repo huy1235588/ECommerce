@@ -14,7 +14,9 @@ import org.ha.userservice.dto.response.LoginResponse;
 import org.ha.userservice.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,12 +36,16 @@ public class AuthController {
      * @return ApiResponse containing UserResponse with registered user details.
      */
     @PostMapping("/register")
-    public ApiResponse register(
+    public ResponseEntity<ApiResponse> register(
             @Valid @RequestBody RegisterRequest registerRequest
     ) {
         UserResponse userResponse = authService.register(registerRequest);
 
-        return SuccessResponse.of(userResponse, "User registered successfully");
+        return ResponseEntity.ok()
+                .body(SuccessResponse.of(
+                        userResponse,
+                        "User registered successfully")
+                );
     }
 
     /**
@@ -52,7 +58,7 @@ public class AuthController {
      * @return ApiResponse containing LoginResponse with access token and user details.
      */
     @PostMapping("/login")
-    public ApiResponse login(
+    public ResponseEntity<ApiResponse> login(
             @Valid @RequestBody LoginRequest loginRequest,
             HttpServletResponse response
     ) {
@@ -68,7 +74,8 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-        return SuccessResponse.of(resp, "Login successful");
+        return ResponseEntity.ok()
+                .body(SuccessResponse.of(resp, "Login successful"));
     }
 
     /**
@@ -80,7 +87,7 @@ public class AuthController {
      * @return ApiResponse containing the new access token.
      */
     @PostMapping("/refresh")
-    public ApiResponse refreshToken(
+    public ResponseEntity<ApiResponse> refreshToken(
             @NotNull(message = "Refresh token is required") @CookieValue("refreshToken") String refreshToken,
             HttpServletResponse response
     ) {
@@ -99,7 +106,8 @@ public class AuthController {
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
-            return ErrorResponse.of("INVALID_REFRESH_TOKEN", "Invalid or expired refresh token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ErrorResponse.of("INVALID_REFRESH_TOKEN", "Invalid or expired refresh token"));
         }
 
         // Create a new refresh token cookie
@@ -113,7 +121,8 @@ public class AuthController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-        return SuccessResponse.of(resp, "Token refreshed successfully");
+        return ResponseEntity.ok()
+                .body(SuccessResponse.of(resp, "Token refreshed successfully"));
     }
 
     /**
@@ -124,7 +133,7 @@ public class AuthController {
      * @return ApiResponse indicating successful logout.
      */
     @PostMapping("/logout")
-    public ApiResponse logout(HttpServletResponse response) {
+    public ResponseEntity<ApiResponse> logout(HttpServletResponse response) {
         // Invalidate the refresh token cookie
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .path("/")
@@ -135,6 +144,7 @@ public class AuthController {
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
 
-        return SuccessResponse.withMessage("Logout successful");
+        return ResponseEntity.ok()
+                .body(SuccessResponse.withMessage("Logout successful"));
     }
 }

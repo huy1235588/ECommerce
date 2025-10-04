@@ -24,13 +24,14 @@ public class UserController {
      * @return ApiResponse containing paginated list of users
      */
     @GetMapping("/")
-    public ApiResponse getAllUsers(
+    public ResponseEntity<ApiResponse> getAllUsers(
             SearchRequest paginationRequest
     ) {
-        return SuccessResponse.builder()
-                .data(userService.getAllUsers(paginationRequest))
-                .message("Get all users successfully")
-                .build();
+        return ResponseEntity.ok()
+                .body(SuccessResponse.builder()
+                        .data(userService.getAllUsers(paginationRequest))
+                        .message("Get all users successfully")
+                        .build());
     }
 
     /**
@@ -40,11 +41,12 @@ public class UserController {
      * @return ApiResponse containing user details
      */
     @GetMapping("/{id}")
-    public ApiResponse getUserById(@PathVariable String id) {
-        return SuccessResponse.builder()
-                .data(userService.getUserById(id))
-                .message("Get user by id successfully")
-                .build();
+    public ResponseEntity<ApiResponse> getUserById(@PathVariable String id) {
+        return ResponseEntity.ok()
+                .body(SuccessResponse.builder()
+                        .data(userService.getUserById(id))
+                        .message("Get user by id successfully")
+                        .build());
     }
 
     @DeleteMapping("/{id}")
