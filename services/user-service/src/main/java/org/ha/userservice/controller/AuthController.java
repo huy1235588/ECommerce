@@ -2,6 +2,7 @@ package org.ha.userservice.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.ha.commons.dto.response.ApiResponse;
 import org.ha.commons.dto.response.SuccessResponse;
@@ -43,6 +44,15 @@ public class AuthController {
         return SuccessResponse.of(userResponse, "User registered successfully");
     }
 
+    /**
+     * Endpoint for user login.
+     * Authenticates the user and returns access and refresh tokens.
+     * The refresh token is set in an HttpOnly cookie.
+     *
+     * @param loginRequest The login request containing username and password.
+     * @param response     The HttpServletResponse to add the refresh token cookie.
+     * @return ApiResponse containing LoginResponse with access token and user details.
+     */
     @PostMapping("/login")
     public ApiResponse login(
             @Valid @RequestBody LoginRequest loginRequest,
