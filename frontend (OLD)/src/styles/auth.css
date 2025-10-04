@@ -1,0 +1,555 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.GENERAL STYLE
+    02.HEADER STYLE
+		
+*=============================================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    01.START GENERAL
+*===================================*/
+.article {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 1rem 1.75rem 1.75rem;
+    background-color: #171717;
+}
+
+@media (min-width: 768px) {
+    .container {
+        width: 45%;
+    }
+    .container.w-35 {
+        width: 35%;
+    }
+}
+
+.auth-main {
+    max-width: 32rem;
+    width: 100%;
+}
+
+.container.login .auth-main {
+    max-width: 30rem;
+}
+
+.heading {
+    margin-bottom: 1.25rem;
+    text-align: center;
+    letter-spacing: -0.025em;
+    font-size: 1.75rem;
+    line-height: 2rem;
+    font-weight: 800;
+    color: #e5e7eb;
+}
+
+.links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.link {
+    color: #63b3ed;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+/*===================================*
+    01.END GENERAL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.START ASIDE
+*===================================*/
+.auth-aside {
+    flex: 1;
+}
+
+.auth-aside img {
+    z-index: -1;
+    user-select: none;
+}
+
+.auth-aside.left {
+    order: 2;
+}
+
+.auth-aside.right {
+    order: 0;
+}
+
+/* Logo */
+.logo-container {
+    position: absolute;
+    top: 5%;
+    left: 3%;
+    width: 5rem;
+    height: 2rem;
+    z-index: 2;
+}
+
+.logo-container a {
+    display: inline-block;
+}
+
+.auth-aside-banner {
+    z-index: -1;
+}
+/*===================================*
+    02.END ASIDE
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START FORM
+*===================================*/
+.form {
+    width: 100%;
+    margin: 1.5rem 0;
+}
+
+.form-container {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    row-gap: 1.85rem;
+    column-gap: 1rem;
+}
+
+.form-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.form-field {
+    width: 100%;
+}
+
+/* Input */
+.input-form input {
+    color: #e5e7eb;
+    background-color: #0a0a0a;
+}
+
+.input-form label {
+    color: #6b7280;
+}
+
+.input-form fieldset,
+.select-form fieldset {
+    border-color: #ffffff2f;
+}
+
+.input-form
+    > div:not(.Mui-focused, .Mui-error):hover
+    .MuiOutlinedInput-notchedOutline,
+.select-form
+    > div:not(.Mui-focused, .Mui-error):hover
+    .MuiOutlinedInput-notchedOutline {
+    border-color: #aaaaae;
+}
+
+.form-field:has(.input-form-48) {
+    width: 48%;
+}
+
+/* Input Password */
+.input-form.password .MuiInputBase-input {
+    padding-right: 55px;
+}
+
+.input-form.password.tooltip .MuiInputBase-input {
+    padding-right: 90px;
+}
+
+/* Select */
+.form-field .select-form div {
+    color: #e5e7eb;
+    background-color: #0a0a0a;
+}
+
+.form-field .select-form label,
+.form-field .select-form svg {
+    color: #6b7280;
+    fill: #6b7280;
+}
+
+.form-field
+    .select-form
+    label.css-113d811-MuiFormLabel-root-MuiInputLabel-root {
+    background-color: #171717;
+    padding: 0 7px;
+}
+
+.MuiPaper-root.css-1tktgsa-MuiPaper-root-MuiPopover-paper-MuiMenu-paper {
+    color: #e5e7eb;
+    background-color: #242424;
+    max-height: calc(50% - 32px);
+}
+
+/* Password */
+.eye-password {
+    position: absolute;
+    top: 0.7rem;
+    right: 1rem;
+}
+
+.eye-password.tooltip {
+    position: absolute;
+    top: 0.7rem;
+    right: 3rem;
+}
+
+.eye-password.login {
+    right: 0.5rem;
+}
+
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}
+
+.eye-password button {
+    width: 35px;
+    color: #6b7280;
+}
+
+.eye-password button:hover {
+    background-color: #1f2937;
+}
+
+.form-field .css-1n04w30-MuiInputBase-root-MuiOutlinedInput-root {
+    padding: 0;
+}
+
+/* Tooltip */
+div.MuiTooltip-popper .css-3v9qdb-MuiTooltip-tooltip {
+    width: 250px;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.form-field .tooltip-icon {
+    position: absolute;
+    top: 0.7rem;
+    right: 0.5rem;
+    width: 35px;
+    padding: 8px 8px;
+    border-radius: 2px;
+    color: #6b7280;
+    z-index: 2;
+}
+
+.form-field .tooltip-icon:hover {
+    background-color: #1f2937;
+}
+
+/* Button submit */
+.submit-button {
+    margin-top: 1.7rem !important;
+    padding: 0.7rem !important;
+    color: #ffffff !important;
+    background-color: #2563eb !important;
+}
+
+.submit-button:hover {
+    background-color: #3b82f6 !important;
+}
+
+.submit-button:disabled {
+    background-color: #2563eb !important;
+    opacity: 0.5;
+}
+
+.submit-button span {
+    counter-reset: #fff;
+}
+/*===================================*
+    03.END FORM
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    04.START ACCOUNT VERIFICATION
+*===================================*/
+.info-text {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+p.error-message {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    padding-right: 0.75rem;
+    margin: 1rem 0;
+    border: 1px solid #f8514966;
+    border-radius: 5px;
+    background-image: linear-gradient(#e53e3e1a, #e53e3e1a);
+    color: #f0f6fc;
+}
+
+.error-message svg {
+    height: 100%;
+    color: #f85149;
+}
+.error-message button.error-close {
+    min-width: 2.25rem;
+    width: 2.25rem;
+}
+
+.error-message button.error-close:hover {
+    background-color: transparent;
+}
+
+.error-message button.error-close:hover svg {
+    color: #b9403c;
+}
+
+/* Input */
+.input-form-code input {
+    padding: 1.2rem 1rem;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 700;
+}
+
+.input-form-code label {
+    line-height: 1.75rem;
+}
+
+/* Action form */
+.action-form-container {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+.clear-icon {
+    color: #718096;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.clear-icon:hover {
+    color: #647185;
+}
+
+.divider {
+    border-left: 1px solid #2d3748;
+    margin-right: 5px;
+}
+
+.link-resend.cursor-not-allowed {
+    user-select: none;
+    color: #6b7280;
+}
+
+.link-resend.cursor-not-allowed:hover {
+    color: #6b7280;
+}
+
+.link-resend .link-resend-text {
+    padding: 0.5rem 0.7rem;
+    padding-right: 0;
+}
+
+.link-resend:hover {
+    text-decoration: none;
+    color: #2563eb;
+}
+
+/* Button submit */
+button.verify-button {
+    margin-top: 20px;
+    padding: 10px 0;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    color: #080808;
+    background-color: #f9fcff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button.verify-button:hover {
+    background-color: #c0c0c0;
+}
+
+button.verify-button:disabled {
+    color: #08080888;
+    background-color: #c0c0c088;
+}
+/*===================================*
+    04.END ACCOUNT VERIFICATION
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START ACCOUNT VERIFICATION
+*===================================*/
+.step-label .MuiStepLabel-labelContainer {
+    color: #61636b;
+}
+
+.step-label .MuiStepLabel-label.Mui-active,
+.step-label .MuiStepLabel-label.Mui-completed {
+    color: #556ad0;
+}
+
+.step-label .MuiStepIcon-root {
+    border: 1px #61636b solid;
+    border-radius: 50%;
+    color: transparent;
+}
+
+.step-label .MuiStepIcon-root.Mui-active,
+.step-label .MuiStepIcon-root.Mui-completed {
+    color: #556ad0;
+}
+
+/*===================================*
+    05.END ACCOUNT VERIFICATION
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    06.START FORGOT PASSWORD
+*===================================*/
+.forgot-password-container .form-verify .action {
+    position: absolute;
+    top: 50%;
+    right: 4%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.forgot-password-container .form-verify .separate {
+    display: inline-block;
+    width: 1px;
+    height: 1.25rem;
+    border-left: 1px solid #3f3f3f;
+    margin: 0 7px;
+}
+
+.forgot-password-container .form-verify .button-clear {
+    color: #61636b;
+}
+
+.forgot-password-container .form-verify .button-clear:hover {
+    color: #61636ba6;
+}
+
+.forgot-password-container .form-verify .button-resend-email {
+    display: flex;
+    align-items: center;
+    min-width: auto;
+    padding: 0;
+    margin-left: 1px;
+    text-transform: capitalize;
+}
+
+.forgot-password-container .form-verify .button-resend-email.Mui-disabled {
+    color: #647185;
+}
+
+.forgot-password-container .form-verify .button-resend-email:hover {
+    color: #1565c0bc;
+}
+
+.forgot-password-container .form-verify .button-resend-email .button-text {
+    margin-right: 3px;
+}
+/*===================================*
+    06.END FORGOT PASSWORD
+*===================================*/

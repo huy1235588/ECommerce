@@ -1,0 +1,230 @@
+.data-grid-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    user-select: none;
+}
+
+.data-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-grid-table th,
+.data-grid-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.data-grid-table th {
+    cursor: pointer;
+}
+
+.data-grid-table td {
+    padding: 0 12px;
+}
+
+.data-grid-pagination {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.data-grid-pagination button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.data-grid-pagination button:disabled {
+    background-color: #9c9c9c;
+    cursor: not-allowed;
+}
+
+.data-grid-pagination span {
+    display: flex;
+    align-items: center;
+}
+
+.data-grid-row {
+    cursor: pointer;
+}
+
+.data-grid-row:hover {
+    background-color: #ececec;
+    color: #007bff;
+}
+
+.data-grid-cell {
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* data-grid-no-data */
+.data-grid-no-data {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    font-size: 1.5rem;
+    color: #ccc;
+}
+
+/* Sort icon */
+.sort-icon {
+    display: inline-block;
+    vertical-align: middle;
+    width: 14px;
+    height: 14px;
+    margin-left: 2px;
+    background-image: url(/icons/order.svg);
+    filter: opacity(.9) invert(1);
+}
+
+.sort-icon.asc {
+    background-image: url(/icons/order-asc.svg);
+}
+
+.sort-icon.desc {
+    background-image: url(/icons/order-desc.svg);
+}
+
+/* Search */
+.search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.search-container {
+    position: relative;
+    width: 50%;
+    color: #fff;
+    border-bottom: #0000001a 2px solid;
+    padding: 0 8px;
+    margin-left: 2rem;
+    display: flex;
+    align-items: center;
+    transition: border-bottom-color 0.2s;
+}
+
+.search-container:hover {
+    border-bottom-color: #00000083;
+}
+
+.search-container.focus {
+    border-bottom-color: #2c82dd;
+}
+
+.search-input-container {
+    flex: 1;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.4375em;
+    letter-spacing: 0.00938em;
+    padding-right: 0.5rem;
+    padding-left: 1rem;
+    color: rgb(255, 255, 255);
+    box-sizing: border-box;
+    position: relative;
+    cursor: text;
+    display: inline-flex;
+    -webkit-box-align: center;
+    align-items: center;
+}
+
+.search-input-container .data-grid-search {
+    font: inherit;
+    letter-spacing: inherit;
+    color: currentColor;
+    padding: 0.5rem 0;
+    margin-left: 5px;
+    border: 0;
+    box-sizing: content-box;
+    background: none;
+    height: 1em;
+    margin: 0;
+    -webkit-tap-highlight-color: transparent;
+    display: block;
+    min-width: 0;
+    width: 100%;
+    outline: none;
+    -webkit-animation-name: mui-auto-fill-cancel;
+    animation-name: mui-auto-fill-cancel;
+    -webkit-animation-duration: 10ms;
+    animation-duration: 10ms;
+}
+
+.search-input-container .data-grid-search::placeholder {
+    color: #8181818f;
+}
+
+.button-clear {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    font-size: 1rem;
+    padding: 5px;
+    border-radius: 50%;
+    color: #000;
+    fill: #000;
+    transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+}
+
+.button-clear:hover {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+.button-clear:active {
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+.data-grid-container .search-icon {
+    position: absolute;
+    top: 0.0125rem;
+    left: -1rem;
+    color: #ffffff;
+    fill: #ffffff;
+    padding: 0.5rem;
+}
+
+/* footer */
+.data-grid-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-top: 1px solid #ccc;
+}
+
+#rowsPerPage {
+    padding: 8px;
+    margin-left: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#rowsPerPage:focus {
+    border-color: #51a7e8;
+    box-shadow: 0 0 0 2px #66c0f4;
+    outline: none;
+}
+
+#rowsPerPage option {
+    padding: 8px;
+}

@@ -1,0 +1,524 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.SWIPER HIGHLIGHT
+    02.PRODUCT DETAIL
+    03.SYSTEM REQUIREMENTS
+    04.FEATURE
+    05.LANGUAGE
+    06.ACHIEVEMENTS
+    =============================
+		
+*=============================================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    01.START SWIPER HIGHLIGHT
+*===================================*/
+/* Swiper */
+.swiper.main-player-swiper {
+    position: unset;
+    width: 100%;
+    background-color: #000;
+    --swiper-navigation-top-offset: 87.2%; /* Khoảng cách nút điều hướng với viền trên */
+    --swiper-navigation-sides-offset: 0px; /* Khoảng cách nút điều hướng với viền bên */
+    --swiper-navigation-size: 12px; /* Kích thước nút điều hướng */
+}
+
+.main-player-swiper .swiper-button-next,
+.main-player-swiper .swiper-button-prev {
+    padding: 9px 16px; /* Kích thước nút điều hướng */
+    color: #407899; /* Màu nút điều hướng */
+    background: #233c5166;
+}
+
+.main-player-swiper .swiper-button-next:hover,
+.main-player-swiper .swiper-button-prev:hover {
+    background: linear-gradient(
+        135deg,
+        #3d6c8d 0%,
+        #2e5470 100%
+    ); /* Màu nút điều hướng khi hover */
+}
+
+/* Swiper thumb */
+.swiper.thumb-swiper {
+    padding-bottom: 25px;
+    --swiper-scrollbar-size: 18px; /* Kích thước scrollbar */
+    --swiper-scrollbar-sides-offset: 32px; /* Khoảng cách scrollbar với viền */
+    --swiper-scrollbar-border-radius: 5px; /* Bo tròn scrollbar */
+}
+
+.thumb-swiper .swiper-scrollbar {
+    background: rgba(133, 133, 133, 0.3); /* Màu nền scrollbar */
+}
+
+.thumb-swiper .swiper-scrollbar-drag {
+    background: #457aa566; /* Màu thanh kéo scrollbar */
+}
+
+.swiper-scrollbar .swiper-scrollbar-drag:hover {
+    background: linear-gradient(
+        135deg,
+        #3d6c8d 0%,
+        #2e5470 100%
+    ); /* Màu thanh kéo scrollbar khi hover */
+}
+
+
+/* Video */
+.main-player-swiper .highlight-video {
+    position: relative;
+    width: 100%;
+    background: #000;
+}
+/*===================================*
+    01.END SWIPER HIGHLIGHT
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.START PRODUCT DETAIL
+*===================================*/
+.product-detail-container {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.product-detail-auto-collapse {
+    max-height: none;
+    overflow: hidden;
+    margin-top: 30px;
+    transition: max-height 0.3s ease;
+}
+
+.product-detail-container.collapsed .product-detail-auto-collapse {
+    max-height: 850px;
+}
+
+.product-detail-area {
+    line-height: 1.5em;
+    font-size: 16px;
+    margin-top: 30px;
+    overflow: hidden;
+    width: 616px;
+    max-width: 100%;
+    font-family: "Motiva Sans", Sans-serif;
+    font-weight: normal;
+}
+
+.product-detail-area h2,
+.product-detail-area h1 {
+    background-image: url(https://store.fastly.steamstatic.com/public/images/v6/maincol_gradient_rule.png);
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    line-height: 36px;
+
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 20px;
+    letter-spacing: 0.03em;
+    font-weight: normal;
+    padding-top: 2px;
+}
+
+.product-detail-area h2.bb_tag {
+    margin-top: 18px;
+    margin-bottom: 0px;
+    background-image: none;
+    font-size: 20px;
+    color: #2f89bc;
+    text-transform: none;
+    letter-spacing: 0px;
+}
+
+.product-detail-area img.bb_img {
+    max-width: 100%;
+    user-select: none;
+}
+
+.product-detail-toggle {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 73px;
+    z-index: 1;
+    background: url(/image/autocollapse_fade.png);
+}
+
+.product-detail-container.collapsed .product-detail-toggle {
+    display: block;
+}
+
+.product-detail-toggle-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 20px;
+    line-height: 20px;
+    cursor: pointer;
+    color: #537ca6;
+    font-size: 10px;
+    padding-right: 12px;
+    background: url(/image/autocollapse_readmore.png) no-repeat right center;
+}
+
+.product-detail-toggle-button:hover {
+    color: #fff;
+}
+/*===================================*
+    02.END PRODUCT DETAIL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START SYSTEM REQUIREMENTS
+*===================================*/
+/* System requirements */
+.product-sysReq-container {
+    margin-top: 30px;
+}
+
+.product-sysReq-title {
+    background-image: url(https://store.fastly.steamstatic.com/public/images/v6/maincol_gradient_rule.png);
+    background-repeat: no-repeat;
+    background-position: bottom left;
+    line-height: 36px;
+}
+
+.sysReq_contents {
+    margin-top: 10px;
+}
+
+.sysReq_content {
+    display: none;
+}
+
+.sysReq_content.active {
+    display: flex;
+    justify-content: space-between;
+}
+
+.game_area_sys_req_leftCol,
+.game_area_sys_req_rightCol {
+    width: 48%;
+}
+
+.game_area_sys_req h3 {
+    font-size: 16px;
+    color: #bdbdbd;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    font-weight: normal;
+}
+
+.game_area_sys_req ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.game_area_sys_req ul li {
+    margin: 5px 0px;
+}
+
+.game_area_sys_req strong {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    font-size: 10px;
+    color: #bcc6cd;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.game_area_sys_req ul li strong {
+    color: #61686d;
+    font-size: 16px;
+    margin-right: 4px;
+    font-weight: normal;
+    margin-bottom: 2px;
+    text-transform: none;
+}
+/*===================================*
+    03.END SYSTEM REQUIREMENTS
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    04.START FEATURE
+*===================================*/
+.product-achievements-container {
+    padding: 16px;
+    margin-bottom: 8px;
+    margin-top: 0;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+.product-features-container {
+    padding: 16px;
+    margin-bottom: 8px;
+    margin-top: 0;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+.product-features-item {
+    margin-bottom: 2px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+}
+
+.product-features-item-icon {
+    padding: 0px 6px;
+    display: flex;
+}
+
+.product-features-item-icon img {
+    width: 26px;
+    height: 16px;
+}
+
+.product-features-text {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 8px;
+    height: 100%;
+    background: rgba(103, 193, 245, 0.1);
+    width: 100%;
+    border-radius: 1px;
+    color: #66c0f4;
+}
+
+.product-features-item:hover .product-features-text {
+    text-decoration: none;
+    color: #ffffff;
+    background: #67c1f5;
+    background: linear-gradient(135deg, #67c1f5 0%, #417a9b 100%);
+}
+/*===================================*
+    04.END FEATURE
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    05.START LANGUAGE
+*===================================*/
+.product-languages-container {
+    padding: 16px;
+    margin-bottom: 8px;
+    margin-top: 0;
+    background: linear-gradient(
+        to right,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+}
+
+.product-languages-table {
+    border-collapse: collapse;
+}
+
+.product-languages-table tr {
+    border-bottom: 1px solid #626366;
+}
+
+.product-languages-table th {
+    font-size: 12px;
+    color: #b0aeac;
+    font-weight: normal;
+    width: 100px;
+}
+
+.product-languages-table td {
+    color: #8f98a0;
+    padding: 3px 0px 3px 0px;
+    font-size: 12px;
+    width: 130px;
+    text-align: left;
+}
+
+.product-languages-table td.checkCol,
+.product-languages-table th.checkCol {
+    width: 60px;
+    text-align: center;
+}
+
+.product-languages-table td span {
+    font-weight: bold;
+    color: #67c1f5;
+}
+
+/*===================================*
+    05.END LANGUAGE
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    06.START ACHIEVEMENTS
+*===================================*/
+.product-achievements-list {
+    padding: 4px 0px 4px 0px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.product-achievements-item {
+    float: left;
+    width: 64px;
+    height: 64px;
+    margin-right: 4px;
+}
+
+.product-achievements-item img {
+    width: 64px;
+    height: 64px;
+    user-select: none;
+}
+
+a.product-achievements-view-all {
+    background-color: rgba(103, 193, 245, 0.2);
+    border-radius: 1px;
+    font-size: 13px;
+    font-family: "Motiva Sans", Sans-serif;
+    font-weight: normal;
+    color: #67c1f5;
+    text-align: center;
+    height: 64px;
+    padding: 0 4px;
+    margin-right: 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    line-height: 14px;
+}
+
+a.product-achievements-view-all:hover {
+    background: linear-gradient(135deg, #67c1f5 0%, #417a9b 100%);
+    color: #ffffff;
+}
+
+/*===================================*
+    06.END ACHIEVEMENTS
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    07.START RELATED GAMES
+*===================================*/
+/* Swiper */
+.swiper.related-products-swiper {
+    position: unset;
+    user-select: none;
+    --swiper-navigation-top-offset: 50%; /* Khoảng cách nút điều hướng với viền trên */
+    --swiper-navigation-sides-offset: -20px; /* Khoảng cách nút điều hướng với viền bên */
+    --swiper-navigation-size: 20px; /* Kích thước nút điều hướng */
+
+    --swiper-scrollbar-size: 5px; /* Kích thước scrollbar */
+    --swiper-scrollbar-top: calc(100% + 10px); /* Khoảng cách scrollbar với viền */
+    --swiper-scrollbar-sides-offset: 32px; /* Khoảng cách scrollbar với viền */
+    --swiper-scrollbar-border-radius: 5px; /* Bo tròn scrollbar */
+}
+
+.related-products-swiper .swiper-button-next,
+.related-products-swiper .swiper-button-prev {
+    border-radius: 50%;
+    transform: translateY(50%);
+    padding: 20px; /* Kích thước nút điều hướng */
+    color: #407899; /* Màu nút điều hướng */
+    background: #233c5166;
+}
+
+.related-products-swiper .swiper-button-next:hover,
+.related-products-swiper .swiper-button-prev:hover {
+    background: linear-gradient(
+        135deg,
+        #8d3d6e 0%,
+        #702e52 100%
+    ); /* Màu nút điều hướng khi hover */
+}

@@ -1,0 +1,94 @@
+{
+    // Editor configuration
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.trimAutoWhitespace": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.removeUnusedImports": "explicit"
+    },
+    // ESLint configuration
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    "eslint.format.enable": false,
+    // Prettier configuration
+    "prettier.requireConfig": true,
+    "prettier.useEditorConfig": false,
+    // File associations
+    "files.associations": {
+        "*.css": "tailwindcss"
+    },
+    // Emmet
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact",
+        "typescript": "typescriptreact"
+    },
+    // Tailwind CSS
+    "tailwindCSS.includeLanguages": {
+        "javascript": "javascript",
+        "typescript": "typescript",
+        "javascriptreact": "javascript",
+        "typescriptreact": "typescript",
+        "html": "HTML"
+    },
+    "tailwindCSS.experimental.classRegex": [
+        [
+            "cva\\(([^)]*)\\)",
+            "[\"'`]([^\"'`]*).*?[\"'`]"
+        ],
+        [
+            "cx\\(([^)]*)\\)",
+            "(?:'|\"|`)([^']*)(?:'|\"|`)"
+        ]
+    ],
+    "tailwindCSS.experimental.configFile": "frontend/src/styles/globals.css",
+    // File explorer
+    "files.exclude": {
+        "**/node_modules": true,
+        "**/.next": true,
+        "**/dist": true,
+        "**/out": true,
+        "**/.git": true,
+        "**/.DS_Store": true
+    },
+    "search.exclude": {
+        // Thư mục
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/coverage": true,
+        "**/.next": true,
+        "**/.nuxt": true,
+        "**/.cache": true,
+        "**/.obsidian": true,
+        // File build/output
+        "**/*.min.js": true,
+        "**/*.min.css": true,
+        "**/*.bundle.js": true,
+        "**/*.map": true,
+        // File log và temp
+        "**/*.log": true,
+        "**/*.tmp": true,
+        "**/*.temp": true,
+        // File config và lock
+        "**/package-lock.json": true,
+        "**/yarn.lock": true,
+        "**/pnpm-lock.yaml": true,
+        // File hệ thống
+        "**/Thumbs.db": true,
+        "**/.DS_Store": true,
+        "**/desktop.ini": true,
+        // File environment
+        "**/.env": true,
+        "**/.env.local": true,
+        "**/.env.production": true
+    }
+}

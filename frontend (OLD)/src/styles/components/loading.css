@@ -1,0 +1,144 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.GENERAL STYLE
+    02.HEADER STYLE
+		
+*=============================================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    01.START GENERAL
+*===================================*/
+:root {
+    --brown: #8d6e63;
+    --white-cream: #f5f5dc;
+    --white: #fff;
+    --gray: #e0e0e0;
+    --yellow: #020202;
+
+    /* --header-bg: #266A29; */
+    --body-bg: #1b2838;
+    /* --body-bg: #ffffff; */
+    --header-bg: #393939;
+    --header-bg: #fcfcfc;
+    /* --header-bg: transparent; */
+
+    /* Search */
+    --input-search-bg: #eeeeee;
+    --input-search-text: #000;
+
+    /* Navbar-right */
+    --navbar-right-btn-bg-hover: #377dff1a;
+    --navbar-right-btn-icon: #71869d;
+    --navbar-right-btn-icon-hover: #377dff;
+    --navbar-right-avatar-status: #00c9a7;
+
+    /* Navbar Dropdown */
+    --navbar-dropdown-text: #1e2022;
+    --navbar-dropdown-hover: #bdc5d14d;
+}
+/*===================================*
+    01.END GENERAL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.LOADING WAZE
+*===================================*/
+.loading-lds-ellipsis {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    --loading-lds-ellipsis-color: #fff;
+    --loading-lds-ellipsis-size: 13px;
+}
+
+.loading-lds-ellipsis div {
+    position: absolute;
+    top: 0;
+    width: var(--loading-lds-ellipsis-size);
+    height: var(--loading-lds-ellipsis-size);
+    border-radius: 50%;
+    background: var(--loading-lds-ellipsis-color);
+    animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.loading-lds-ellipsis div:nth-child(1) {
+    left: 8px;
+    animation: lds-ellipsis1 0.6s infinite;
+}
+
+.loading-lds-ellipsis div:nth-child(2) {
+    left: 8px;
+    animation: lds-ellipsis2 0.6s infinite;
+}
+
+.loading-lds-ellipsis div:nth-child(3) {
+    left: 32px;
+    animation: lds-ellipsis2 0.6s infinite;
+}
+
+.loading-lds-ellipsis div:nth-child(4) {
+    left: 56px;
+    animation: lds-ellipsis3 0.6s infinite;
+}
+
+@keyframes lds-ellipsis1 {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes lds-ellipsis3 {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(0);
+    }
+}
+
+@keyframes lds-ellipsis2 {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(24px, 0);
+    }
+}
+
+/*===================================*
+    02.END LOADING BALL
+*===================================*/

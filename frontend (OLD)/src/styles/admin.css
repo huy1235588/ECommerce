@@ -1,0 +1,485 @@
+/*=========================================================
+Author       : LeThienHuy.
+==============================================================*/
+
+/*=============================================================
+    CSS INDEX
+  =============================
+    01.GENERAL STYLE
+    02.HEADER STYLE
+		
+*=============================================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    01.START GENERAL
+*===================================*/
+:root {
+    --brown: #8d6e63;
+    --white-cream: #f5f5dc;
+    --white: #fff;
+    --gray: #e0e0e0;
+    --yellow: #020202;
+
+    /* --header-bg: #266A29; */
+    --body-bg: #1b2838;
+    /* --body-bg: #ffffff; */
+    --header-bg: #393939;
+    --header-bg: #fcfcfc;
+    /* --header-bg: transparent; */
+
+    /* Search */
+    --input-search-bg: #eeeeee;
+    --input-search-text: #000;
+
+    /* Navbar-right */
+    --navbar-right-btn-bg-hover: #377dff1a;
+    --navbar-right-btn-icon: #71869d;
+    --navbar-right-btn-icon-hover: #377dff;
+    --navbar-right-avatar-status: #00c9a7;
+
+    /* Navbar Dropdown */
+    --navbar-dropdown-text: #1e2022;
+    --navbar-dropdown-hover: #bdc5d14d;
+}
+
+html {
+    min-height: 100%;
+    position: relative;
+}
+
+body {
+    background-color: var(--body-bg);
+    font-family: Lato, sans-serif;
+    color: #ffffff;
+}
+
+tbody {
+    border: none;
+}
+
+a,
+ul,
+li {
+    text-decoration: none;
+    list-style: none;
+    color: #fff;
+}
+
+button {
+    border: none;
+    margin: 0;
+    text-decoration: none;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+}
+
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 900px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1000px;
+    }
+}
+
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1280px;
+    }
+}
+
+.ngl-hide {
+    display: none;
+}
+
+/* Hidden */
+.hs-hidden {
+    display: none;
+    visibility: hidden;
+    opacity: 0;
+}
+
+/* Visible */
+.hs-visible {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* position */
+.relative {
+    position: relative;
+}
+
+/* display */
+.d-none {
+    display: none;
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: padding-left 0.3s ease-in-out;
+}
+
+.heading-section {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    text-align: center;
+}
+/*===================================*
+    01.END GENERAL
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    02.START HEADER
+*===================================*/
+.header {
+    z-index: 1300;
+    background-color: #1976d2;
+}
+
+.content-left {
+    display: flex;
+    align-items: center;
+    margin-left: 0.25rem;
+}
+
+.navbar-menu.MuiAppBar-root {
+    transition: padding-left 0.3s ease-in-out;
+}
+
+.navbar-menu.drawerOpen {
+    padding-left: 250px;
+}
+
+.navbar-menu.drawerClosed {
+    padding-left: 5.25rem;
+}
+
+.navbar-menu .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.content-left .search {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border-radius: 4px;
+    padding: 0 8px;
+    margin-left: 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.search .searchIcon {
+    color: #fff;
+}
+
+.content-left .searchInput {
+    padding: 0.5rem 0.5rem;
+    color: #fff;
+}
+
+/* Content right */
+.content-right {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 1rem;
+}
+
+.content-right .MuiButtonBase-root {
+    color: #fff;
+    height: 100%;
+    padding: 1.125rem 0.75rem;
+}
+
+.avatar {
+    border-radius: 50%;
+}
+
+/* Menu account */
+.user-menu-container {
+    align-items: center;
+}
+
+.user-menu.MuiPaper-root {
+    position: absolute;
+    top: 66px;
+    right: 35px;
+    width: 350px;
+    background-color: #1e1e2e;
+    color: #fff;
+}
+
+.menu-section-title {
+    padding: 0.75rem 1rem;
+    font-weight: bold;
+}
+
+.user-menu.MuiPaper-root .menu-item {
+    padding: 0.5rem 1rem;
+}
+
+.user-menu.MuiPaper-root .MuiMenuItem-root,
+.user-menu.MuiPaper-root .MuiMenuItem-root .MuiListItemIcon-root {
+    color: #8f96b6;
+}
+
+.user-menu.MuiPaper-root .MuiMenuItem-root:hover,
+.user-menu.MuiPaper-root .MuiMenuItem-root:hover .MuiListItemIcon-root {
+    color: #556de5;
+    background-color: #343746;
+}
+
+/* Menu item right */
+.menu-item-right {
+    position: static;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-left: auto;
+}
+
+.menu-item-right .menu-item-right-icon.MuiListItemIcon-root {
+    min-width: 16px;
+    margin-left: 0.25rem;
+}
+
+/* User Submenu */
+.user-submenu.MuiPaper-root {
+    position: absolute;
+    right: 350px;
+    width: 214px;
+    border-radius: 10px;
+    background-color: #1e1e2e;
+    color: #fff;
+}
+.user-submenu .user-submenu-item {
+    padding: 0.5rem 1rem;
+}
+
+.user-submenu .user-submenu-item.Mui-selected {
+    color: #556de5;
+}
+
+.user-submenu .user-submenu-item svg {
+    color: #556de5;
+    min-width: 16px;
+    margin-left: auto;
+}
+/*===================================*
+    02.END HEADER
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    03.START SIDEBAR
+*===================================*/
+.drawer {
+    width: 250px;
+    transition: width 0.3s ease-in-out;
+}
+
+.drawer .MuiDrawer-paper {
+    background-color: #000;
+    transition: width 0.3s ease-in-out;
+    overflow: unset;
+}
+
+.drawerOpen {
+    width: 16.25rem;
+}
+
+.drawerClosed {
+    width: 5.25rem;
+}
+
+.logo-sidebar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 1.25rem 1rem 0.75rem;
+    margin: 0 auto;
+}
+
+.sidebar.MuiList-root {
+    flex: 1;
+    overflow: auto;
+}
+
+.sidebar .MuiListItemIcon-root {
+    min-width: 1.75rem;
+    color: #fff;
+}
+
+.sidebar > .MuiListItemButton-root > .MuiListItemIcon-root svg {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.sidebar .MuiListItemButton-root.active,
+.sidebar .MuiListItemButton-root.active .MuiListItemIcon-root {
+    color: #1580c7;
+}
+
+.sidebar .MuiListItemButton-root.Mui-selected,
+.sidebar .MuiListItemButton-root.Mui-selected .MuiListItemIcon-root {
+    color: #1580c7;
+}
+
+.sidebar .MuiListItemButton-root:hover {
+    background-color: #1e1e2e;
+}
+
+/* Scroll bar */
+.sidebar::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: #4b4b4b;
+    border-radius: 10px;
+    background-clip: padding-box;
+}
+
+/* Footer */
+.sidebar-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 2rem;
+    margin: 0 auto;
+    border-top: 1px solid #333333;
+}
+
+.sidebar-footer .MuiIconButton-root {
+    padding: 0.75rem;
+    color: #fff;
+}
+
+/* Menu */
+.lang-menu.MuiPaper-root {
+    position: absolute;
+    top: 66px;
+    right: 10px;
+    width: 180px;
+    background-color: #1e1e2e;
+    color: #fff;
+}
+
+.lang-menu-item.MuiMenuItem-root {
+    padding: 0.75rem 1rem;
+}
+
+.lang-menu-item.MuiMenuItem-root.Mui-selected {
+    color: #556de5;
+}
+
+.lang-menu-item-text.MuiTypography-root {
+    margin-left: 0.75rem;
+}
+
+.lang-menu-item-check {
+    margin-left: auto;
+}
+/*===================================*
+    03.END SIDEBAR
+*===================================*/
+/*
+
+
+
+
+
+
+
+
+
+
+*/
+/*===================================*
+    10.START MAIN CONTENT
+*===================================*/
+.main {
+    padding: 4.125rem 0 3.5rem 16.25rem;
+    transition: padding 0.3s ease-in-out;
+}
+
+.main.close {
+    padding-left: 5.25rem;
+}
+
+.content {
+    width: 100%;
+    padding: 1.65rem 2rem 1.75rem;
+}
+/*===================================*
+    10.END MAIN CONTENT
+*===================================*/
