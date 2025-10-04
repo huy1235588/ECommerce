@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ha.commons.dto.request.SearchRequest;
 import org.ha.commons.dto.response.PageResponse;
-import org.ha.userservice.dto.response.UserResponse;
+import org.ha.commons.exception.ResourceNotFoundException;
 import org.ha.userservice.dto.response.UserWithProfileDto;
 import org.ha.userservice.model.entity.User;
 import org.ha.userservice.repository.UserRepository;
@@ -47,13 +47,13 @@ public class UserServiceImpl implements UserService {
     // Lấy user theo id
     public User getUserByIdInternal(String id) {
         return userRepository.findById(UUID.fromString(id))
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
     // Lấy user với profile theo id
     public UserWithProfileDto getUserByIdWithProfileInternal(String id) {
         return userRepository.findByIdWithProfile(UUID.fromString(id))
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
     }
 
     //===============================================================
@@ -78,6 +78,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserWithProfileDto getUserById(String id) {
         return getUserByIdWithProfileInternal(id);
+    }
+
+    @Override
+    public void deleteUser(String id) {
+        User user = getUserByIdInternal(id);
+        userRepository.delete(user);
     }
 
     //===============================================================

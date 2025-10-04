@@ -3,12 +3,12 @@ package org.ha.userservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.ha.commons.dto.request.SearchRequest;
 import org.ha.commons.dto.response.ApiResponse;
+import org.ha.commons.dto.response.ErrorResponse;
 import org.ha.commons.dto.response.SuccessResponse;
 import org.ha.userservice.service.UserService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
@@ -45,5 +45,28 @@ public class UserController {
                 .data(userService.getUserById(id))
                 .message("Get user by id successfully")
                 .build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteUser(
+            @PathVariable String id,
+            @RequestHeader("X-USER-ROLES") String roles
+    ) {
+        // Check if user has ADMIN role
+        if (roles == null || !roles.contains("ADMIN")) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(ErrorResponse.of(
+                            "AUTHZ_FORBIDDEN",
+                            "You do not have permission to delete user"
+                    ));
+        }
+
+        // Proceed to delete user
+        userService.deleteUser(id);
+
+        return ResponseEntity
+                .ok()
+                .body(SuccessResponse.withMessage("User deleted successfully"));
     }
 }

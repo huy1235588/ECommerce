@@ -21,4 +21,11 @@ public interface UserService {
      * @return UserWithProfileDto containing user details
      */
     UserWithProfileDto getUserById(String id);
+
+    /**
+     * Delete a user by their unique identifier.
+     *
+     * @param id the unique identifier of the user to be deleted
+     */
+    void deleteUser(String id);
 }

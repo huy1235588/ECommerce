@@ -3,6 +3,7 @@ package org.ha.userservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.ha.commons.exception.ResourceAlreadyExistsException;
 import org.ha.commons.exception.BusinessException;
+import org.ha.commons.exception.ResourceNotFoundException;
 import org.ha.userservice.dto.request.RegisterRequest;
 import org.ha.userservice.dto.request.LoginRequest;
 import org.ha.userservice.dto.response.UserResponse;
@@ -61,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public Role findRoleByNameInternal(String name) {
-        return roleRepository.findByName(name).orElseThrow(() -> new RuntimeException("Role not found: " + name));
+        return roleRepository.findByName(name).orElseThrow(() -> new ResourceNotFoundException("Role not found: " + name));
     }
 
     public User updateLastLoginInternal(User user) {
