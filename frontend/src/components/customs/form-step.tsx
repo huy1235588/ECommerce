@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
-import { LoadingSpinner } from '@/components/ui/customs/loading-spinner';
+import { LoadingSpinner } from '@/components/customs/loading-spinner';
 
 interface FormStepProps {
     title: string;

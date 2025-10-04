@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import Footer from '@/components/common/Footer';
 import Header from '@/components/common/Header';
 import { User } from '@/types/api';
-import { useAuth } from '@/store/hooks';
+import { useAuth } from '@/hooks/api';
 
 interface MainLayoutProps {
     children: React.ReactNode;

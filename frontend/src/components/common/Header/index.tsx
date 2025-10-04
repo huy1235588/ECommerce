@@ -25,7 +25,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { User } from '@/types/api';
-import { useAuth } from '@/store/hooks';
+import { useAuth } from '@/hooks/api';
 import NotificationDropdown from './NotificationDropdown';
 import { useTheme } from 'next-themes';
 interface HeaderProps {
@@ -76,7 +76,7 @@ export default function Header({
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                         <Avatar className="h-9 w-9">
-                            <AvatarImage src={user?.avatar} alt={user?.username || 'User'} />
+                            <AvatarImage src={user?.avatarUrl} alt={user?.username || 'User'} />
                             <AvatarFallback>
                                 {user?.firstName?.[0]?.toUpperCase() ||
                                     user?.username?.[0]?.toUpperCase() || 'U'}

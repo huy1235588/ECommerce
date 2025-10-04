@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '../index';
+import { useAppDispatch, useAppSelector } from '@/store/index';
 import {
     useLoginMutation,
     useRegisterMutation,
@@ -9,7 +9,7 @@ import {
     useChangePasswordMutation,
     useForgotPasswordMutation,
     useResetPasswordMutation,
-} from '../api/auth-api';
+} from '@/store/api/auth-api';
 import {
     clearAuth,
     clearError,
@@ -18,7 +18,7 @@ import {
     selectIsAuthenticated,
     selectIsLoading,
     selectError
-} from '../slices/auth/auth-slice';
+} from '@/store/slices/auth/auth-slice';
 import { LoginFormData, RegisterFormData } from '@/types/api/auth';
 import { cookieUtils } from '@/lib';
 

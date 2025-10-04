@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../index';
-import { env } from '@/config/env';
+import { API_CONFIG } from '@/lib/constants';
 
 // Base query với authentication và error handling
 const baseQuery = fetchBaseQuery({
-    baseUrl: `${env.API_URL}`,
-    timeout: env.API_TIMEOUT,
+    baseUrl: `${API_CONFIG.BASE_URL}`,
+    timeout: API_CONFIG.TIMEOUT,
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
         const token = (getState() as RootState).auth.token;
