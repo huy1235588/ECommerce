@@ -32,6 +32,6 @@ eureka:
 
 # JWT configuration
 jwt:
-  secret: Pma6hMA+QdiVA4lwmxzHtJszfcf5pYxj8KvdNYvP6+4=
+  secret: Pma6hMA+QdiVA4lwmxzHtJszfcf5pYxj8KvdNYvP6+4= # Base64 encoded secret key
   expiration: 3600000 # 1 hour in milliseconds
   refresh-expiration: 2592000000 # 30 days in milliseconds
