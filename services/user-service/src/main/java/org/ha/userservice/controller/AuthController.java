@@ -70,6 +70,14 @@ public class AuthController {
         return SuccessResponse.of(resp, "Login successful");
     }
 
+    /**
+     * Endpoint for refreshing the access token.
+     * Uses the refresh token from the HttpOnly cookie to generate a new access token.
+     *
+     * @param refreshToken The refresh token from the cookie.
+     * @param response     The HttpServletResponse to add the new refresh token cookie.
+     * @return ApiResponse containing the new access token.
+     */
     @PostMapping("/refresh")
     public ApiResponse refreshToken(
             @NotNull(message = "Refresh token is required") @CookieValue("refreshToken") String refreshToken,
@@ -88,5 +96,27 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         return SuccessResponse.of(resp, "Token refreshed successfully");
+    }
+
+    /**
+     * Endpoint for user logout.
+     * Invalidates the refresh token cookie.
+     *
+     * @param response The HttpServletResponse to remove the refresh token cookie.
+     * @return ApiResponse indicating successful logout.
+     */
+    @PostMapping("/logout")
+    public ApiResponse logout(HttpServletResponse response) {
+        // Invalidate the refresh token cookie
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+
+        return SuccessResponse.withMessage("Logout successful");
     }
 }
