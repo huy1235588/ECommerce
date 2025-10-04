@@ -14,6 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -38,8 +40,20 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size);
         Page<UserWithProfileDto> result = userRepository.findAllWithProfile(pageable);
         log.info("Result of findAllWithProfile: totalElements={}, totalPages={}, currentPage={}, pageSize={}, content={}",
-                 result.getTotalElements(), result.getTotalPages(), result.getNumber(), result.getSize(), result.getContent());
+                result.getTotalElements(), result.getTotalPages(), result.getNumber(), result.getSize(), result.getContent());
         return result;
+    }
+
+    // Lấy user theo id
+    public User getUserByIdBasic(String id) {
+        return userRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+    }
+
+    // Lấy user với profile theo id
+    public UserWithProfileDto getUserByIdWithProfile(String id) {
+        return userRepository.findByIdWithProfile(UUID.fromString(id))
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
     }
 
     //===============================================================
@@ -53,29 +67,17 @@ public class UserServiceImpl implements UserService {
 
         Page<UserWithProfileDto> page = getAllUsersWithProfile(searchRequest.getPage(), searchRequest.getSize());
 
-        Page<UserResponse> userResponses = page.map(userWithProfileDto -> UserResponse.builder()
-                .id(userWithProfileDto.getId().toString())
-                .email(userWithProfileDto.getEmail())
-                .username(userWithProfileDto.getUsername())
-                .firstName(userWithProfileDto.getFirstName())
-                .lastName(userWithProfileDto.getLastName())
-                .avatarUrl(userWithProfileDto.getAvatarUrl())
-                .status(userWithProfileDto.getStatus())
-//                .roles(userWithProfileDto.getRoles() != null ? userWithProfileDto.getRoles().stream().map(Object::toString).toList() : Collections.emptyList())
-                .emailVerified(userWithProfileDto.getEmailVerified())
-                .birthDate(userWithProfileDto.getBirthDate() != null ? userWithProfileDto.getBirthDate().toString() : null)
-                .country(userWithProfileDto.getCountry())
-                .createdAt(userWithProfileDto.getCreatedAt() != null ? userWithProfileDto.getCreatedAt().toString() : null)
-                .updatedAt(userWithProfileDto.getUpdatedAt() != null ? userWithProfileDto.getUpdatedAt().toString() : null)
-                .lastLoginAt(userWithProfileDto.getLastLoginAt() != null ? userWithProfileDto.getLastLoginAt().toString() : null)
-                .build());
-
         return PageResponse.of(
                 page.getContent(),
                 page.getNumber(),
                 page.getSize(),
                 page.getTotalElements()
         );
+    }
+
+    @Override
+    public UserWithProfileDto getUserById(String id) {
+        return getUserByIdWithProfile(id);
     }
 
     //===============================================================

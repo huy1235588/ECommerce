@@ -24,4 +24,13 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             JOIN UserProfile up ON u.id = up.userId
             """)
     Page<UserWithProfileDto> findAllWithProfile(Pageable pageable);
+
+    @Query("""
+            SELECT new org.ha.userservice.dto.response.UserWithProfileDto(u, up)
+            FROM User u
+            LEFT JOIN FETCH u.roles
+            JOIN UserProfile up ON u.id = up.userId
+            WHERE u.id = :id
+            """)
+    Optional<UserWithProfileDto> findByIdWithProfile(UUID id);
 }

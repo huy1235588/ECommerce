@@ -13,4 +13,12 @@ public interface UserService {
      * @return PageResponse containing a list of users and pagination metadata
      */
     PageResponse<UserWithProfileDto> getAllUsers(SearchRequest searchRequest);
+
+    /**
+     * Retrieve a user by their unique identifier.
+     *
+     * @param id the unique identifier of the user
+     * @return UserWithProfileDto containing user details
+     */
+    UserWithProfileDto getUserById(String id);
 }

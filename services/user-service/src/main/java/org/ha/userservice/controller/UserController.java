@@ -6,6 +6,7 @@ import org.ha.commons.dto.response.ApiResponse;
 import org.ha.commons.dto.response.SuccessResponse;
 import org.ha.userservice.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +30,20 @@ public class UserController {
         return SuccessResponse.builder()
                 .data(userService.getAllUsers(paginationRequest))
                 .message("Get all users successfully")
+                .build();
+    }
+
+    /**
+     * Get user by ID.
+     *
+     * @param id the ID of the user
+     * @return ApiResponse containing user details
+     */
+    @GetMapping("/{id}")
+    public ApiResponse getUserById(@PathVariable String id) {
+        return SuccessResponse.builder()
+                .data(userService.getUserById(id))
+                .message("Get user by id successfully")
                 .build();
     }
 }
