@@ -13,10 +13,10 @@ public class UserController {
 
     @GetMapping("/test")
     public ApiResponse test(
-//            @RequestHeader("X-USER-ID") String userId
+            @RequestHeader("X-USER-ID") String userId
     ) {
         return SuccessResponse.builder()
-//                .data(userId)
+                .data(userId)
                 .message("User service is up and running")
                 .build();
     }
