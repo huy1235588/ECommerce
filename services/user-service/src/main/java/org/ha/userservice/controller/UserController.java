@@ -25,8 +25,19 @@ public class UserController {
      */
     @GetMapping("/")
     public ResponseEntity<ApiResponse> getAllUsers(
-            SearchRequest paginationRequest
+            SearchRequest paginationRequest,
+            @RequestHeader("X-USER-ROLES") String roles
     ) {
+        // Check if user has ADMIN role
+        if (roles == null || !roles.contains("ADMIN")) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(ErrorResponse.of(
+                            "AUTHZ_FORBIDDEN",
+                            "You do not have permission to access this resource"
+                    ));
+        }
+
         return ResponseEntity.ok()
                 .body(SuccessResponse.builder()
                         .data(userService.getAllUsers(paginationRequest))
