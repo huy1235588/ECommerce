@@ -1,7 +1,6 @@
 package org.ha.userservice.dto.response;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 

@@ -1,7 +1,11 @@
 package org.ha.userservice.repository;
 
+import org.ha.userservice.dto.response.UserWithProfileDto;
 import org.ha.userservice.model.entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -12,4 +16,25 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByUsername(String username);
 
     Optional<User> findByEmail(String email);
+
+    @Query("""
+            SELECT new org.ha.userservice.dto.response.UserWithProfileDto(
+                u.id,
+                u.email,
+                u.username,
+                up.firstName,
+                up.lastName,
+                up.avatarUrl,
+                u.status,
+                u.emailVerified,
+                up.birthDate,
+                up.country,
+                u.createdAt,
+                u.updatedAt,
+                u.lastLoginAt
+            )
+            FROM User u
+            JOIN UserProfile up ON u.id = up.userId
+            """)
+    Page<UserWithProfileDto> findAllWithProfile(Pageable pageable);
 }
