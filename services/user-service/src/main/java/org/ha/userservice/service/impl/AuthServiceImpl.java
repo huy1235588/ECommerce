@@ -176,6 +176,36 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    @Override
+    @Transactional
+    public String refreshToken(String refreshToken) {
+        // validate refresh token
+        if (!jwtUtil.isTokenValid(refreshToken)) {
+            throw new BusinessException
+                    ("INVALID_TOKEN", "Refresh token is invalid or expired");
+        }
+
+        // extract details from token
+        String username = jwtUtil.extractUsername(refreshToken);
+        String userId = jwtUtil.extractUserId(refreshToken);
+        List<String> roles = jwtUtil.extractRoles(refreshToken);
+
+        // create new access token
+        String newAccessToken = jwtUtil.generateToken(
+                username,
+                userId,
+                roles
+        );
+        // create new refresh token
+        String newRefreshToken = jwtUtil.generateRefreshToken(
+                username,
+                userId,
+                roles
+        );
+
+        return newAccessToken;
+    }
+
     //===============================================================
     //
     //  Helper methods

@@ -21,4 +21,13 @@ public interface AuthService {
      * @return LoginResponse containing session token and user info
      */
     LoginResponse login(LoginRequest loginRequest);
+
+
+    /**
+     * Refresh an access token using a refresh token.
+     *
+     * @param refreshToken the refresh token
+     * @return LoginResponse containing new access token and user info
+     */
+    String refreshToken(String refreshToken);
 }

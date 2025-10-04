@@ -14,10 +14,7 @@ import org.ha.userservice.service.AuthService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -71,5 +68,25 @@ public class AuthController {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
         return SuccessResponse.of(resp, "Login successful");
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse refreshToken(
+            @NotNull(message = "Refresh token is required") @CookieValue("refreshToken") String refreshToken,
+            HttpServletResponse response
+    ) {
+        String resp = authService.refreshToken(refreshToken);
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", resp)
+                .path("/")
+                .maxAge(jwtRefreshExpiration / 1000) // default expiration
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+        return SuccessResponse.of(resp, "Token refreshed successfully");
     }
 }
