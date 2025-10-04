@@ -18,80 +18,43 @@ BEGIN;
 -- =============================================================================
 
 -- Roles table: stores role definitions (RBAC)
-CREATE TABLE IF NOT EXISTS roles
+CREATE TABLE roles
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    name VARCHAR
-(
-    50
-) NOT NULL UNIQUE,
-    description VARCHAR
-(
-    255
-),
-    is_default BOOLEAN NOT NULL DEFAULT false,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW
-(
-),
-    updated_at TIMESTAMP
-    );
+    id          UUID PRIMARY KEY     DEFAULT gen_random_uuid(),
+    name        VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    is_default  BOOLEAN     NOT NULL DEFAULT false,
+    created_at  TIMESTAMP   NOT NULL DEFAULT NOW(),
+    updated_at  TIMESTAMP
+);
 
 -- Junction table mapping users to roles (many-to-many)
-CREATE TABLE IF NOT EXISTS user_roles
+CREATE TABLE user_roles
 (
-    id
-    UUID
-    PRIMARY
-    KEY
-    DEFAULT
-    gen_random_uuid
-(
-),
-    user_id UUID NOT NULL,
-    role_id UUID NOT NULL,
-    assigned_at TIMESTAMP NOT NULL DEFAULT NOW
-(
-),
-    revoked_at TIMESTAMP,
-    CONSTRAINT fk_user_roles_user FOREIGN KEY
-(
-    user_id
-) REFERENCES users
-(
-    id
-) ON DELETE CASCADE,
-    CONSTRAINT fk_user_roles_role FOREIGN KEY
-(
-    role_id
-) REFERENCES roles
-(
-    id
-)
-  ON DELETE CASCADE
-    );
+    id          UUID PRIMARY KEY   DEFAULT gen_random_uuid(),
+    user_id     UUID      NOT NULL,
+    role_id     UUID      NOT NULL,
+    assigned_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    revoked_at  TIMESTAMP,
+    CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE
+);
 
 -- =============================================================================
 -- INDEXES
 -- =============================================================================
 
 -- Unique / primary indexes
-CREATE UNIQUE INDEX IF NOT EXISTS pk_roles ON roles(id);
-CREATE UNIQUE INDEX IF NOT EXISTS pk_user_roles ON user_roles(id);
+CREATE UNIQUE INDEX pk_roles ON roles (id);
+CREATE UNIQUE INDEX pk_user_roles ON user_roles (id);
 
 -- Business unique constraints
-CREATE UNIQUE INDEX IF NOT EXISTS uk_roles_name ON roles(name);
-CREATE UNIQUE INDEX IF NOT EXISTS uk_user_roles_user_role ON user_roles(user_id, role_id);
+CREATE UNIQUE INDEX uk_roles_name ON roles (name);
+CREATE UNIQUE INDEX uk_user_roles_user_role ON user_roles (user_id, role_id);
 
 -- Foreign key / join indexes
-CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
+CREATE INDEX idx_user_roles_user_id ON user_roles (user_id);
+CREATE INDEX idx_user_roles_role_id ON user_roles (role_id);
 
 -- =============================================================================
 -- CONSTRAINTS & CHECKS

@@ -160,6 +160,22 @@ ALTER TABLE user_profiles ADD CONSTRAINT chk_user_profiles_bio_length
 ALTER TABLE user_profiles ADD CONSTRAINT chk_user_profiles_birth_date
     CHECK (birth_date IS NULL OR birth_date < CURRENT_DATE - INTERVAL '13 years');
 
+-- Foreign key constraints
+ALTER TABLE user_profiles ADD CONSTRAINT fk_user_profiles_user_id
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE refresh_tokens ADD CONSTRAINT fk_refresh_tokens_user_id
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE password_reset_tokens ADD CONSTRAINT fk_password_reset_tokens_user_id
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE email_verification_tokens ADD CONSTRAINT fk_email_verification_tokens_user_id
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+ALTER TABLE user_sessions ADD CONSTRAINT fk_user_sessions_user_id
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
 -- =============================================================================
 -- FUNCTIONS
 -- =============================================================================
