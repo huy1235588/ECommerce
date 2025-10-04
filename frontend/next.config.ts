@@ -1,28 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    // I18n
-    i18n: {
-        locales: ["en", "vn"],
-        defaultLocale: "en",
-    },
+    /* config options here */
     images: {
-        remotePatterns: [
-            {
-                // Lấy ảnh từ server
-                hostname: process.env.NEXT_PUBLIC_SERVER_HOSTNAME || "localhost",
-            },
-            {
-                protocol: "https",
-                hostname: "**.steamstatic.com", // Tất cả subdomain
-            },
-            {
-                protocol: "https",
-                hostname: "placehold.co", // Tất cả subdomain
-            },
-        ]
+        domains: [
+            'images.unsplash.com',
+            'www.gravatar.com',
+            'lh3.googleusercontent.com',
+            'res.cloudinary.com',
+            'localhost',
+        ],
     },
-    reactStrictMode: false,
 };
 
 export default nextConfig;

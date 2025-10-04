@@ -25,6 +25,33 @@
         "paths": {
             "@/*": [
                 "./src/*"
+            ],
+            "@/components/*": [
+                "./src/components/*"
+            ],
+            "@/hooks/*": [
+                "./src/hooks/*"
+            ],
+            "@/lib/*": [
+                "./src/lib/*"
+            ],
+            "@/types/*": [
+                "./src/types/*"
+            ],
+            "@/store/*": [
+                "./src/store/*"
+            ],
+            "@/config/*": [
+                "./src/config/*"
+            ],
+            "@/styles/*": [
+                "./src/styles/*"
+            ],
+            "@/providers/*": [
+                "./src/providers/*"
+            ],
+            "@/app/*": [
+                "./src/app/*"
             ]
         }
     },
