@@ -92,16 +92,39 @@ export const useUser = () => {
     };
 };
 
-// Hook để lấy tất cả users
-export const useAllUsers = () => {
-    const { data: usersData, isLoading, error, refetch } = useGetUsersQuery({ size: 100 }); // Lấy tối đa 100 users
+// Hook để lấy tất cả users với tối ưu caching
+export const useAllUsers = (params?: {
+    page?: number;
+    size?: number;
+    search?: string;
+    role?: string;
+}) => {
+    const {
+        data: usersData,
+        isLoading,
+        error,
+        refetch,
+        isFetching
+    } = useGetUsersQuery(
+        {
+            size: 100,
+            ...params
+        },
+        {
+            // Tối ưu: Chỉ refetch khi cần thiết
+            refetchOnMountOrArgChange: false,
+            refetchOnFocus: false,
+            refetchOnReconnect: true,
+        }
+    );
 
     return {
         users: usersData?.data || [],
-        total: usersData?.pagination.totalElements || 0,
+        total: usersData?.pagination?.totalElements || 0,
         isLoading,
+        isFetching, // Thêm isFetching để biết khi đang fetch data
         error,
-        refetch, // Thêm refetch để làm mới dữ liệu
+        refetch,
     };
 };
 
