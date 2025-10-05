@@ -98,7 +98,7 @@ export const useAllUsers = () => {
 
     return {
         users: usersData?.data || [],
-        total: usersData?.total || 0,
+        total: usersData?.pagination.totalElements || 0,
         isLoading,
         error,
         refetch, // Thêm refetch để làm mới dữ liệu

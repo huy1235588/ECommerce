@@ -95,7 +95,7 @@ const userSlice = createSlice({
             .addMatcher(userApi.endpoints.getUsers.matchFulfilled, (state, action) => {
                 state.isLoading = false;
                 state.users = action.payload.data;
-                state.totalUsers = action.payload.total;
+                state.totalUsers = action.payload.pagination.totalElements;
             })
             .addMatcher(userApi.endpoints.getUsers.matchRejected, (state, action) => {
                 state.isLoading = false;

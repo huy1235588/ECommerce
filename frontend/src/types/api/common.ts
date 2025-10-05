@@ -23,8 +23,10 @@ export interface ApiErrorResponse {
 export interface Pagination {
     page: number;
     size: number;
-    total: number;
+    totalElements: number;
     totalPages: number;
+    hasNext: boolean;
+    hasPrevious: boolean;
 }
 
 export interface ErrorDetail {

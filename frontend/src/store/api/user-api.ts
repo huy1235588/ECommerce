@@ -1,16 +1,16 @@
-import { User } from "@/types";
+import { User, UserResponse, UsersResponse } from "@/types";
 import { baseApi } from "./base-api";
 
 export const userApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
         // Lấy thông tin người dùng hiện tại
-        getCurrentUser: builder.query<{ data: User }, void>({
+        getCurrentUser: builder.query<UserResponse, void>({
             query: () => '/users/me',
             providesTags: ['User'],
         }),
 
         // Cập nhật thông tin người dùng hiện tại
-        updateCurrentUser: builder.mutation<{ data: User }, Partial<User>>({
+        updateCurrentUser: builder.mutation<UserResponse, Partial<User>>({
             query: (data) => ({
                 url: '/users/me',
                 method: 'PUT',
@@ -20,7 +20,7 @@ export const userApi = baseApi.injectEndpoints({
         }),
 
         // Lấy danh sách người dùng với phân trang và lọc
-        getUsers: builder.query<{ data: User[]; total: number }, {
+        getUsers: builder.query<UsersResponse, {
             page?: number;
             size?: number;
             search?: string;

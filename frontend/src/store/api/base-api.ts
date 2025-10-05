@@ -58,8 +58,7 @@ const baseQueryWithReauth: BaseQueryFn<
     // Nếu token hết hạn, thử refresh
     if (
         result.error &&
-        result.error.status === 401 &&
-        (result.error.data as any)?.error?.code === 'TOKEN_EXPIRED'
+        result.error.status === 401
     ) {
         console.log('Token expired, attempting refresh...');
 

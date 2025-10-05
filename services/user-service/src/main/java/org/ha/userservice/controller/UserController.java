@@ -45,10 +45,7 @@ public class UserController {
         }
 
         return ResponseEntity.ok()
-                .body(SuccessResponse.builder()
-                        .data(userService.getAllUsers(paginationRequest))
-                        .message("Get all users successfully")
-                        .build());
+                .body(userService.getAllUsers(paginationRequest));
     }
 
     /**
