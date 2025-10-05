@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AdminLayoutContent } from "./_components/admin-layout-content";
+import { AdminLayoutContent } from "@/components/admin/layout/admin-layout-content";
 
 export const metadata: Metadata = {
     title: "Admin Dashboard - E-Commerce",
