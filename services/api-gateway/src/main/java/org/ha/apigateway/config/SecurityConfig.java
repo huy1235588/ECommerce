@@ -22,6 +22,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.HttpMethod.OPTIONS;
+
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -34,6 +36,7 @@ public class SecurityConfig {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
+                        .pathMatchers(OPTIONS).permitAll() // Allow all OPTIONS requests
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/api/auth/**").permitAll()
                         .anyExchange().authenticated())
