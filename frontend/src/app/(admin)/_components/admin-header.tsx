@@ -52,36 +52,6 @@ export function AdminHeader() {
                     <DropdownMenuContent align="end" className="w-80">
                         <DropdownMenuLabel>Thông báo</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <div className="flex flex-col gap-1">
-                                <p className="text-sm font-medium">
-                                    Đơn hàng mới #1234
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    5 phút trước
-                                </p>
-                            </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <div className="flex flex-col gap-1">
-                                <p className="text-sm font-medium">
-                                    Sản phẩm sắp hết hàng
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    1 giờ trước
-                                </p>
-                            </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                            <div className="flex flex-col gap-1">
-                                <p className="text-sm font-medium">
-                                    Khách hàng mới đăng ký
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    2 giờ trước
-                                </p>
-                            </div>
-                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
 

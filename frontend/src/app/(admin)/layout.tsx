@@ -13,7 +13,7 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <SidebarProvider defaultOpen={true}>
+        <SidebarProvider defaultOpen={false}>
             <AdminLayoutContent>{children}</AdminLayoutContent>
         </SidebarProvider>
     );

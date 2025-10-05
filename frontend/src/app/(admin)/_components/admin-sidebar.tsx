@@ -3,13 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-    LayoutDashboard, Users,
-    Package,
-    Settings,
+    LayoutDashboard, Users, Settings,
     BarChart3,
     Tags,
-    ShoppingCart,
-    FileText,
+    ShoppingCart, Building,
+    Gamepad2,
+    BadgePercent,
+    CreditCard,
+    RotateCcw,
+    Library,
+    Headphones,
+    TrendingUp,
+    UserCheck,
+    Shield,
+    ImageIcon
 } from "lucide-react";
 import {
     Sidebar,
@@ -29,7 +36,7 @@ import Image from "next/image";
 
 const menuItems = [
     {
-        title: "Tổng quan",
+        title: "TỔNG QUAN",
         items: [
             {
                 title: "Dashboard",
@@ -44,47 +51,112 @@ const menuItems = [
         ],
     },
     {
-        title: "Quản lý",
+        title: "QUẢN LÝ NỘI DUNG",
         items: [
             {
-                title: "Sản phẩm",
-                url: "/admin/products",
-                icon: Package,
+                title: "Trò chơi",
+                url: "/admin/games",
+                icon: Gamepad2,
             },
+            {
+                title: "Thể loại",
+                url: "/admin/categories",
+                icon: Tags,
+            },
+            {
+                title: "Nhà phát hành",
+                url: "/admin/publishers",
+                icon: Building,
+            },
+            {
+                title: "Khuyến mãi",
+                url: "/admin/promotions",
+                icon: BadgePercent,
+            },
+            {
+                title: "Banner & Slide",
+                url: "/admin/banners",
+                icon: ImageIcon,
+            },
+        ],
+    },
+    {
+        title: "QUẢN LÝ GIAO DỊCH",
+        items: [
             {
                 title: "Đơn hàng",
                 url: "/admin/orders",
                 icon: ShoppingCart,
             },
             {
-                title: "Khách hàng",
-                url: "/admin/customers",
+                title: "Giao dịch",
+                url: "/admin/transactions",
+                icon: CreditCard,
+            },
+            {
+                title: "Hoàn tiền",
+                url: "/admin/refunds",
+                icon: RotateCcw,
+            },
+        ],
+    },
+    {
+        title: "QUẢN LÝ NGƯỜI DÙNG",
+        items: [
+            {
+                title: "Tài khoản",
+                url: "/admin/users",
                 icon: Users,
             },
             {
-                title: "Danh mục",
-                url: "/admin/categories",
-                icon: Tags,
+                title: "Thư viện game",
+                url: "/admin/user-games",
+                icon: Library,
+            },
+            {
+                title: "Hỗ trợ",
+                url: "/admin/support",
+                icon: Headphones,
             },
         ],
     },
     {
-        title: "Vận hành",
+        title: "BÁO CÁO & PHÂN TÍCH",
         items: [
             {
-                title: "Báo cáo",
-                url: "/admin/reports",
-                icon: FileText,
+                title: "Báo cáo doanh thu",
+                url: "/admin/reports/revenue",
+                icon: TrendingUp,
+            },
+            {
+                title: "Phân tích game",
+                url: "/admin/reports/game-analytics",
+                icon: BarChart3,
+            },
+            {
+                title: "Người dùng",
+                url: "/admin/reports/user-analytics",
+                icon: UserCheck,
             },
         ],
     },
     {
-        title: "Hệ thống",
+        title: "HỆ THỐNG",
         items: [
             {
-                title: "Cài đặt",
-                url: "/admin/settings",
+                title: "Cài đặt thanh toán",
+                url: "/admin/settings/payment",
+                icon: CreditCard,
+            },
+            {
+                title: "Cài đặt chung",
+                url: "/admin/settings/general",
                 icon: Settings,
+            },
+            {
+                title: "Quản trị viên",
+                url: "/admin/settings/admins",
+                icon: Shield,
             },
         ],
     },
@@ -95,7 +167,7 @@ export function AdminSidebar() {
     const { state } = useSidebar();
 
     return (
-        <Sidebar collapsible="icon">
+        <Sidebar variant="floating" collapsible="icon">
             <SidebarHeader>
                 <div className={`flex items-center gap-2 px-1 h-12`}>
                     <SidebarTrigger />
@@ -115,7 +187,9 @@ export function AdminSidebar() {
             <SidebarContent>
                 {menuItems.map((group) => (
                     <SidebarGroup key={group.title}>
-                        <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+                        <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
+                            {group.title}
+                        </SidebarGroupLabel>
                         <SidebarGroupContent>
                             <SidebarMenu>
                                 {group.items.map((item) => {
