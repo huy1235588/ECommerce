@@ -48,9 +48,7 @@ jwt:
 # Cors Configuration
 app:
   cors:
-    allowedOrigins:
-      - http://localhost:3000
-      - http://localhost:4200
+    allowedOrigins: http://localhost:3000,http://localhost:4200
 
 # Logging Configuration
 logging:

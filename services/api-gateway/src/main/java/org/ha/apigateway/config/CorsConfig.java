@@ -1,9 +1,9 @@
 package org.ha.apigateway.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsWebFilter;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -16,19 +16,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CorsConfig {
 
-    private final Environment env;
+    @Value("${app.cors.allowedOrigins}")
+    private String allowedOrigins;
 
     @Bean
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
 
-        String[] originsArray = env.getProperty("app.cors.allowedOrigins", String[].class, new String[0]);
-
-        List<String> origins = Arrays.stream(originsArray)
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList());
+        List<String> origins = Arrays.asList(allowedOrigins.split(","));
 
         if (origins.isEmpty()) {
             // default: allow any origin when none configured
