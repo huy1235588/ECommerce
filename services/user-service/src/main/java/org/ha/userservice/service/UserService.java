@@ -1,6 +1,6 @@
 package org.ha.userservice.service;
 
-import org.ha.commons.dto.request.SearchRequest;
+import org.ha.commons.dto.request.PaginationRequest;
 import org.ha.commons.dto.response.PageResponse;
 import org.ha.userservice.dto.response.UserResponse;
 
@@ -9,10 +9,10 @@ public interface UserService {
     /**
      * Retrieve a paginated list of users.
      *
-     * @param searchRequest pagination and sorting information
+     * @param paginationRequest pagination and sorting information
      * @return PageResponse containing a list of users and pagination metadata
      */
-    PageResponse<UserResponse> getAllUsers(SearchRequest searchRequest);
+    PageResponse<UserResponse> getAllUsers(PaginationRequest paginationRequest);
 
     /**
      * Retrieve a user by their unique identifier.

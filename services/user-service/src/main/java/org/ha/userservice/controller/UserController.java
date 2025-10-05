@@ -1,7 +1,9 @@
 package org.ha.userservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.ha.commons.dto.request.SearchRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.ha.commons.dto.request.PaginationRequest;
 import org.ha.commons.dto.response.ApiResponse;
 import org.ha.commons.dto.response.ErrorResponse;
 import org.ha.commons.dto.response.SuccessResponse;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -23,13 +26,16 @@ public class UserController {
      * @param paginationRequest the pagination request containing page number and size
      * @return ApiResponse containing paginated list of users
      */
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<ApiResponse> getAllUsers(
-            SearchRequest paginationRequest,
+            @Valid @ModelAttribute PaginationRequest paginationRequest,
             @RequestHeader("X-USER-ROLES") String roles
     ) {
+        log.info("Received request to get all users with pagination: {}", paginationRequest);
+
         // Check if user has ADMIN role
         if (roles == null || !roles.contains("ADMIN")) {
+            log.info("User with roles {} attempted to access admin resource", roles);
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
                     .body(ErrorResponse.of(

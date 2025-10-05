@@ -276,7 +276,7 @@ paths:
       description: Lấy danh sách users (chỉ admin)
       parameters:
         - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SizeParam'
         - $ref: '#/components/parameters/SortParam'
         - name: status
           in: query
@@ -521,8 +521,8 @@ components:
         default: 1
       description: Page number
 
-    LimitParam:
-      name: limit
+    SizeParam:
+      name: size
       in: query
       schema:
         type: integer

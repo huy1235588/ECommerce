@@ -2,7 +2,7 @@ package org.ha.userservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ha.commons.dto.request.SearchRequest;
+import org.ha.commons.dto.request.PaginationRequest;
 import org.ha.commons.dto.response.PageResponse;
 import org.ha.commons.exception.ResourceNotFoundException;
 import org.ha.userservice.dto.response.UserResponse;
@@ -63,9 +63,9 @@ public class UserServiceImpl implements UserService {
     //===============================================================
 
     @Override
-    public PageResponse<UserResponse> getAllUsers(SearchRequest searchRequest) {
+    public PageResponse<UserResponse> getAllUsers(PaginationRequest paginationRequest) {
 
-        Page<UserWithProfileView> page = getAllUsersWithProfileInternal(searchRequest.getPage(), searchRequest.getSize());
+        Page<UserWithProfileView> page = getAllUsersWithProfileInternal(paginationRequest.getPage(), paginationRequest.getSize());
 
         Page<UserResponse> responsePage = page.map(this::mapToUserResponse);
 

@@ -114,7 +114,7 @@ paths:
       description: Lấy danh sách notifications của user hiện tại
       parameters:
         - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SizeParam'
         - name: type
           in: query
           schema:
@@ -430,7 +430,7 @@ paths:
       description: Lấy danh sách notification templates
       parameters:
         - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SizeParam'
         - name: type
           in: query
           schema:
@@ -566,8 +566,8 @@ components:
         default: 1
       description: Page number
 
-    LimitParam:
-      name: limit
+    SizeParam:
+      name: size
       in: query
       schema:
         type: integer
