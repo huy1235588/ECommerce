@@ -18,7 +18,7 @@ import {
     selectIsAuthenticated,
     selectIsLoading,
     selectError
-} from '@/store/slices/auth/auth-slice';
+} from '@/store/slices/auth-slice';
 import { LoginFormData, RegisterFormData } from '@/types/api/auth';
 import { cookieUtils } from '@/lib';
 

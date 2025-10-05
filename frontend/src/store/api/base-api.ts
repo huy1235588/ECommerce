@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { RootState } from '../index';
 import { API_CONFIG } from '@/lib/constants';
+import { TokenService, cookieUtils } from '@/lib';
+import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
 
 // Base query với authentication và error handling
 const baseQuery = fetchBaseQuery({
@@ -8,7 +9,7 @@ const baseQuery = fetchBaseQuery({
     timeout: API_CONFIG.TIMEOUT,
     credentials: 'include',
     prepareHeaders: (headers, { getState }) => {
-        const token = (getState() as RootState).auth.token;
+        const token = TokenService.getAccessToken();
         if (token) {
             headers.set('authorization', `Bearer ${token}`);
         }
@@ -17,21 +18,110 @@ const baseQuery = fetchBaseQuery({
     },
 });
 
+// Mutex để đảm bảo chỉ có một request refresh token tại một thời điểm
+let isRefreshing = false;
+let failedQueue: Array<{
+    resolve: (value?: unknown) => void;
+    reject: (reason?: unknown) => void;
+}> = [];
+
+const processQueue = (error: unknown = null) => {
+    failedQueue.forEach(promise => {
+        if (error) {
+            promise.reject(error);
+        } else {
+            promise.resolve();
+        }
+    });
+    failedQueue = [];
+};
+
 // Base query với retry và error handling
-const baseQueryWithReauth = async (args: any, api: any, extraOptions: any) => {
-    const result = await baseQuery(args, api, extraOptions);
+const baseQueryWithReauth: BaseQueryFn<
+    string | FetchArgs,
+    unknown,
+    FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+    // Đợi nếu đang refresh token
+    if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+        })
+            .then(() => baseQuery(args, api, extraOptions))
+            .catch((error) => {
+                return { error: error as FetchBaseQueryError };
+            });
+    }
+
+    let result = await baseQuery(args, api, extraOptions);
 
     // Nếu token hết hạn, thử refresh
-    if (result.error && result.error.status === 401) {
+    if (
+        result.error &&
+        result.error.status === 401 &&
+        (result.error.data as any)?.error?.code === 'TOKEN_EXPIRED'
+    ) {
         console.log('Token expired, attempting refresh...');
 
-        // Dispatch logout action nếu refresh thất bại
-        const { clearAuth } = await import('../slices/auth/auth-slice');
-        api.dispatch(clearAuth());
+        // Set flag để các request khác đợi
+        isRefreshing = true;
 
-        // Redirect to login page
-        if (typeof window !== 'undefined') {
-            window.location.href = '/login';
+        try {
+            // Lấy refresh token từ cookie hoặc localStorage
+            let refreshToken: string | null = null;
+            if (typeof window !== 'undefined') {
+                refreshToken = cookieUtils.get('refreshToken') || TokenService.getRefreshToken();
+            }
+
+            if (!refreshToken) {
+                throw new Error('No refresh token available');
+            }
+
+            // Gọi API refresh token
+            const refreshResult = await baseQuery(
+                {
+                    url: '/auth/refresh',
+                    method: 'POST',
+                    body: { refreshToken },
+                },
+                api,
+                extraOptions
+            );
+
+            if (refreshResult.data) {
+                // Lưu token mới
+                const newToken = (refreshResult.data as any).data;
+                TokenService.setTokens(newToken);
+
+                // Update token trong store
+                const { setToken } = await import('../slices/auth-slice');
+                api.dispatch(setToken(newToken));
+
+                // Process queue - retry các request đang chờ
+                processQueue();
+
+                // Retry request ban đầu với token mới
+                result = await baseQuery(args, api, extraOptions);
+            } else {
+                throw new Error('Refresh token failed');
+            }
+        } catch (error) {
+            console.error('Refresh token error:', error);
+
+            // Clear queue với lỗi
+            processQueue(error);
+
+            // Dispatch logout action
+            const { clearAuth } = await import('../slices/auth-slice');
+            api.dispatch(clearAuth());
+
+            // Redirect to login page
+            if (typeof window !== 'undefined') {
+                window.location.href = '/login';
+            }
+        } finally {
+            // Reset flag
+            isRefreshing = false;
         }
     }
 
@@ -43,14 +133,7 @@ export const baseApi = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithReauth,
     tagTypes: [
-        'User',
-        'Collection',
-        'Item',
-        'Category',
-        'Tag',
-        'Comment',
-        'Like',
-        'Follow'
+        'User'
     ],
     endpoints: () => ({}),
 });

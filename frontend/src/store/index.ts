@@ -14,7 +14,8 @@ import {
 import storage from 'redux-persist/lib/storage';
 
 import { baseApi } from './api/base-api';
-import authReducer from './slices/auth/auth-slice';
+import authReducer from './slices/auth-slice';
+import userReducer from './slices/user-slice';
 
 // Persist config for auth
 const authPersistConfig = {
@@ -30,6 +31,7 @@ export const store = configureStore({
     reducer: {
         api: baseApi.reducer,
         auth: persistedAuthReducer,
+        user: userReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
