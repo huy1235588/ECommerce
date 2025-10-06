@@ -102,7 +102,7 @@ class SteamDataProcessor:
                 subdir = self.app_details_dir / self.get_subdir(app_id)
                 log_file = self.success_ids_file
             else:
-                subdir = self.errors_dir
+                subdir = self.errors_dir / self.get_subdir(app_id)
                 log_file = self.failed_ids_file
             
             subdir.mkdir(exist_ok=True)
