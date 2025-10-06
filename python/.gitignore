@@ -1,5 +1,6 @@
 # Bỏ qua thư mục và file không cần thiết
 app_details/
+analysis_results/
 logs/
 ids.txt
 .venv/
