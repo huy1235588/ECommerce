@@ -1,0 +1,14 @@
+# Bỏ qua thư mục và file không cần thiết
+app_details/
+logs/
+ids.txt
+.venv/
+
+# Bỏ qua file Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Bỏ qua file log khác nếu có
+*.log

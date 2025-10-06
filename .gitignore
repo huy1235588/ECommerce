@@ -11,6 +11,7 @@ server/data.json
 
 python/*.html
 python/*.txt
+!python/requirements.txt
 python/ids/app_ids.txt
 server/achievement.json
 server/language.json
