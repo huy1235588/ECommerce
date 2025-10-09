@@ -27,6 +27,7 @@ class SteamDataProcessor:
         self.fetched_ids_file = self.logs_dir / "fetched_ids.txt"
         self.success_ids_file = self.logs_dir / "success_ids.txt"
         self.failed_ids_file = self.logs_dir / "failed_ids.txt"
+        self.retried_ids_file = self.logs_dir / "retried_ids.txt"
         
         # Đảm bảo thư mục tồn tại
         self.logs_dir.mkdir(exist_ok=True)
@@ -100,6 +101,12 @@ class SteamDataProcessor:
         """
         return set(self.read_ids_from_file(self.failed_ids_file))
     
+    def load_retried_ids(self):
+        """
+        Tải danh sách ID đã thử lại vào set.
+        """
+        return set(self.read_ids_from_file(self.retried_ids_file))
+    
     def log_id(self, app_id: str, log_file: Path):
         """
         Ghi ID vào file log.
@@ -107,15 +114,21 @@ class SteamDataProcessor:
         with open(log_file, "a") as f:
             f.write(f"{app_id}\n")
     
-    def process_app_id(self, app_id: str, fetched_ids: set, failed_ids: set):
+    def process_app_id(self, app_id: str, fetched_ids: set, failed_ids: set, retried_ids: set):
         """
         Xử lý một app_id: fetch dữ liệu, lưu file, ghi log.
         """
-        if app_id in fetched_ids and app_id not in failed_ids:
-            print(f"ID {app_id} đã được xử lý thành công, bỏ qua.")
-            return
+        if app_id in fetched_ids:
+            if app_id not in failed_ids:
+                print(f"ID {app_id} đã được xử lý thành công, bỏ qua.")
+                return
+            elif app_id in retried_ids:
+                print(f"ID {app_id} đã thử lại, bỏ qua.")
+                return
+            else:
+                print(f"ID {app_id} đã thất bại trước đó, thử lại.")
         
-        # Nếu đã thất bại trước đó hoặc chưa xử lý, thử lại
+        # Xử lý (lần đầu hoặc thử lại)
         data = self.fetch_app_details(app_id)
         data_2 = self.fetch_app_details_2(app_id)
         if data and app_id in data:
@@ -142,6 +155,11 @@ class SteamDataProcessor:
         # Luôn ghi vào fetched_ids
         self.log_id(app_id, self.fetched_ids_file)
         fetched_ids.add(app_id)
+        
+        # Nếu là lần thử lại, ghi vào retried_ids
+        if app_id in failed_ids:
+            self.log_id(app_id, self.retried_ids_file)
+            retried_ids.add(app_id)
 
 def main():
     """
@@ -158,11 +176,12 @@ def main():
     
     fetched_ids = processor.load_fetched_ids()
     failed_ids = processor.load_failed_ids()
+    retried_ids = processor.load_retried_ids()
     
     total = len(app_ids)
     for i, app_id in enumerate(app_ids, 1):
         print(f"Đang xử lý {i}/{total}: {app_id}")
-        processor.process_app_id(app_id, fetched_ids, failed_ids)
+        processor.process_app_id(app_id, fetched_ids, failed_ids, retried_ids)
 
 if __name__ == "__main__":
     main()
