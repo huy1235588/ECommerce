@@ -13,3 +13,4 @@ __pycache__/
 
 # Bỏ qua file log khác nếu có
 *.log
+backup

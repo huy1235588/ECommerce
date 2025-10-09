@@ -5,6 +5,7 @@ from pathlib import Path
 
 # Constants - Các hằng số cấu hình
 API_URL_TEMPLATE = "https://store.steampowered.com/api/appdetails?appids={app_id}"
+API_URL_TEMPLATE_2 = "https://steamspy.com/api.php?request=appdetails&appid={app_id}"
 SUBDIR_GROUP_SIZE = 1000
 
 class SteamDataProcessor:
@@ -45,6 +46,20 @@ class SteamDataProcessor:
         except requests.RequestException as e:
             print(f"Lỗi khi lấy dữ liệu cho app_id {app_id}: {e}")
             return None
+        
+    def fetch_app_details_2(self, app_id: str):
+        """
+        Lấy dữ liệu chi tiết ứng dụng từ SteamSpy API.
+        Trả về dữ liệu JSON hoặc None nếu lỗi.
+        """
+        url = API_URL_TEMPLATE_2.format(app_id=app_id)
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            print(f"Lỗi khi lấy dữ liệu từ SteamSpy cho app_id {app_id}: {e}")
+            return None
     
     def save_to_file(self, data, filename: Path):
         """
@@ -52,7 +67,6 @@ class SteamDataProcessor:
         """
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
-        print(f"Dữ liệu đã lưu vào {filename}")
     
     def get_subdir(self, app_id: str) -> str:
         """
@@ -80,6 +94,12 @@ class SteamDataProcessor:
         """
         return set(self.read_ids_from_file(self.fetched_ids_file))
     
+    def load_failed_ids(self):
+        """
+        Tải danh sách ID thất bại vào set.
+        """
+        return set(self.read_ids_from_file(self.failed_ids_file))
+    
     def log_id(self, app_id: str, log_file: Path):
         """
         Ghi ID vào file log.
@@ -87,17 +107,23 @@ class SteamDataProcessor:
         with open(log_file, "a") as f:
             f.write(f"{app_id}\n")
     
-    def process_app_id(self, app_id: str, fetched_ids: set):
+    def process_app_id(self, app_id: str, fetched_ids: set, failed_ids: set):
         """
         Xử lý một app_id: fetch dữ liệu, lưu file, ghi log.
         """
-        if app_id in fetched_ids:
-            print(f"ID {app_id} đã được xử lý, bỏ qua.")
+        if app_id in fetched_ids and app_id not in failed_ids:
+            print(f"ID {app_id} đã được xử lý thành công, bỏ qua.")
             return
         
+        # Nếu đã thất bại trước đó hoặc chưa xử lý, thử lại
         data = self.fetch_app_details(app_id)
+        data_2 = self.fetch_app_details_2(app_id)
         if data and app_id in data:
-            success = data[app_id].get("success", False)
+            app_data = data[app_id]
+            if data_2:
+                app_data["steamspy"] = data_2
+            
+            success = app_data.get("success", False)
             if success:
                 subdir = self.app_details_dir / self.get_subdir(app_id)
                 log_file = self.success_ids_file
@@ -107,7 +133,7 @@ class SteamDataProcessor:
             
             subdir.mkdir(exist_ok=True)
             filename = subdir / f"app_details_{app_id}.json"
-            self.save_to_file(data, filename)
+            self.save_to_file(app_data, filename)
             self.log_id(app_id, log_file)
         else:
             self.log_id(app_id, self.failed_ids_file)
@@ -131,9 +157,12 @@ def main():
         sys.exit(1)
     
     fetched_ids = processor.load_fetched_ids()
+    failed_ids = processor.load_failed_ids()
     
-    for app_id in app_ids:
-        processor.process_app_id(app_id, fetched_ids)
+    total = len(app_ids)
+    for i, app_id in enumerate(app_ids, 1):
+        print(f"Đang xử lý {i}/{total}: {app_id}")
+        processor.process_app_id(app_id, fetched_ids, failed_ids)
 
 if __name__ == "__main__":
     main()
