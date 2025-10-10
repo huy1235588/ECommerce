@@ -4,13 +4,13 @@ import re
 
 def update_logs():
     """
-    Script để update các file log dựa trên thư mục app_details và errors.
+    Script để update các file log dựa trên thư mục app_details.
     Quét các file JSON trong thư mục để cập nhật success_ids.txt, failed_ids.txt, và fetched_ids.txt.
+    success_ids từ app_details (loại trừ errors), fetched_ids từ tất cả app_details, failed_ids = fetched_ids - success_ids.
     """
     script_dir = Path(__file__).parent
     logs_dir = script_dir / "logs"
     app_details_dir = script_dir / "app_details"
-    errors_dir = app_details_dir / "errors"
     
     success_file = logs_dir / "success_ids.txt"
     failed_file = logs_dir / "failed_ids.txt"
@@ -18,12 +18,12 @@ def update_logs():
     
     # Khởi tạo sets cho các ID
     success_ids = set()
-    failed_ids = set()
+    fetched_ids = set()
     
     # Pattern để match tên file: app_details_{app_id}.json
     pattern = re.compile(r'app_details_(\d+)\.json')
     
-    # Quét thư mục app_details (không bao gồm errors)
+    # Quét thư mục app_details (không bao gồm errors) để lấy success_ids
     if app_details_dir.exists():
         for root, dirs, files in os.walk(app_details_dir):
             # Bỏ qua thư mục errors
@@ -35,17 +35,17 @@ def update_logs():
                     app_id = match.group(1)
                     success_ids.add(app_id)
     
-    # Quét thư mục errors
-    if errors_dir.exists():
-        for root, dirs, files in os.walk(errors_dir):
+    # Quét tất cả thư mục app_details (bao gồm errors) để lấy fetched_ids
+    if app_details_dir.exists():
+        for root, dirs, files in os.walk(app_details_dir):
             for file in files:
                 match = pattern.match(file)
                 if match:
                     app_id = match.group(1)
-                    failed_ids.add(app_id)
+                    fetched_ids.add(app_id)
     
-    # fetched_ids là hợp của success và failed
-    fetched_ids = success_ids | failed_ids
+    # failed_ids là fetched_ids loại trừ success_ids
+    failed_ids = fetched_ids - success_ids
     
     # Sort theo thứ tự số
     sorted_success = sorted(success_ids, key=int)
