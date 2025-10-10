@@ -21,7 +21,6 @@ class SteamDataProcessor:
         self.script_dir = script_dir
         self.logs_dir = script_dir / "logs"
         self.app_details_dir = script_dir / "app_details"
-        self.errors_dir = self.app_details_dir / "errors"
         
         # Đường dẫn file log
         self.fetched_ids_file = self.logs_dir / "fetched_ids.txt"
@@ -32,7 +31,6 @@ class SteamDataProcessor:
         # Đảm bảo thư mục tồn tại
         self.logs_dir.mkdir(exist_ok=True)
         self.app_details_dir.mkdir(exist_ok=True)
-        self.errors_dir.mkdir(exist_ok=True)
     
     def fetch_app_details(self, app_id: str):
         """
@@ -135,18 +133,23 @@ class SteamDataProcessor:
         
         # Xử lý (lần đầu hoặc thử lại)
         data = self.fetch_app_details(app_id)
-        data_2 = self.fetch_app_details_2(app_id)
         if data and app_id in data:
             app_data = data[app_id]
-            if data_2:
-                app_data["steamspy"] = data_2
-            
             success = app_data.get("success", False)
+            subdir = self.app_details_dir / self.get_subdir(app_id)
             if success:
-                subdir = self.app_details_dir / self.get_subdir(app_id)
+                data_2 = self.fetch_app_details_2(app_id)
+                if data_2:
+                    # Gộp positive, negative, languages, tags từ SteamSpy thẳng vào data
+                    app_data["data"]["reviews"] = {
+                        "positive": data_2.get("positive"),
+                        "negative": data_2.get("negative")
+                    }
+                    app_data["data"]["languages"] = data_2.get("languages")
+                    app_data["data"]["tags"] = data_2.get("tags")
+                
                 log_file = self.success_ids_file
             else:
-                subdir = self.errors_dir / self.get_subdir(app_id)
                 log_file = self.failed_ids_file if app_id not in failed_ids else None
             
             subdir.mkdir(exist_ok=True)
