@@ -1,7 +1,6 @@
 import { ApiResponse } from '@/types';
 import { baseApi } from './base-api';
-import { LoginResponse, LoginFormData, RegisterFormData, UserResponse } from '@/types/api/auth';
-import { User } from '@/types/api/user';
+import { LoginResponse, LoginFormData, RegisterFormData, User, UserResponse } from '@/types';
 import { TokenService } from '@/lib';
 
 export const authApi = baseApi.injectEndpoints({

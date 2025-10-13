@@ -1,10 +1,9 @@
+import { ApiListResponse, ApiResponse } from "./common";
+
 //===============================================================
 //
 //  Model
 //
-
-import { ApiListResponse, ApiResponse } from "./common";
-
 //===============================================================
 export interface User {
     id: string;

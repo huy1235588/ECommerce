@@ -35,8 +35,6 @@ export interface LoginResponse extends ApiResponse<{
     user: User;
 }> { }
 
-export interface UserResponse extends ApiResponse<User> { }
-
 //===============================================================
 //
 //  State
