@@ -2,7 +2,7 @@
 
 ## Tổng quan
 
-Admin Panel là hệ thống quản trị hoàn chỉnh cho nền tảng E-Commerce, được xây dựng với Next.js 14, React, TypeScript và Tailwind CSS.
+Admin Panel là hệ thống quản trị hoàn chỉnh cho nền tảng E-Commerce game, được xây dựng với Next.js 14, React, TypeScript và Tailwind CSS.
 
 ## Cấu trúc
 
@@ -14,37 +14,97 @@ frontend/src/app/(admin)/
 │   └── admin-header.tsx         # Header với search, notifications
 └── admin/                        # Các trang admin
     ├── page.tsx                 # Dashboard chính
-    ├── products/                # Quản lý sản phẩm
+    ├── analytics/               # Thống kê tổng quan
+    │   └── page.tsx
+    ├── games/                   # Quản lý trò chơi
+    │   └── page.tsx
+    ├── categories/              # Quản lý thể loại
+    │   └── page.tsx
+    ├── publishers/              # Quản lý nhà phát hành
+    │   └── page.tsx
+    ├── promotions/              # Quản lý khuyến mãi
+    │   └── page.tsx
+    ├── banners/                 # Quản lý banner & slide
     │   └── page.tsx
     ├── orders/                  # Quản lý đơn hàng
     │   └── page.tsx
-    ├── customers/               # Quản lý khách hàng
+    ├── transactions/            # Quản lý giao dịch
     │   └── page.tsx
-    ├── categories/              # Quản lý danh mục
+    ├── refunds/                 # Quản lý hoàn tiền
     │   └── page.tsx
-    ├── analytics/               # Thống kê và phân tích
+    ├── users/                   # Quản lý tài khoản người dùng
     │   └── page.tsx
+    ├── user-games/              # Quản lý thư viện game người dùng
+    │   └── page.tsx
+    ├── support/                 # Quản lý hỗ trợ
+    │   └── page.tsx
+    ├── reports/                 # Báo cáo & phân tích
+    │   ├── revenue/             # Báo cáo doanh thu
+    │   ├── game-analytics/      # Phân tích game
+    │   └── user-analytics/      # Phân tích người dùng
     └── settings/                # Cài đặt hệ thống
-        └── page.tsx
+        ├── payment/             # Cài đặt thanh toán
+        ├── general/             # Cài đặt chung
+        └── admins/              # Quản lý quản trị viên
 ```
 
 ## Tính năng
 
-### 1. Dashboard (/)
+### 1. Tổng quan
 
-- Tổng quan doanh thu, đơn hàng, khách hàng, sản phẩm
+#### Dashboard (/admin)
+
+- Tổng quan doanh thu, đơn hàng, người dùng, trò chơi
 - Danh sách đơn hàng gần đây
 - Thống kê nhanh với biểu đồ
 
-### 2. Quản lý sản phẩm (/admin/products)
+#### Thống kê (/admin/analytics)
 
-- Danh sách tất cả sản phẩm
-- Tìm kiếm và lọc sản phẩm
-- Thêm, sửa, xóa sản phẩm
-- Quản lý tồn kho
-- Trạng thái sản phẩm (Đang bán, Sắp hết, Hết hàng)
+- Biểu đồ tổng quan hệ thống
+- Phân tích xu hướng
+- Metrics chính
 
-### 3. Quản lý đơn hàng (/admin/orders)
+### 2. Quản lý nội dung
+
+#### Trò chơi (/admin/games)
+
+- Danh sách tất cả trò chơi
+- Tìm kiếm và lọc trò chơi
+- Thêm, sửa, xóa trò chơi
+- Quản lý trạng thái trò chơi
+- Upload và quản lý hình ảnh
+
+#### Thể loại (/admin/categories)
+
+- Danh sách thể loại trò chơi
+- Cấu trúc thể loại cha-con
+- Thêm, sửa, xóa thể loại
+- Quản lý slug và SEO
+
+#### Nhà phát hành (/admin/publishers)
+
+- Danh sách nhà phát hành
+- Thông tin chi tiết nhà phát hành
+- Quản lý liên kết với trò chơi
+- Thêm, sửa, xóa nhà phát hành
+
+#### Khuyến mãi (/admin/promotions)
+
+- Danh sách chương trình khuyến mãi
+- Tạo và quản lý mã giảm giá
+- Cấu hình điều kiện áp dụng
+- Theo dõi hiệu quả khuyến mãi
+
+#### Banner & Slide (/admin/banners)
+
+- Quản lý banner trang chủ
+- Upload và chỉnh sửa hình ảnh
+- Cấu hình thứ tự hiển thị
+- Responsive design
+
+### 3. Quản lý giao dịch
+
+#### Đơn hàng (/admin/orders)
 
 - Danh sách tất cả đơn hàng
 - Chi tiết đơn hàng
@@ -52,37 +112,82 @@ frontend/src/app/(admin)/
 - Tìm kiếm và lọc theo trạng thái
 - Theo dõi quá trình giao hàng
 
-### 4. Quản lý khách hàng (/admin/customers)
+#### Giao dịch (/admin/transactions)
 
-- Danh sách khách hàng
-- Thông tin chi tiết khách hàng
-- Lịch sử mua hàng
-- Phân loại khách hàng (VIP, Thường, Mới)
-- Thống kê chi tiêu của khách hàng
+- Lịch sử tất cả giao dịch
+- Chi tiết giao dịch thanh toán
+- Tích hợp với cổng thanh toán
+- Báo cáo giao dịch
 
-### 5. Quản lý danh mục (/admin/categories)
+#### Hoàn tiền (/admin/refunds)
 
-- Danh sách danh mục sản phẩm
-- Cấu trúc danh mục cha-con
-- Thêm, sửa, xóa danh mục
-- Quản lý slug và SEO
-- Đếm số sản phẩm trong mỗi danh mục
+- Quản lý yêu cầu hoàn tiền
+- Xử lý hoàn tiền tự động
+- Theo dõi trạng thái hoàn tiền
+- Báo cáo hoàn tiền
 
-### 6. Thống kê (/admin/analytics)
+### 4. Quản lý người dùng
 
-- Biểu đồ doanh thu theo tháng
-- Top sản phẩm bán chạy
-- Tỷ lệ chuyển đổi
-- Giá trị tồn kho
-- Phân tích xu hướng
+#### Tài khoản (/admin/users)
 
-### 7. Cài đặt (/admin/settings)
+- Danh sách người dùng
+- Thông tin chi tiết tài khoản
+- Quản lý trạng thái tài khoản
+- Phân quyền người dùng
 
-- Thông tin cửa hàng
-- Cài đặt thanh toán (COD, Banking, VNPay, MoMo)
-- Cài đặt vận chuyển
-- Cài đặt thông báo (Email, SMS)
-- Tùy chỉnh giao diện
+#### Thư viện game (/admin/user-games)
+
+- Xem thư viện game của người dùng
+- Quản lý quyền truy cập
+- Theo dõi lịch sử tải game
+
+#### Hỗ trợ (/admin/support)
+
+- Quản lý ticket hỗ trợ
+- Chat với người dùng
+- Câu hỏi thường gặp
+- Báo cáo hỗ trợ
+
+### 5. Báo cáo & phân tích
+
+#### Báo cáo doanh thu (/admin/reports/revenue)
+
+- Báo cáo doanh thu theo thời gian
+- Phân tích lợi nhuận
+- Xu hướng doanh thu
+- Báo cáo chi tiết
+
+#### Phân tích game (/admin/reports/game-analytics)
+
+- Thống kê trò chơi bán chạy
+- Phân tích tương tác người dùng
+- Báo cáo hiệu suất game
+
+#### Phân tích người dùng (/admin/reports/user-analytics)
+
+- Thống kê hành vi người dùng
+- Phân tích tỷ lệ chuyển đổi
+- Báo cáo retention
+
+### 6. Hệ thống
+
+#### Cài đặt thanh toán (/admin/settings/payment)
+
+- Cấu hình cổng thanh toán
+- Quản lý phương thức thanh toán
+- Cài đặt phí giao dịch
+
+#### Cài đặt chung (/admin/settings/general)
+
+- Cấu hình hệ thống
+- Quản lý email templates
+- Cài đặt thông báo
+
+#### Quản trị viên (/admin/settings/admins)
+
+- Quản lý tài khoản admin
+- Phân quyền admin
+- Nhật ký hoạt động
 
 ## Components chính
 
@@ -106,12 +211,24 @@ frontend/src/app/(admin)/
 Tất cả các route admin được bảo vệ bởi layout group `(admin)`:
 
 - `/admin` - Dashboard
-- `/admin/products` - Quản lý sản phẩm
+- `/admin/analytics` - Thống kê tổng quan
+- `/admin/games` - Quản lý trò chơi
+- `/admin/categories` - Quản lý thể loại
+- `/admin/publishers` - Quản lý nhà phát hành
+- `/admin/promotions` - Quản lý khuyến mãi
+- `/admin/banners` - Quản lý banner & slide
 - `/admin/orders` - Quản lý đơn hàng
-- `/admin/customers` - Quản lý khách hàng
-- `/admin/categories` - Quản lý danh mục
-- `/admin/analytics` - Thống kê
-- `/admin/settings` - Cài đặt
+- `/admin/transactions` - Quản lý giao dịch
+- `/admin/refunds` - Quản lý hoàn tiền
+- `/admin/users` - Quản lý tài khoản người dùng
+- `/admin/user-games` - Quản lý thư viện game
+- `/admin/support` - Quản lý hỗ trợ
+- `/admin/reports/revenue` - Báo cáo doanh thu
+- `/admin/reports/game-analytics` - Phân tích game
+- `/admin/reports/user-analytics` - Phân tích người dùng
+- `/admin/settings/payment` - Cài đặt thanh toán
+- `/admin/settings/general` - Cài đặt chung
+- `/admin/settings/admins` - Quản lý quản trị viên
 
 ## UI Components sử dụng
 

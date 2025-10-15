@@ -31,6 +31,16 @@ spring:
                   args:
                     name: userServiceCircuitBreaker
                     fallbackUri: forward:/fallback/users
+            - id: game-service
+              uri: lb://game-service
+              predicates:
+                - Path=/api/games/**
+              filters:
+                - StripPrefix=1
+                - name: CircuitBreaker
+                  args:
+                    name: gameServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/games
 
 # eureka client configuration
 eureka:
@@ -48,7 +58,7 @@ jwt:
 # Cors Configuration
 app:
   cors:
-    allowedOrigins: http://localhost:3000,http://localhost:4200
+    allowedOrigins: http://localhost:3000,http://192.168.1.13:3000
 
 # Logging Configuration
 logging:

@@ -1,4 +1,4 @@
-# 🔄 Redux Store Tối Ưu - My Digital Collection
+# 🔄 Redux Store Tối Ưu
 
 ## 📁 Cấu Trúc Thư Mục Mới
 

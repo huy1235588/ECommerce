@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { PublicLayout } from '@/components/common';
 
 export const metadata: Metadata = {
-    title: 'Dashboard - My Digital Collection',
-    description: 'Welcome to My Digital Collection - A digital collection management system.',
+    title: 'Dashboard - Admin Panel',
+    description: 'Admin dashboard overview and statistics',
 };
 
 export default function DashboardPage() {

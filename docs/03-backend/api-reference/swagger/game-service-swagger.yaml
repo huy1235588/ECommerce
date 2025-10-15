@@ -1,0 +1,1036 @@
+openapi: 3.0.3
+info:
+  title: Game Service API
+  description: |
+    API cho việc quản lý dữ liệu game từ nền tảng Steam trong hệ thống ECommerce.
+    
+    ## Features
+    - Quản lý danh sách game
+    - Chi tiết game và metadata
+    - Lọc và tìm kiếm game
+    - Quản lý genres và categories
+    - Screenshots và media
+    
+    ## Authentication
+    Một số endpoints yêu cầu JWT token trong Authorization header:
+    ```
+    Authorization: Bearer <token>
+    ```
+  version: 1.0.0
+  contact:
+    name: Backend Team
+    email: backend@ecommerce.com
+
+servers:
+  - url: http://localhost:8082/v1
+    description: Local development
+  - url: https://api-dev.ecommerce.com/v1
+    description: Development environment
+  - url: https://api.ecommerce.com/v1
+    description: Production
+
+tags:
+  - name: Games
+    description: Game management operations
+  - name: Genres
+    description: Game genres operations
+  - name: Categories
+    description: Game categories operations
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token từ /auth/login endpoint
+
+  parameters:
+    GameIdParam:
+      name: appId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Steam App ID của game
+      example: 220
+
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Số trang
+
+    SizeParam:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Số items mỗi trang
+
+    SortParam:
+      name: sort
+      in: query
+      schema:
+        type: string
+        example: 'name:asc'
+      description: 'Định dạng sort: field:order (vd: name:asc)'
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: BAD_REQUEST
+              message: Invalid request format
+            timestamp: '2025-10-03T12:00:00.000Z'
+            traceId: bad-request-123
+
+    Unauthorized:
+      description: Unauthorized - Missing or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: AUTH_INVALID_TOKEN
+              message: Invalid authentication token
+            timestamp: '2025-10-03T12:00:00.000Z'
+            traceId: auth-error-456
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: AUTHZ_FORBIDDEN
+              message: You don't have permission to access this resource
+            timestamp: '2025-10-03T12:00:00.000Z'
+            traceId: authz-error-789
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: RESOURCE_NOT_FOUND
+              message: Game not found
+            timestamp: '2025-10-03T12:00:00.000Z'
+            traceId: not-found-012
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+                - field: appId
+                  code: VALIDATION_REQUIRED_FIELD
+                  message: Steam App ID is required
+                - field: name
+                  code: VALIDATION_MIN_LENGTH
+                  message: Name must be at least 1 character
+            timestamp: '2025-10-03T12:00:00.000Z'
+            traceId: validation-error-345
+
+  examples:
+    GameCreatedResponse:
+      summary: Successful game creation
+      value:
+        success: true
+        data:
+          appId: 220
+          type: game
+          name: "Half-Life 2"
+          isFree: false
+          detailedDescription: "Detailed description here..."
+          aboutTheGame: "About the game..."
+          shortDescription: "Short description"
+          platforms:
+            windows: true
+            mac: true
+            linux: true
+          releaseDate:
+            comingSoon: false
+            date: "Nov 16, 2004"
+          createdAt: '2025-10-03T12:00:00.000Z'
+          updatedAt: '2025-10-03T12:00:00.000Z'
+        message: Game created successfully
+        timestamp: '2025-10-03T12:00:00.000Z'
+
+  schemas:
+    GameResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          $ref: '#/components/schemas/Game'
+        message:
+          type: string
+          example: Game retrieved successfully
+        timestamp:
+          type: string
+          format: date-time
+
+    GamesListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        timestamp:
+          type: string
+          format: date-time
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              description: Human-readable error message
+              example: Invalid input data
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/ErrorDetail'
+        timestamp:
+          type: string
+          format: date-time
+        traceId:
+          type: string
+          description: Request trace ID for debugging
+          example: abc-123-def-456
+        path:
+          type: string
+          description: API path that caused error
+          example: /v1/games
+
+    ErrorDetail:
+      type: object
+      properties:
+        field:
+          type: string
+          description: Field name that caused error
+          example: appId
+        code:
+          type: string
+          description: Specific error code for this field
+          example: VALIDATION_REQUIRED_FIELD
+        message:
+          type: string
+          description: Error message for this field
+          example: Steam App ID is required
+
+    Pagination:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          example: 1
+        perPage:
+          type: integer
+          example: 20
+        totalPages:
+          type: integer
+          example: 5
+        totalItems:
+          type: integer
+          example: 100
+        hasNext:
+          type: boolean
+          example: true
+        hasPrev:
+          type: boolean
+          example: false
+
+    Game:
+      type: object
+      required:
+        - appId
+        - type
+        - name
+        - isFree
+        - detailedDescription
+        - aboutTheGame
+        - shortDescription
+        - platforms
+        - releaseDate
+      properties:
+        appId:
+          type: integer
+          description: Unique Steam App ID
+          example: 220
+        type:
+          type: string
+          enum: [game, dlc, demo, advertising, mod, video]
+          description: Game type
+          example: game
+        name:
+          type: string
+          description: Game name
+          example: "Half-Life 2"
+        requiredAge:
+          type: integer
+          description: Age restriction
+          example: 0
+        isFree:
+          type: boolean
+          description: Free to play status
+          example: false
+        detailedDescription:
+          type: string
+          description: HTML formatted detailed description
+        aboutTheGame:
+          type: string
+          description: Game overview
+        shortDescription:
+          type: string
+          description: Brief summary
+        headerImage:
+          type: string
+          format: uri
+          description: Header banner URL
+        capsuleImage:
+          type: string
+          format: uri
+          description: Capsule image URL
+        capsuleImagev5:
+          type: string
+          format: uri
+          description: Capsule image v5 URL
+        background:
+          type: string
+          format: uri
+          description: Background image URL
+        backgroundRaw:
+          type: string
+          format: uri
+          description: Raw background image URL
+        website:
+          type: string
+          format: uri
+          description: Official website
+        screenshots:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              pathThumbnail:
+                type: string
+                format: uri
+              pathFull:
+                type: string
+                format: uri
+        movies:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+              thumbnail:
+                type: string
+                format: uri
+              webm:
+                type: object
+                properties:
+                  "480":
+                    type: string
+                    format: uri
+                  max:
+                    type: string
+                    format: uri
+              mp4:
+                type: object
+                properties:
+                  "480":
+                    type: string
+                    format: uri
+                  max:
+                    type: string
+                    format: uri
+              highlight:
+                type: boolean
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              description:
+                type: string
+        genres:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              description:
+                type: string
+        developers:
+          type: array
+          items:
+            type: string
+        publishers:
+          type: array
+          items:
+            type: string
+        pcRequirements:
+          type: object
+          properties:
+            minimum:
+              type: string
+            recommended:
+              type: string
+        macRequirements:
+          type: object
+          properties:
+            minimum:
+              type: string
+            recommended:
+              type: string
+        linuxRequirements:
+          type: object
+          properties:
+            minimum:
+              type: string
+            recommended:
+              type: string
+        platforms:
+          type: object
+          required:
+            - windows
+            - mac
+            - linux
+          properties:
+            windows:
+              type: boolean
+            mac:
+              type: boolean
+            linux:
+              type: boolean
+        releaseDate:
+          type: object
+          required:
+            - comingSoon
+            - date
+          properties:
+            comingSoon:
+              type: boolean
+            date:
+              type: string
+              example: "Nov 16, 2004"
+        packages:
+          type: array
+          items:
+            type: integer
+        packageGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              title:
+                type: string
+              description:
+                type: string
+              selectionText:
+                type: string
+              saveText:
+                type: string
+              displayType:
+                type: integer
+              isRecurringSubscription:
+                type: string
+              subs:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    packageid:
+                      type: integer
+                    percentSavingsText:
+                      type: string
+                    percentSavings:
+                      type: integer
+                    optionText:
+                      type: string
+                    optionDescription:
+                      type: string
+                    canGetFreeLicense:
+                      type: string
+                    isFreeLicense:
+                      type: boolean
+                    priceInCentsWithDiscount:
+                      type: integer
+        priceOverview:
+          type: object
+          properties:
+            currency:
+              type: string
+              example: "USD"
+            initial:
+              type: integer
+              description: Initial price in cents
+            final:
+              type: integer
+              description: Final price after discount in cents
+            discountPercent:
+              type: integer
+              minimum: 0
+              maximum: 100
+            initialFormatted:
+              type: string
+            finalFormatted:
+              type: string
+        achievements:
+          type: object
+          properties:
+            total:
+              type: integer
+            highlighted:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  path:
+                    type: string
+                    format: uri
+        recommendations:
+          type: object
+          properties:
+            total:
+              type: integer
+        reviews:
+          type: object
+          properties:
+            positive:
+              type: integer
+            negative:
+              type: integer
+        languages:
+          type: string
+        supportedLanguages:
+          type: string
+        contentDescriptors:
+          type: object
+          properties:
+            ids:
+              type: array
+              items:
+                type: integer
+            notes:
+              type: string
+        ratings:
+          type: object
+          properties:
+            dejus:
+              type: object
+              properties:
+                rating:
+                  type: string
+                descriptors:
+                  type: string
+            steamGermany:
+              type: object
+              properties:
+                ratingGenerated:
+                  type: string
+                rating:
+                  type: string
+                requiredAge:
+                  type: string
+                banned:
+                  type: string
+                useAgeGate:
+                  type: string
+                descriptors:
+                  type: string
+        supportInfo:
+          type: object
+          properties:
+            url:
+              type: string
+              format: uri
+            email:
+              type: string
+              format: email
+        tags:
+          type: object
+          description: Game tags
+        metacritic:
+          type: object
+          properties:
+            score:
+              type: integer
+            url:
+              type: string
+              format: uri
+        dlc:
+          type: array
+          items:
+            type: integer
+        demos:
+          type: array
+          items:
+            type: object
+            properties:
+              appid:
+                type: integer
+              description:
+                type: string
+        fullgame:
+          type: object
+          properties:
+            appid:
+              type: integer
+            name:
+                type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    BulkCreateGamesRequest:
+      type: object
+      required:
+        - games
+      properties:
+        games:
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+          minItems: 1
+          maxItems: 100
+          description: Array of games to create (max 100 games per request)
+
+    BulkCreateGamesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          properties:
+            created:
+              type: integer
+              description: Number of games successfully created
+              example: 95
+            failed:
+              type: integer
+              description: Number of games that failed to create
+              example: 5
+            results:
+              type: array
+              items:
+                type: object
+                properties:
+                  appId:
+                    type: integer
+                    example: 220
+                  success:
+                    type: boolean
+                    example: true
+                  error:
+                    type: string
+                    description: Error message if creation failed
+                    example: "Game already exists"
+            createdGames:
+              type: array
+              items:
+                $ref: '#/components/schemas/Game'
+        message:
+          type: string
+          example: "Bulk create completed: 95 created, 5 failed"
+        timestamp:
+          type: string
+          format: date-time
+
+paths:
+  /games:
+    get:
+      tags:
+        - Games
+      summary: Get list of games
+      description: Lấy danh sách games với bộ lọc và phân trang
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: genre
+          in: query
+          schema:
+            type: string
+          description: Lọc theo genre
+        - name: platform
+          in: query
+          schema:
+            type: string
+            enum: [windows, mac, linux]
+          description: Lọc theo platform
+        - name: isFree
+          in: query
+          schema:
+            type: boolean
+          description: Lọc games miễn phí
+        - name: maxPrice
+          in: query
+          schema:
+            type: integer
+          description: Giá tối đa (cents)
+        - name: minPrice
+          in: query
+          schema:
+            type: integer
+          description: Giá tối thiểu (cents)
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Lọc theo category
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Tìm kiếm theo tên game
+      responses:
+        '200':
+          description: Games retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamesListResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Games
+      summary: Create a new game
+      description: Tạo game mới (chỉ admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+      responses:
+        '201':
+          description: Game created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameResponse'
+              examples:
+                success:
+                  $ref: '#/components/examples/GameCreatedResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /games/bulk:
+    post:
+      tags:
+        - Games
+      summary: Create multiple games
+      description: Tạo nhiều game cùng lúc (chỉ admin, tối đa 100 games/request)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkCreateGamesRequest'
+      responses:
+        '200':
+          description: Bulk create completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkCreateGamesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /games/{appId}:
+    get:
+      tags:
+        - Games
+      summary: Get game by Steam App ID
+      description: Lấy thông tin chi tiết game theo Steam App ID
+      parameters:
+        - $ref: '#/components/parameters/GameIdParam'
+      responses:
+        '200':
+          description: Game retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      tags:
+        - Games
+      summary: Update game
+      description: Cập nhật thông tin game (chỉ admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GameIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Game'
+      responses:
+        '200':
+          description: Game updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GameResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags:
+        - Games
+      summary: Delete game
+      description: Xóa game khỏi database (chỉ admin)
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/GameIdParam'
+      responses:
+        '204':
+          description: Game deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /games/{appId}/screenshots:
+    get:
+      tags:
+        - Games
+      summary: Get game screenshots
+      description: Lấy screenshots của game
+      parameters:
+        - $ref: '#/components/parameters/GameIdParam'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 200
+          description: Số screenshots trả về
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Offset cho pagination
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  screenshots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        pathThumbnail:
+                          type: string
+                          format: uri
+                        pathFull:
+                          type: string
+                          format: uri
+                  total:
+                    type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /genres:
+    get:
+      tags:
+        - Genres
+      summary: Get all genres
+      description: Lấy danh sách tất cả genres có sẵn
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  genres:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        description:
+                          type: string
+                        count:
+                          type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: Get all categories
+      description: Lấy danh sách tất cả categories có sẵn
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        description:
+                          type: string
+                        count:
+                          type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
